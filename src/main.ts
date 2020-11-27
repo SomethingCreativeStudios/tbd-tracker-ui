@@ -4,10 +4,14 @@ import router from './router';
 import store from './store';
 import vuetify from './plugins/vuetify';
 import VueCompositionAPI from '@vue/composition-api';
+import { bootstrap } from '~/bootstrap/bootstrap';
 
 Vue.config.productionTip = false;
 
 Vue.use(VueCompositionAPI);
+
+//@ts-ignore
+window.store = store;
 
 new Vue({
    router,
@@ -16,3 +20,9 @@ new Vue({
    vuetify,
    render: h => h(App),
 }).$mount('#app');
+
+async function main() {
+   await bootstrap();
+}
+
+main();

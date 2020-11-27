@@ -1,5 +1,5 @@
 <template>
-   <v-app id="app">
+   <v-app id="app" :style="appStyles" :class="`mobile-${$vuetify.breakpoint.mobile}`">
       <v-navigation-drawer v-model="drawer" app absolute bottom temporary>
          <v-list nav dense>
             <v-list-item-group>
@@ -31,24 +31,162 @@
          <v-app-bar-nav-icon @click="drawer = !drawer"> </v-app-bar-nav-icon>
 
          <v-toolbar-title class="title">TBA Tracker</v-toolbar-title>
+
+         <template v-if="view === 'anime'">
+            <v-spacer></v-spacer>
+            <v-layout v-if="selectedShows.length" class="action-buttons">
+               <v-btn text>
+                  <span><v-icon class="action-icon">fas fa-check</v-icon> {{ selectedShows.length }} {{ !isMobile ? 'Selected' : '' }}</span>
+               </v-btn>
+               <v-btn @click="selectAll" text
+                  ><span> <v-icon class="action-icon">fas fa-check-double</v-icon>{{ !isMobile ? 'Select All' : '' }} </span>
+               </v-btn>
+               <v-btn @click="unselectAll" text
+                  ><span><v-icon class="action-icon">fas fa-times</v-icon> {{ !isMobile ? 'Deselect All' : '' }}</span>
+               </v-btn>
+               <v-btn @click="deleteAll" text
+                  ><span><v-icon class="action-icon">fas fa-trash</v-icon>{{ !isMobile ? 'Delete Selected' : '' }}</span>
+               </v-btn>
+
+               <confirm-dialog v-if="!isMobile" :maxWidth="360" @confirm="onCopySelected">
+                  <template #headline>
+                     Copy Subgroups from
+                  </template>
+                  <template #message>
+                     <v-select :items="showNames" label="Show Names" v-model="showToCopy"></v-select>
+                  </template>
+                  <template #activator="{ on, attrs }">
+                     <v-btn v-on="on" v-bind="attrs" text>
+                        <span><v-icon class="action-icon">fas fa-copy</v-icon> Copy Subgroups From</span>
+                     </v-btn>
+                  </template>
+               </confirm-dialog>
+            </v-layout>
+            <v-spacer></v-spacer>
+            <v-icon @click="syncShows">fas fa-sync</v-icon>
+         </template>
+         <template v-if="view === 'downloads'"> </template>
       </v-app-bar>
 
       <v-main>
          <router-view></router-view>
       </v-main>
+      <v-snackbar v-model="showMessage" :timeout="5000">
+         {{ message }}
+         <template v-slot:action="{ attrs }">
+            <v-btn color="red" text v-bind="attrs" @click="snackbar = false">
+               Close
+            </v-btn>
+         </template>
+      </v-snackbar>
    </v-app>
 </template>
 
 <script>
+import { mapState } from 'vuex';
+import { copySubgroup, syncShows } from '~/compositions/series/series';
+import { AnimeModule } from '~/store/modules/anime';
+import { ConfirmDialog } from '~/components/dialogs';
+import { AppModule } from './store/modules/app';
+import { MessageModule } from '~modules/message';
+
 export default {
    name: 'App',
 
-   components: {},
+   components: { ConfirmDialog },
 
-   data: () => ({ drawer: false }),
+   data: () => {
+      return {
+         snackbar: false,
+         drawer: false,
+         height: 0,
+         showToCopy: -1,
+      };
+   },
 
    mounted() {},
+   computed: {
+      ...mapState({
+         view: ({ app }) => app.view,
+         selectedShows: ({ anime }) => anime.selectedShows || [],
+      }),
+      appStyles() {
+         return {
+            '--app-height': `${this.height}px`,
+         };
+      },
+      isMobile() {
+         return this.$vuetify.breakpoint.mobile;
+      },
+      showNames() {
+         return AnimeModule.shows.map(({ name, id }) => ({ text: name, value: id }));
+      },
+      showMessage: {
+         get: function() {
+            return MessageModule.showMessage;
+         },
+         set: function(value) {
+            MessageModule.setShowMessage(value);
+         },
+      },
+      message() {
+         return MessageModule.message;
+      },
+   },
+   watch: {
+      $route(to, from) {
+         AppModule.setView(this.$router.currentRoute.name);
+      },
+   },
+   created() {
+      this.height = window.innerHeight;
+
+      document.addEventListener('resize', () => {
+         this.height = window.innerHeight;
+      });
+   },
+   methods: {
+      syncShows() {
+         syncShows();
+      },
+
+      addDownload() {},
+
+      selectAll() {
+         AnimeModule.selectAll();
+         AnimeModule.setSelectMode('multi');
+      },
+      unselectAll() {
+         AnimeModule.setSelected([]);
+         AnimeModule.setSelectMode('single');
+      },
+
+      async deleteAll() {
+         await AnimeModule.removeShowByIds(this.selectedShows);
+         await AnimeModule.setSelected([]);
+         await AnimeModule.setSelectMode('single');
+      },
+
+      async onCopySelected() {
+         await copySubgroup(this.showToCopy, this.selectedShows);
+         location.reload();
+      },
+   },
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.v-app-bar {
+   height: 55px !important;
+}
+
+.mobile-true {
+   .action-buttons .v-btn {
+      min-width: 32px;
+   }
+}
+
+.action-icon {
+   padding-right: 10px;
+}
+</style>

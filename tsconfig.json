@@ -1,5 +1,6 @@
 {
    "compilerOptions": {
+      "experimentalDecorators": true,
       "target": "esnext",
       "module": "esnext",
       "jsx": "preserve",
@@ -14,7 +15,9 @@
       "types": ["webpack-env"],
       "paths": {
          "@/*": ["src/*"],
-         "~/*": ["src/*"]
+         "~/*": ["src/*"],
+         "~modules/*": ["src/store/modules/*"],
+         "~dialogs/*": ["src/components/dialogs/*"]
       },
       "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
    },

@@ -1,7 +1,15 @@
+const path = require('path');
+
 module.exports = {
    lintOnSave: false,
    transpileDependencies: ['vuetify'],
-   chainWebpack: config => {
-      config.resolve.alias.set('~', path.resolve(__dirname, '/src'));
+   configureWebpack: {
+      resolve: {
+         alias: {
+            '~': path.resolve(__dirname, 'src/'),
+            '~modules': path.resolve(__dirname, 'src/store/modules/'),
+            '~dialogs': path.resolve(__dirname, 'src/components/dialogs/'),
+         },
+      },
    },
 };
