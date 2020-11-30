@@ -75,8 +75,13 @@ async function setWebsocket() {
 }
 
 async function setUpDownloads() {
-   window.tbaSocket.on('start-downloading', function({ hash }) {
-      DownloadModule.addItem(hash);
+   window.tbaSocket.on('start-downloading', function({ hash, value }) {
+      DownloadModule.addItem({ hash, url: value.url, queued: value.queued });
+   });
+
+   window.tbaSocket.on('torrent-queued', function({ url, fileName }) {
+      console.log('Queued', url, fileName);
+      DownloadModule.addQueuedItem({ url, name: fileName });
    });
 
    window.tbaSocket.on('metadata', function({ hash, value }) {

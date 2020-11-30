@@ -102,7 +102,7 @@ export default {
             { label: 'Summer', value: SeasonName.SUMMER },
             { label: 'Fall', value: SeasonName.FALL },
          ],
-         years: ['2020', '2024', '2025', '2026', '2027', '2028', '2029', '2030'],
+         years: ['2020', '2021', '2022', '2023', '2024', '2025', '2026', '2027', '2028', '2029', '2030'],
          selectedSeason: SeasonName.WINTER,
          selectedYear: '2020',
       };

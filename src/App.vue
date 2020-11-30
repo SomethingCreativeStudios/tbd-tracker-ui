@@ -65,7 +65,10 @@
             <v-spacer></v-spacer>
             <v-icon @click="syncShows">fas fa-sync</v-icon>
          </template>
-         <template v-if="view === 'downloads'"> </template>
+         <template v-if="view === 'downloads'">
+            <v-spacer></v-spacer>
+            <v-icon @click="testDownload">fas fa-cross</v-icon>
+         </template>
       </v-app-bar>
 
       <v-main>
@@ -84,7 +87,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import { copySubgroup, syncShows } from '~/compositions/series/series';
+import { copySubgroup, downloadShowTest, syncShows } from '~/compositions/series/series';
 import { AnimeModule } from '~/store/modules/anime';
 import { ConfirmDialog } from '~/components/dialogs';
 import { AppModule } from './store/modules/app';
@@ -104,7 +107,6 @@ export default {
       };
    },
 
-   mounted() {},
    computed: {
       ...mapState({
          view: ({ app }) => app.view,
@@ -134,13 +136,17 @@ export default {
       },
    },
    watch: {
-      $route(to, from) {
-         AppModule.setView(this.$router.currentRoute.name);
+      $route: {
+         handler(to, from) {
+            AppModule.setView(this.$router.currentRoute.name);
+            console.log(to, from);
+         },
       },
    },
-   created() {
+   mounted() {
       this.height = window.innerHeight;
-
+      AppModule.setView(this.$router.currentRoute.name);
+      console.log(this.$router.currentRoute.path);
       document.addEventListener('resize', () => {
          this.height = window.innerHeight;
       });
@@ -148,6 +154,10 @@ export default {
    methods: {
       syncShows() {
          syncShows();
+      },
+
+      testDownload() {
+         downloadShowTest();
       },
 
       addDownload() {},

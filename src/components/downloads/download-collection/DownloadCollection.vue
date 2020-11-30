@@ -1,7 +1,7 @@
 <template>
    <div class="download-collection">
       <template v-for="activeDownload in activeDownloads">
-         <download-item :key="activeDownload.hash" v-bind="activeDownload"></download-item>
+         <download-item :key="activeDownload.name" v-bind="activeDownload"></download-item>
       </template>
    </div>
 </template>

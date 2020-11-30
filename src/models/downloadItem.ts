@@ -6,4 +6,5 @@ export interface DownloadItem {
    hash: string;
    timeLeft: string;
    isDone: boolean;
+   queued: boolean;
 }

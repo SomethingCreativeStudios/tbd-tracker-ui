@@ -34,8 +34,12 @@ export async function syncShows() {
    return axios.put('/nyaa/feed/sync');
 }
 
-export async function downloadShow(url: string, seriesId: number) {
-   return axios.post('/nyaa/download', { seriesId, url });
+export async function downloadShow(url: string, name: string, seriesId: number) {
+   return axios.post('/nyaa/download', { seriesId, url, name });
+}
+
+export async function downloadShowTest() {
+   return axios.post('/nyaa/download/test');
 }
 
 export async function syncShow(id: number) {

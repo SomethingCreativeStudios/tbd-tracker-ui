@@ -74,10 +74,8 @@ export default {
          this.$emit('update:dialog', false);
          this.$emit('confirm');
       },
-      onItem({ downloadLink }) {
-         // window.open(downloadLink, '_blank');
-
-         downloadShow(downloadLink, this.seriesId);
+      onItem({ downloadLink, itemName }) {
+         downloadShow(downloadLink, itemName, this.seriesId);
       },
 
       onSync() {

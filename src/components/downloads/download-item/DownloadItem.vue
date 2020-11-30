@@ -1,8 +1,8 @@
 <template>
-   <v-card class="download-item">
+   <v-card class="download-item" :class="queued ? 'queued' : ''">
       <v-list-item two-line>
          <v-list-item-content>
-            <v-list-item-title class="headline"> {{ name }} ({{ timeLeft }}) </v-list-item-title>
+            <v-list-item-title class="headline"> {{ name }} ({{ queued ? 'queued' : timeLeft }}) </v-list-item-title>
          </v-list-item-content>
       </v-list-item>
       <v-card-text>
@@ -42,6 +42,10 @@ export default Vue.extend({
          type: String,
          default: '',
       },
+      queued: {
+         type: Boolean,
+         default: false,
+      },
    },
    data() {
       return {};
@@ -59,4 +63,9 @@ export default Vue.extend({
 });
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.download-item.queued {
+   pointer-events: none;
+   opacity: 0.7;
+}
+</style>

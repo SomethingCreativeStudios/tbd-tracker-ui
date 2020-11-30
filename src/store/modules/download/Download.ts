@@ -12,7 +12,11 @@ class DownloadModule extends VuexModule {
    @Mutation
    private mutateUpdateName({ hash, name }: { hash: string; name: string }) {
       if (!this.items.some(item => item.hash === hash)) {
-         Vue.set(this, 'items', this.items.concat({ hash, name, isDone: false, progress: 0, timeLeft: '', speed: 0, totalDownloaded: 0 }));
+         Vue.set(
+            this,
+            'items',
+            this.items.concat({ hash, name, isDone: false, progress: 0, queued: true, timeLeft: '', speed: 0, totalDownloaded: 0 })
+         );
       }
 
       Vue.set(
@@ -45,6 +49,7 @@ class DownloadModule extends VuexModule {
                progress: 0,
                speed: 0,
                totalDownloaded: 0,
+               queued: false,
             })
          );
       }
@@ -61,6 +66,7 @@ class DownloadModule extends VuexModule {
                     totalDownloaded: progressModel.totalDownloaded,
                     speed: progressModel.speed,
                     timeLeft: progressModel.timeLeft,
+                    queued: false,
                  }
                : item;
          })
@@ -77,8 +83,20 @@ class DownloadModule extends VuexModule {
    }
 
    @Mutation
-   private mutateAddItem(hash: string) {
-      Vue.set(this, 'items', this.items.concat({ hash, isDone: false, name: 'loading', timeLeft: '', progress: 0, speed: 0, totalDownloaded: 0 }));
+   private mutateAddItem({ hash, url, name }: { hash: string; name?: string; url?: string }) {
+      if (url) {
+         Vue.set(
+            this,
+            'items',
+            this.items.map(item => (item.hash === url ? { ...item, hash, queued: true } : item))
+         );
+      } else {
+         Vue.set(
+            this,
+            'items',
+            this.items.concat({ hash, isDone: false, name: name || 'loading', timeLeft: '', progress: 0, queued: true, speed: 0, totalDownloaded: 0 })
+         );
+      }
    }
 
    @Action
@@ -104,8 +122,17 @@ class DownloadModule extends VuexModule {
    }
 
    @Action
-   public async addItem(hash: string) {
-      this.context.commit('mutateAddItem', hash);
+   public async addItem({ hash, url, queued }: { hash: string; url: string; queued?: boolean }) {
+      if (queued) {
+         this.context.commit('mutateAddItem', { hash, url });
+      } else {
+         this.context.commit('mutateAddItem', { hash });
+      }
+   }
+
+   @Action
+   public async addQueuedItem({ url, name }: { url: string; name: string }) {
+      this.context.commit('mutateAddItem', { hash: url, name });
    }
 }
 
