@@ -9,6 +9,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { DownloadModule } from '~modules/download';
+import { service as NyaaService } from '~/websockets/nyaaService';
 
 import DownloadItem from '../download-item';
 
@@ -24,6 +25,7 @@ export default Vue.extend({
          return DownloadModule.items;
       },
    },
+   created() {},
    methods: {},
 });
 </script>

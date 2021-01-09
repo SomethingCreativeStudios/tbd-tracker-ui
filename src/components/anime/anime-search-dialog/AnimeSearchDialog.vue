@@ -16,7 +16,11 @@
          </slot>
       </template>
 
-      <v-card>
+      <v-card :class="loading ? 'loading' : ''">
+         <div v-if="loading" class="progress-block">
+            <v-progress-circular :size="100" indeterminate color="primary"></v-progress-circular>
+         </div>
+
          <v-tabs v-model="tab">
             <v-tab>Search Anime</v-tab>
             <v-tab>Find By Season</v-tab>
@@ -24,29 +28,40 @@
          <v-tabs-items v-model="tab">
             <v-tab-item>
                <v-row class="search-body">
-                  <v-col cols="12">
-                     <v-text-field label="Anime Name" :loading="searchingAnime" @change="onSearch"> </v-text-field>
-                  </v-col>
-                  <div class="results">
-                     <template v-for="(result, index) in results">
-                        <search-result
-                           :key="result.title"
-                           v-bind="result"
-                           :selected="index === selectedIndex"
-                           @click="onClick(index, $event)"
-                        ></search-result>
-                     </template>
-                  </div>
+                  <v-row>
+                     <v-col cols="12" md="10">
+                        <v-text-field label="Anime Name" :loading="searching" v-model="search"> </v-text-field>
+                     </v-col>
+                     <v-col cols="12" md="2">
+                        <v-btn class="button" color="green darken-1" text @click="onMalSearch(search)">
+                           Search
+                        </v-btn>
+                     </v-col>
+                  </v-row>
+                  <search-collection :results="malAnime" @selected="onSelected($event, 'mal')"></search-collection>
                </v-row>
             </v-tab-item>
             <v-tab-item>
                <v-row class="season-body">
-                  <v-col cols="12" md="6">
-                     <v-select label="Season" :items="seasons" item-value="value" item-text="label" v-model="selectedSeason"></v-select>
-                  </v-col>
-                  <v-col cols="12" md="6">
-                     <v-select label="Year" :items="years" v-model="selectedYear"></v-select>
-                  </v-col>
+                  <v-row>
+                     <v-col cols="12" md="5">
+                        <v-select label="Season" :items="seasons" item-value="value" item-text="label" v-model="selectedSeason"></v-select>
+                     </v-col>
+                     <v-col cols="12" md="5">
+                        <v-select label="Year" :items="years" v-model="selectedYear"></v-select>
+                     </v-col>
+                     <v-col cols="12" md="2">
+                        <v-btn class="button" color="green darken-1" text @click="onSeasonSearch">
+                           Search
+                        </v-btn>
+                     </v-col>
+                  </v-row>
+                  <search-collection
+                     :multiSelect="true"
+                     :defaultSelected="true"
+                     :results="seasonAnime"
+                     @selected="onSelected($event, 'season')"
+                  ></search-collection>
                </v-row>
             </v-tab-item>
          </v-tabs-items>
@@ -73,16 +88,15 @@ import { clone } from 'ramda';
 
 import { WatchingStatus } from '@/models/anime';
 import { AnimeModule } from '~modules/anime';
-import { createFromSeason } from '~/compositions/series/series';
-import { setSetting } from '~/compositions/settings';
-import axios from '~/axios/axios';
-import { SearchResult } from './components';
 import { SeasonName } from '@/models/season';
 import { SettingsModule } from '@/store/modules/settings';
+import { service as SettingService } from '~/websockets/settingsService';
+import { service as SeriesService } from '~/websockets/seriesService';
+import SearchCollection from './components/search-collection/SearchCollection.vue';
 
 export default {
    name: 'anime-search-dialog',
-   components: { SearchResult },
+   components: { SearchCollection },
    props: {
       id: {
          type: Number,
@@ -93,16 +107,20 @@ export default {
       return {
          tab: null,
          dialog: false,
-         searchingAnime: false,
-         results: [],
-         selectedIndex: -1,
+         loading: false,
+         searching: false,
+         search: '',
+         malAnime: [],
+         malSelected: [],
+         seasonAnime: [],
+         seasonSelected: [],
          seasons: [
             { label: 'Winter', value: SeasonName.WINTER },
             { label: 'Spring', value: SeasonName.SPRING },
             { label: 'Summer', value: SeasonName.SUMMER },
             { label: 'Fall', value: SeasonName.FALL },
          ],
-         years: ['2020', '2021', '2022', '2023', '2024', '2025', '2026', '2027', '2028', '2029', '2030'],
+         years: ['2019', '2020', '2021', '2022', '2023', '2024', '2025', '2026', '2027', '2028', '2029', '2030'],
          selectedSeason: SeasonName.WINTER,
          selectedYear: '2020',
       };
@@ -120,31 +138,50 @@ export default {
          this.$emit('cancel');
       },
       async onConfirm() {
-         const results = this.tab === 0 ? this.results[this.selectedIndex] : await createFromSeason(this.selectedYear, this.selectedSeason);
+         this.loading = true;
+         console.log(this.malSelected);
+         const results =
+            this.tab === 0
+               ? [await SeriesService.createByMal(this.malSelected[0].malId)]
+               : await SeriesService.createSeason(this.seasonSelected, this.selectedSeason, this.selectedYear);
 
          if (this.tab !== 0) {
-            const newYear = await setSetting('currentYear', this.selectedYear);
-            const newSeason = await setSetting('currentSeason', this.selectedSeason);
+            const newYear = await SettingService.setSettings('currentYear', this.selectedYear);
+            const newSeason = await SettingService.setSettings('currentSeason', this.selectedSeason);
 
-            SettingsModule.setCurrentYear(newYear.value);
-            SettingsModule.setCurrentSeason(newSeason.value);
+            await SettingsModule.setCurrentYear(newYear.value);
+            await SettingsModule.setCurrentSeason(newSeason.value);
          }
 
          this.dialog = false;
          this.$emit('update:dialog', false);
-         this.$emit('confirm', { type: this.tab === 0 ? 'mal' : 'season', results });
+         this.$emit('confirm', { results, clear: this.tab !== 0 });
+         this.loading = false;
       },
-      onClick(index, selected) {
-         this.selectedIndex = selected ? index : -1;
+
+      async onMalSearch(text) {
+         console.log(this.search);
+         this.searching = true;
+
+         const results = await SeriesService.searchMAL(text);
+
+         this.$set(this, 'malAnime', results);
+
+         this.searching = false;
       },
-      async onSearch(text) {
-         this.searchingAnime = true;
-         this.selectedIndex = -1;
 
-         const results = await axios.get(`/series/mal/${text}`);
-         this.$set(this, 'results', results.data);
+      async onSeasonSearch() {
+         this.searching = true;
 
-         this.searchingAnime = false;
+         const results = await SeriesService.searchMALBySeason(this.selectedSeason, this.selectedYear);
+
+         this.$set(this, 'seasonAnime', results);
+
+         this.searching = false;
+      },
+
+      onSelected(selected, name) {
+         this.$set(this, `${name}Selected`, selected);
       },
    },
 };
@@ -163,7 +200,7 @@ export default {
    }
 }
 
-.results {
+.search-collection {
    height: 610px;
    padding: 21px;
 
@@ -175,6 +212,26 @@ export default {
    padding: 20px;
 }
 
-.v-dialog--fullscreen {
+.loader {
+   position: relative;
+   opacity: 0.25;
+   background-color: gray;
+   pointer-events: none;
+}
+
+.progress-block {
+   position: absolute;
+   width: 100%;
+   height: 100%;
+   z-index: 1;
+
+   > div {
+      top: 50%;
+      left: 50%;
+   }
+}
+
+.button {
+   margin-top: 15px;
 }
 </style>

@@ -74,7 +74,7 @@ import { SubgroupDialog } from '~/components/subgroup';
 import { AnimeModule } from '~modules/anime';
 import AnimeDialog from '../anime-dialog';
 import ShowDialog from '../show-dialog/ShowDialog.vue';
-import { syncShow } from '@/compositions/series/series';
+import { service as NyaaService } from '~/websockets/nyaaService';
 
 export default {
    name: 'anime-card',
@@ -171,7 +171,7 @@ export default {
             watchColor = '#ff0000';
          }
 
-         return { '--AnimeCard--watch-status': watchColor };
+         return { '--AnimeCard--watch-status': watchColor, '--AnimeCard--line-clamp': this.tags.length > 0 ? 3 : 5 };
       },
       cardClasses() {
          return {
@@ -200,7 +200,7 @@ export default {
          this.$emit('select', !this.selected);
       },
       onSync() {
-         syncShow(this.id);
+         NyaaService.syncShow(this.id);
       },
       onStatusUpdate() {
          AnimeModule.updateWatchStatus(this.id);
@@ -306,7 +306,7 @@ export default {
 }
 
 .v-list-item--five-line ::v-deep .v-list-item__subtitle {
-   -webkit-line-clamp: 5;
+   -webkit-line-clamp: var(--AnimeCard--line-clamp, 5);
 }
 
 .v-list-item__subtitle:hover {

@@ -61,6 +61,7 @@ export default {
 .result__image {
    img {
       height: 210px;
+      width: 100%;
    }
 }
 
@@ -90,14 +91,14 @@ export default {
    }
 
    .result__text--title {
-      font-size: 32px;
+      font-size: 18px;
 
       line-height: 1;
    }
 
    .result__text--description {
-      max-height: 80px;
-      font-size: 20px;
+      max-height: 43px;
+      font-size: 14px;
    }
 }
 </style>

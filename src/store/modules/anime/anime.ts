@@ -1,64 +1,19 @@
 // initial state
 import Vue from 'vue';
-import { mergeDeepRight, uniq, update } from 'ramda';
+import { uniq } from 'ramda';
 import { VuexModule, Module, Mutation, Action, getModule, MutationAction } from 'vuex-module-decorators';
 
 import { Anime, NyaaItem, WatchingStatus } from '~/models/anime';
-import {
-   addSubgroup,
-   updateSeries,
-   removeSubgroup,
-   updateSubgroup,
-   removeSubgroupRule,
-   updateSubgroupRule,
-   addSubgroupRule,
-   removeSeries,
-   removeManySeries,
-   updateWatchStatus,
-} from '~/compositions/series/series';
+import { updateWatchStatus } from '~/compositions/series/series';
+
+import { service as SeriesService } from '~/websockets/seriesService';
+import { service as SubGroupService } from '~/websockets/subgroupService';
+import { service as SubGroupRuleService } from '~/websockets/subgroupRuleService';
 
 import store from '~/store';
 import { PartialDeep } from 'type-fest';
 import { SubGroup } from '~/models/subgroup';
 import { RuleType, SubGroupRule } from '@/models/subgroupRule';
-
-function mergeSubgroups(groups: SubGroup[] = [], group: PartialDeep<SubGroup>, groupId: number) {
-   const hasGroup = groups.find(({ id }) => id === groupId);
-
-   if (!hasGroup) {
-      return groups.concat(group as SubGroup);
-   }
-
-   return groups.map(oldGroup => (oldGroup.id === groupId ? mergeDeepRight(oldGroup, group) : oldGroup));
-}
-
-function mergeRule(groups: SubGroup[], groupId: number, rule: PartialDeep<SubGroupRule>, ruleId: number) {
-   return groups.map(oldGroup => {
-      if (oldGroup.id !== groupId) return oldGroup;
-
-      const hasRule = (oldGroup?.rules ?? []).filter(({ id }) => id === ruleId);
-
-      if (!hasRule || hasRule?.length === 0) {
-         return { ...oldGroup, rules: (oldGroup?.rules ?? []).concat(rule as SubGroupRule) };
-      }
-
-      return { ...oldGroup, rules: (oldGroup?.rules ?? []).map(oldRule => (oldRule.id === ruleId ? mergeDeepRight(oldRule, rule) : oldRule)) };
-   });
-}
-
-function removeRule(groups: SubGroup[], groupId: number, ruleId: number) {
-   return groups.map(oldGroup => {
-      if (oldGroup.id !== groupId) return oldGroup;
-
-      const hasRule = (oldGroup?.rules ?? []).filter(({ id }) => id === ruleId);
-
-      if (!hasRule) {
-         return oldGroup;
-      }
-
-      return { ...oldGroup, rules: (oldGroup?.rules ?? []).filter(oldRule => oldRule.id !== ruleId) };
-   });
-}
 
 function sortShow(sortBy, a, b) {
    if (sortBy === 'Name') {
@@ -102,7 +57,11 @@ class AnimeModule extends VuexModule {
    }
 
    @Mutation
-   private mutateAddShows(shows: Anime[]) {
+   private mutateAddShows({ shows, clear = false }: { shows: Anime[]; clear: boolean }) {
+      if (clear) {
+         this.shows = [];
+      }
+
       Vue.set(this, 'shows', this.shows.concat(shows));
       Vue.set(this, 'folderNames', uniq(this.folderNames.concat(shows.map(show => show.folderPath))));
    }
@@ -124,11 +83,11 @@ class AnimeModule extends VuexModule {
    }
 
    @Mutation
-   private mutateUpdateShowById({ id, newShow }: { id: number; newShow: PartialDeep<Anime> }) {
+   private mutateUpdateShowById(newShow: Anime) {
       Vue.set(
          this,
          'shows',
-         this.shows.map(show => (show.id === id ? mergeDeepRight(show, newShow) : show))
+         this.shows.map(show => (show.id === newShow.id ? newShow : show))
       );
    }
 
@@ -138,52 +97,6 @@ class AnimeModule extends VuexModule {
          this,
          'shows',
          this.shows.map(show => (show.id === id ? { ...show, watchStatus: status } : show))
-      );
-   }
-
-   @Mutation
-   private mutateUpdateSubgroup({ id, subgroupId, newGroup }: { id: number; subgroupId: number; newGroup: PartialDeep<SubGroup> }) {
-      Vue.set(
-         this,
-         'shows',
-         this.shows.map(show => (show.id === id ? { ...show, subgroups: mergeSubgroups(show.subgroups, newGroup, subgroupId) } : show))
-      );
-   }
-
-   @Mutation
-   private mutateRemoveSubgroup({ id, subgroupId }: { id: number; subgroupId: number }) {
-      Vue.set(
-         this,
-         'shows',
-         this.shows.map(show => (show.id === id ? { ...show, subgroups: show.subgroups.filter(group => group.id !== subgroupId) } : show))
-      );
-   }
-
-   @Mutation
-   private mutateUpdateSubgroupRule({
-      id,
-      subgroupId,
-      ruleId,
-      newRule,
-   }: {
-      id: number;
-      subgroupId: number;
-      ruleId: number;
-      newRule: PartialDeep<SubGroupRule>;
-   }) {
-      Vue.set(
-         this,
-         'shows',
-         this.shows.map(show => (show.id === id ? { ...show, subgroups: mergeRule(show.subgroups, subgroupId, newRule, ruleId) } : show))
-      );
-   }
-
-   @Mutation
-   private mutateRemoveSubgroupRule({ id, subgroupId, ruleId }: { id: number; subgroupId: number; ruleId: number }) {
-      Vue.set(
-         this,
-         'shows',
-         this.shows.map(show => (show.id === id ? { ...show, subgroups: removeRule(show.subgroups, subgroupId, ruleId) } : show))
       );
    }
 
@@ -207,104 +120,109 @@ class AnimeModule extends VuexModule {
 
    @Action
    public async loadShows() {
-      this.context.commit('mutateAddShows', []);
+      this.context.commit('mutateAddShows', { shows: [] });
    }
 
    @Action
-   public async addShows(shows: Anime[]) {
-      this.context.commit(
-         'mutateAddShows',
-         shows.map(show => ({ ...show, airingData: new Date(show.airingData), score: Number(show.score) }))
-      );
+   public async addShows({ shows, clear = false }: { shows: Anime[]; clear?: boolean }) {
+      this.context.commit('mutateAddShows', {
+         clear,
+         shows: shows.map(show => ({ ...show, airingData: new Date(show.airingData), score: Number(show.score) })),
+      });
    }
 
    @Action
    public async removeShowById(id: number) {
-      await removeSeries(id);
+      await SeriesService.remove(id);
       this.context.commit('mutateRemoveShows', [id]);
    }
 
    @Action
    public async removeShowByIds(ids: number[]) {
-      await removeManySeries(ids);
+      for (let index = 0; index < ids.length; index++) {
+         await SeriesService.remove(ids[index]);
+      }
+
       this.context.commit('mutateRemoveShows', ids);
    }
 
    @Action
    public async updateShowById(updateModel: { id: number; newShow: PartialDeep<Anime> }) {
-      const foundShow = this.shows.find(show => show.id === updateModel.id);
+      const updatedShow = await SeriesService.update({ id: updateModel.id, ...updateModel.newShow });
 
-      await updateSeries(mergeDeepRight(foundShow, updateModel.newShow) as Anime);
-
-      this.context.commit('mutateUpdateShowById', updateModel);
+      this.context.commit('mutateUpdateShowById', { ...updatedShow, airingData: new Date(updatedShow.airingData), score: Number(updatedShow.score) });
    }
 
    @Action
    public async updateWatchStatus(id: number) {
-      const newStatus = await updateWatchStatus(id);
+      const newStatus = await SeriesService.updateWatchStatus(id);
 
       this.context.commit('mutateUpdateWatchStatus', { id, status: newStatus });
    }
 
    @Action
    public async addSubgroup(updateModel: { id: number }) {
-      const subgroup = await addSubgroup(updateModel.id);
+      const series = await SubGroupService.create(updateModel.id, { name: '', preferedResultion: '720', rules: [] });
 
-      this.context.commit('mutateUpdateSubgroup', {
-         subgroupId: subgroup.id,
-         id: updateModel.id,
-         newGroup: subgroup,
+      this.context.commit('mutateUpdateShowById', {
+         ...series,
+         airingData: new Date(series.airingData),
+         score: Number(series.score),
       });
    }
 
    @Action
    public async updateSubgroup(updateModel: { id: number; subgroupId: number; newGroup: PartialDeep<SubGroup> }) {
-      const foundShow = this.shows.find(({ id }) => id === updateModel.id);
-      const groups = mergeSubgroups(foundShow.subgroups, updateModel.newGroup, updateModel.subgroupId) as SubGroup[];
-      const foundGroup = groups.find(({ id }) => id === updateModel.subgroupId);
+      const updatedSeries = await SubGroupService.update({ ...updateModel.newGroup, id: updateModel.subgroupId });
 
-      await updateSubgroup(foundGroup);
-
-      if (updateModel.newGroup.name) {
-         this.context.commit('mutateSubgroupNames', [updateModel.newGroup.name]);
-      }
-      this.context.commit('mutateUpdateSubgroup', updateModel);
+      this.context.commit('mutateUpdateShowById', {
+         ...updatedSeries,
+         airingData: new Date(updatedSeries.airingData),
+         score: Number(updatedSeries.score),
+      });
    }
 
    @Action
    public async removeSubgroup(removeModel: { id: number; subgroupId: number }) {
-      await removeSubgroup(removeModel.subgroupId);
+      const updatedSeries = await SubGroupService.remove(removeModel.subgroupId);
 
-      this.context.commit('mutateRemoveSubgroup', removeModel);
+      this.context.commit('mutateUpdateShowById', {
+         ...updatedSeries,
+         airingData: new Date(updatedSeries.airingData),
+         score: Number(updatedSeries.score),
+      });
    }
 
    @Action
    public async updateSubgroupRule(updateModel: { id: number; subgroupId: number; ruleId: number; newRule: PartialDeep<SubGroupRule> }) {
-      const foundShow = this.shows.find(({ id }) => id === updateModel.id);
-      const foundGroup = foundShow.subgroups.find(({ id }) => id === updateModel.subgroupId);
-      const foundRule = foundGroup.rules.find(({ id }) => id === updateModel.ruleId);
+      const updatedSeries = await SubGroupRuleService.update(updateModel.subgroupId, { ...updateModel.newRule, id: updateModel.ruleId });
 
-      await updateSubgroupRule(updateModel.subgroupId, mergeDeepRight(foundRule, updateModel.newRule) as SubGroupRule);
-
-      this.context.commit('mutateUpdateSubgroupRule', updateModel);
+      this.context.commit('mutateUpdateShowById', {
+         ...updatedSeries,
+         airingData: new Date(updatedSeries.airingData),
+         score: Number(updatedSeries.score),
+      });
    }
 
    @Action
    public async removeSubgroupRule(removeModel: { id: number; subgroupId: number; ruleId: number }) {
-      await removeSubgroupRule(removeModel.ruleId);
+      const updatedSeries = await SubGroupRuleService.remove(removeModel.subgroupId, removeModel.ruleId);
 
-      this.context.commit('mutateRemoveSubgroupRule', removeModel);
+      this.context.commit('mutateUpdateShowById', {
+         ...updatedSeries,
+         airingData: new Date(updatedSeries.airingData),
+         score: Number(updatedSeries.score),
+      });
    }
 
    @Action
    public async addSubgroupRule(createModel: { id: number; subgroupId: number }) {
-      const rule = await addSubgroupRule(createModel.subgroupId);
+      const updatedSeries = await SubGroupRuleService.create(createModel.subgroupId, { text: '', isPositive: true, ruleType: RuleType.STARTS_WITH });
 
-      this.context.commit('mutateUpdateSubgroupRule', {
-         ruleId: rule.id,
-         id: createModel.id,
-         subgroupId: createModel.subgroupId,
-         newRule: rule,
+      this.context.commit('mutateUpdateShowById', {
+         ...updatedSeries,
+         airingData: new Date(updatedSeries.airingData),
+         score: Number(updatedSeries.score),
       });
    }
 
@@ -320,7 +238,7 @@ class AnimeModule extends VuexModule {
 
    @Action
    public async sortShows(sortBy: 'Name' | 'Queue' | 'Watch Status') {
-      this.context.commit('mutateSortShows', sortBy);
+      //   this.context.commit('mutateSortShows', sortBy);
    }
 
    @MutationAction({ mutate: ['subgroupNames'] })

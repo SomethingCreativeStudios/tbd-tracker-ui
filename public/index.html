@@ -7,12 +7,15 @@
       <link rel="icon" href="<%= BASE_URL %>donut2.svg" />
       <title><%= htmlWebpackPlugin.options.title %></title>
       <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" />
-      <link
-         rel="stylesheet"
-         href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
-         integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ"
-         crossorigin="anonymous"
-      />
+
+      <script>
+         window.configs = {
+            VUE_APP_SERVER_PATH: '$VUE_APP_SERVER_PATH',
+            VUE_APP_WEBSOCKET_PATH: '$VUE_APP_WEBSOCKET_PATH',
+            VUE_APP_USERNAME: '$VUE_APP_USERNAME',
+            VUE_APP_PASSWORD: '$VUE_APP_PASSWORD',
+         };
+      </script>
       <style>
          /* width */
          ::-webkit-scrollbar {

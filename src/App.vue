@@ -67,11 +67,10 @@
          </template>
          <template v-if="view === 'downloads'">
             <v-spacer></v-spacer>
-            <v-icon @click="testDownload">fas fa-cross</v-icon>
          </template>
       </v-app-bar>
 
-      <v-main>
+      <v-main class="main-nav">
          <router-view></router-view>
       </v-main>
       <v-snackbar v-model="showMessage" :timeout="5000">
@@ -150,6 +149,7 @@ export default {
       document.addEventListener('resize', () => {
          this.height = window.innerHeight;
       });
+      console.log('I have updated! 2');
    },
    methods: {
       syncShows() {
@@ -198,5 +198,9 @@ export default {
 
 .action-icon {
    padding-right: 10px;
+}
+
+.main-nav {
+   padding-top: 64px;
 }
 </style>

@@ -6,8 +6,15 @@
          </div>
          <v-row class="anime-cards">
             <template v-for="anime in series">
-               <v-col :key="anime.tag" md="4">
-                  <anime-card v-bind="anime" @select="onSelect(anime, $event)" @delete="onDelete(anime)"></anime-card>
+               <v-col :key="anime.id" md="4">
+                  <v-lazy
+                     :options="{
+                        threshold: 0.5,
+                     }"
+                     transition="fade-transition"
+                  >
+                     <anime-card v-bind="anime" @select="onSelect(anime, $event)" @delete="onDelete(anime)"></anime-card>
+                  </v-lazy>
                </v-col>
             </template>
          </v-row>
@@ -67,5 +74,10 @@ export default {
 .anime-collection {
    display: flex;
    flex-wrap: wrap;
+}
+
+.anime-cards {
+   overflow-y: scroll;
+   height: 82vh;
 }
 </style>

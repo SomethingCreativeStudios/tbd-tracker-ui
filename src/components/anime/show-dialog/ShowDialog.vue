@@ -34,8 +34,7 @@
 </template>
 
 <script>
-import { downloadShow } from '~/compositions/series/series';
-import { syncShow } from '@/compositions/series/series';
+import { service as NyaaService } from '~/websockets/nyaaService';
 
 export default {
    name: 'show-dialog',
@@ -75,11 +74,11 @@ export default {
          this.$emit('confirm');
       },
       onItem({ downloadLink, itemName }) {
-         downloadShow(downloadLink, itemName, this.seriesId);
+         NyaaService.download(this.seriesId, downloadLink, itemName);
       },
 
       onSync() {
-         syncShow(this.seriesId);
+         NyaaService.syncShow(this.seriesId);
       },
    },
 };

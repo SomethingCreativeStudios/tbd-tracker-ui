@@ -11,8 +11,8 @@
 
 <script>
 import { SettingsModule } from '~modules/settings';
-import { setSetting } from '~/compositions/settings';
 import { SeasonName } from '@/models/season';
+import { service as SettingsService } from '~/websockets/settingsService';
 
 export default {
    name: 'settings',
@@ -38,11 +38,11 @@ export default {
    },
    methods: {
       async onSeasonSelect(newSeason) {
-         const setting = await setSetting('currentSeason', newSeason);
+         const setting = await SettingsService.setSettings('currentSeason', newSeason);
          SettingsModule.setCurrentSeason(setting.value);
       },
       async onYearSelect(newYear) {
-         const setting = await setSetting('currentYear', Number(newYear));
+         const setting = await SettingsService.setSettings('currentYear', Number(newYear));
          SettingsModule.setCurrentYear(setting.value);
       },
    },

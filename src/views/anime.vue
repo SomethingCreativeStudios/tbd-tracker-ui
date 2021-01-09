@@ -12,9 +12,9 @@
 <script lang="ts">
 import Vue from 'vue';
 import { mapState } from 'vuex';
-import { createFromId } from '~/compositions/series/series';
 import { AnimeCollection, AnimeSearchDialog } from '~/components/anime';
 import { AnimeModule } from '~modules/anime';
+import { service as SeriesService } from '~/websockets/seriesService';
 
 export default Vue.extend({
    name: 'anime',
@@ -25,12 +25,8 @@ export default Vue.extend({
       }),
    },
    methods: {
-      async addShow({ type, results }) {
-         if (type === 'mal') {
-            AnimeModule.addShows([await createFromId(results.malId)]);
-         } else {
-            AnimeModule.addShows(results.series);
-         }
+      async addShow({ results, clear }) {
+         AnimeModule.addShows({ shows: results, clear });
       },
    },
 });
@@ -38,7 +34,7 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .anime {
-   overflow-y: scroll;
+   overflow: hidden;
    height: 94vh;
 }
 
@@ -54,11 +50,6 @@ export default Vue.extend({
 }
 
 @media only screen and (max-width: 600px) {
-   .anime {
-      overflow-y: scroll;
-      height: 94vh;
-   }
-
    .fab-button {
       position: absolute;
 
