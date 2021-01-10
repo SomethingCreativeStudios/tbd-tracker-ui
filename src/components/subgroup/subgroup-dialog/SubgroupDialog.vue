@@ -10,7 +10,7 @@
       <v-card>
          <v-card-title>
             <span class="headline">
-               Subgroups <span><v-icon @click="onAdd">fas fa-plus</v-icon></span>
+               Subgroups <span><v-icon @click="onAdd">fas fa-plus</v-icon><v-icon class="search-icon" @click="onSearch">fas fa-search</v-icon></span>
             </span>
          </v-card-title>
          <v-card-text>
@@ -74,6 +74,10 @@ export default {
       onAdd() {
          AnimeModule.addSubgroup({ id: this.id, newGroup: new Subgroup() });
       },
+
+      onSearch() {
+         alert('SEARCH r');
+      }
    },
 };
 </script>
@@ -94,5 +98,9 @@ export default {
    .v-card__text {
       padding: 0;
    }
+}
+
+.search-icon {
+   padding-left: 10px;
 }
 </style>

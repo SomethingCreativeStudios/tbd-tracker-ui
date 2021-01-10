@@ -4,6 +4,12 @@ module.exports = {
    lintOnSave: false,
    transpileDependencies: ['vuetify'],
    configureWebpack: {
+      devServer: {
+         clientLogLevel: 'info',
+         watchOptions: {
+            poll: true,
+         },
+      },
       resolve: {
          alias: {
             '~': path.resolve(__dirname, 'src/'),

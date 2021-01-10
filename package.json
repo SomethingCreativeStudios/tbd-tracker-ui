@@ -3,7 +3,8 @@
    "version": "0.1.0",
    "private": true,
    "scripts": {
-      "serve": "vue-cli-service serve",
+      "serve": "vue-cli-service serve --host localhost",
+      "watch": "vue-cli-service build --watch",
       "build": "vue-cli-service build",
       "build:prod": "vue-cli-service build --mode production",
       "build:docker": "docker build -t ericlo417/tba-tracker-ui . && docker push ericlo417/tba-tracker-ui",

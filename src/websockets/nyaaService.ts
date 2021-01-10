@@ -6,6 +6,8 @@ import { MessageModule } from '~modules/message';
 import io from 'socket.io-client';
 
 import getEnv from '~/utils/env';
+import Subgroup from '@/components/subgroup/subgroup';
+import { SubGroup } from '@/models/subgroup';
 
 class NyaaService {
    private socket: SocketIOClient.Socket;
@@ -76,6 +78,12 @@ class NyaaService {
    async testDownload(): Promise<Anime> {
       return new Promise(resolve => {
          this.socket.emit('test-download', {}, resolve);
+      });
+   }
+
+   async suggestSubgroups(name: string, altNames: string): Promise<SubGroup[]> {
+      return new Promise(resolve => {
+         this.socket.emit('suggest-subgroups', { showName: name, altNames }, resolve);
       });
    }
 }
