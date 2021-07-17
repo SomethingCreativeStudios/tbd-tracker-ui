@@ -81,7 +81,7 @@ class NyaaService {
       });
    }
 
-   async suggestSubgroups(name: string, altNames: string): Promise<SubGroup[]> {
+   async suggestSubgroups(name: string, altNames: string[]): Promise<SubGroup[]> {
       return new Promise(resolve => {
          this.socket.emit('suggest-subgroups', { showName: name, altNames }, resolve);
       });

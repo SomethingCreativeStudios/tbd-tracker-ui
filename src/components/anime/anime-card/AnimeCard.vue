@@ -48,7 +48,7 @@
                <subgroup-dialog :id="id">
                   <template #activator="{ on, attrs }">
                      <v-btn color="green" text v-bind="attrs" v-on="on">
-                        Subgroups
+                        Subgroups <v-icon v-if="hasPotentialSubgroups" class="has-subgroups">fas fa-exclamation</v-icon>
                      </v-btn>
                   </template>
                </subgroup-dialog>
@@ -144,6 +144,10 @@ export default {
          type: Boolean,
          default: false,
       },
+      hasPotentialSubgroups: {
+         type: Boolean,
+         default: false,
+      },
    },
    computed: {
       ...mapState({
@@ -186,6 +190,7 @@ export default {
          deleted: false,
       };
    },
+
    methods: {
       onDelete() {
          this.deleted = true;
@@ -343,5 +348,10 @@ export default {
    .v-icon {
       text-shadow: 1px 2px rgb(8 8 8 / 75%);
    }
+}
+
+.has-subgroups {
+   padding-left: 4px;
+   color: red;
 }
 </style>

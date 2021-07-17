@@ -4,9 +4,10 @@ import { uniq } from 'ramda';
 import { VuexModule, Module, Mutation, Action, getModule, MutationAction } from 'vuex-module-decorators';
 
 import { Anime, NyaaItem, WatchingStatus } from '~/models/anime';
-import { updateWatchStatus } from '~/compositions/series/series';
 
 import { service as SeriesService } from '~/websockets/seriesService';
+
+import { service as NyaaService } from '~/websockets/nyaaService';
 import { service as SubGroupService } from '~/websockets/subgroupService';
 import { service as SubGroupRuleService } from '~/websockets/subgroupRuleService';
 
@@ -101,6 +102,15 @@ class AnimeModule extends VuexModule {
    }
 
    @Mutation
+   private mutateSuggestedGroups({ id, hasGroups }: { id: number; hasGroups: boolean }) {
+      Vue.set(
+         this,
+         'shows',
+         this.shows.map(show => (show.id === id ? { ...show, hasPotentialSubgroups: hasGroups } : show))
+      );
+   }
+
+   @Mutation
    private mutateShowQueue({ showId, nyaaItems, count }: { showId: number; count: number; nyaaItems: NyaaItem[] }) {
       Vue.set(
          this,
@@ -161,8 +171,19 @@ class AnimeModule extends VuexModule {
    }
 
    @Action
-   public async addSubgroup(updateModel: { id: number }) {
-      const series = await SubGroupService.create(updateModel.id, { name: '', preferedResultion: '720', rules: [] });
+   public async findSubgroups(show: Anime) {
+      if (show.subgroups.length > 0) {
+         return;
+      }
+
+      const suggestedGroups = await NyaaService.suggestSubgroups(show.name, show.otherNames);
+
+      this.context.commit('mutateSuggestedGroups', { id: show.id, hasGroups: suggestedGroups.length !== 0 });
+   }
+
+   @Action
+   public async addSubgroup(updateModel: { id: number; default?: SubGroup }) {
+      const series = await SubGroupService.create(updateModel.id, updateModel.default || { name: '', preferedResultion: '720', rules: [] });
 
       this.context.commit('mutateUpdateShowById', {
          ...series,

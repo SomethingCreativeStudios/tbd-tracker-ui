@@ -46,6 +46,8 @@ export interface Anime {
    showQueue: NyaaItem[];
 
    isSyncing: boolean;
+
+   hasPotentialSubgroups: boolean;
 }
 
 export interface NyaaItem {

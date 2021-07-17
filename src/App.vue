@@ -64,6 +64,7 @@
             </v-layout>
             <v-spacer></v-spacer>
             <v-icon @click="syncShows">fas fa-sync</v-icon>
+            <v-icon style="padding-left: 10px" @click="checkSubgroups">fas fa-exclamation</v-icon>
          </template>
          <template v-if="view === 'downloads'">
             <v-spacer></v-spacer>
@@ -180,6 +181,21 @@ export default {
       async onCopySelected() {
          await copySubgroup(this.showToCopy, this.selectedShows);
          location.reload();
+      },
+
+      async waitFor(time) {
+         return new Promise(resolve => {
+            setTimeout(() => {
+               resolve();
+            }, time);
+         });
+      },
+
+      async checkSubgroups() {
+         for await (const show of AnimeModule.shows) {
+            await AnimeModule.findSubgroups(show);
+            await this.waitFor(300);
+         }
       },
    },
 };
