@@ -91,11 +91,11 @@ export default Vue.extend({
       },
 
       onSave() {
-         AnimeModule.updateSubgroupRule({ id: this.showId, subgroupId: this.subgroupId, ruleId: this.id, newRule: this.updatedRule });
+         AnimeModule.updateSubgroupRule({ id: this.id, ...this.updatedRule });
       },
 
       onDelete() {
-         AnimeModule.removeSubgroupRule({ id: this.showId, subgroupId: this.subgroupId, ruleId: this.id });
+         AnimeModule.removeSubgroupRule(this.id);
       },
    },
 });

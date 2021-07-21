@@ -14,7 +14,10 @@ import { service as SubGroupRuleService } from '~/websockets/subgroupRuleService
 import store from '~/store';
 import { PartialDeep } from 'type-fest';
 import { SubGroup } from '~/models/subgroup';
-import { RuleType, SubGroupRule } from '@/models/subgroupRule';
+import { CreateSubGroupRuleDTO } from '@/websockets/dto/CreateSubGroupRuleDTO';
+import { UpdateSubGroupRuleDTO } from '@/websockets/dto/UpdateSubGroupRuleDTO';
+import { CreateSubGroupDTO } from '@/websockets/dto/CreateSubGroupDTO';
+import { UpdateSeriesDTO } from '@/websockets/dto/UpdateSeriesDTO';
 
 function sortShow(sortBy, a, b) {
    if (sortBy === 'Name') {
@@ -157,8 +160,8 @@ class AnimeModule extends VuexModule {
    }
 
    @Action
-   public async updateShowById(updateModel: { id: number; newShow: PartialDeep<Anime> }) {
-      const updatedShow = await SeriesService.update({ id: updateModel.id, ...updateModel.newShow });
+   public async updateShowById(updateModel: UpdateSeriesDTO) {
+      const updatedShow = await SeriesService.update(updateModel);
 
       this.context.commit('mutateUpdateShowById', { ...updatedShow, airingData: new Date(updatedShow.airingData), score: Number(updatedShow.score) });
    }
@@ -182,8 +185,8 @@ class AnimeModule extends VuexModule {
    }
 
    @Action
-   public async addSubgroup(updateModel: { id: number; default?: SubGroup }) {
-      const series = await SubGroupService.create(updateModel.id, updateModel.default || { name: '', preferedResultion: '720', rules: [] });
+   public async addSubgroup(createModel: CreateSubGroupDTO) {
+      const series = await SubGroupService.create(createModel);
 
       this.context.commit('mutateUpdateShowById', {
          ...series,
@@ -215,8 +218,8 @@ class AnimeModule extends VuexModule {
    }
 
    @Action
-   public async updateSubgroupRule(updateModel: { id: number; subgroupId: number; ruleId: number; newRule: PartialDeep<SubGroupRule> }) {
-      const updatedSeries = await SubGroupRuleService.update(updateModel.subgroupId, { ...updateModel.newRule, id: updateModel.ruleId });
+   public async updateSubgroupRule(updateModel: UpdateSubGroupRuleDTO) {
+      const updatedSeries = await SubGroupRuleService.update(updateModel);
 
       this.context.commit('mutateUpdateShowById', {
          ...updatedSeries,
@@ -226,8 +229,8 @@ class AnimeModule extends VuexModule {
    }
 
    @Action
-   public async removeSubgroupRule(removeModel: { id: number; subgroupId: number; ruleId: number }) {
-      const updatedSeries = await SubGroupRuleService.remove(removeModel.subgroupId, removeModel.ruleId);
+   public async removeSubgroupRule(id: number) {
+      const updatedSeries = await SubGroupRuleService.remove(id);
 
       this.context.commit('mutateUpdateShowById', {
          ...updatedSeries,
@@ -237,8 +240,8 @@ class AnimeModule extends VuexModule {
    }
 
    @Action
-   public async addSubgroupRule(createModel: { id: number; subgroupId: number }) {
-      const updatedSeries = await SubGroupRuleService.create(createModel.subgroupId, { text: '', isPositive: true, ruleType: RuleType.STARTS_WITH });
+   public async addSubgroupRule(createModel: CreateSubGroupRuleDTO) {
+      const updatedSeries = await SubGroupRuleService.create(createModel);
 
       this.context.commit('mutateUpdateShowById', {
          ...updatedSeries,

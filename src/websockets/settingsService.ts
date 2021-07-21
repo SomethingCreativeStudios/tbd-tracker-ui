@@ -7,6 +7,8 @@ import { service as SeriesService } from '~/websockets/seriesService';
 import io from 'socket.io-client';
 
 import getEnv from '~/utils/env';
+import { UpdateSettingDTO } from './dto/UpdateSettingDTO';
+import { SortBy } from '@/models/anime';
 
 function mapSetting(key: string, settings: Settings[], fallback: any) {
    const foundSetting = settings.find(setting => setting.key == key);
@@ -39,13 +41,13 @@ class SettingsService {
 
    async fetchSettings(): Promise<Settings[]> {
       return new Promise(resolve => {
-         this.socket.emit('fetch', {}, resolve);
+         this.socket.emit('find', {}, resolve);
       });
    }
 
-   async setSettings(key: string, value: any): Promise<Settings[]> {
+   async setSettings(updateModel: UpdateSettingDTO): Promise<Settings> {
       return new Promise(resolve => {
-         this.socket.emit('update', { key, value }, resolve);
+         this.socket.emit('update', updateModel, resolve);
       });
    }
 
@@ -56,7 +58,9 @@ class SettingsService {
       await SettingsModule.setCurrentYear(mapSetting('currentYear', settings, 2020));
       await SettingsModule.setDefaultSubgroup(mapSetting('defaultSubgroup', settings, 'Erai-raws'));
 
-      AnimeModule.addShows({ shows: await SeriesService.fetchAll('QUEUE', SettingsModule.currentSeason, SettingsModule.currentYear) });
+      AnimeModule.addShows({
+         shows: await SeriesService.fetchAll({ sortBy: SortBy.QUEUE, season: SettingsModule.currentSeason, year: SettingsModule.currentYear }),
+      });
    }
 }
 

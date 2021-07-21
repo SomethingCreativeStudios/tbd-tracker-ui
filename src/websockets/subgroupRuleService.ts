@@ -5,6 +5,8 @@ import io from 'socket.io-client';
 import { PartialDeep } from 'type-fest';
 
 import getEnv from '~/utils/env';
+import { CreateSubGroupRuleDTO } from './dto/CreateSubGroupRuleDTO';
+import { UpdateSubGroupRuleDTO } from './dto/UpdateSubGroupRuleDTO';
 
 class SubGroupRuleService {
    private socket: SocketIOClient.Socket;
@@ -13,21 +15,21 @@ class SubGroupRuleService {
       this.socket = io(getEnv('VUE_APP_WEBSOCKET_PATH') + '/subgrouprule');
    }
 
-   async create(subgroupId: number, rule: PartialDeep<SubGroupRule>): Promise<Anime> {
+   async create(createModel: CreateSubGroupRuleDTO): Promise<SubGroupRule[]> {
       return new Promise(resolve => {
-         this.socket.emit('create', { subgroupId, rule }, resolve);
+         this.socket.emit('create-many', createModel, resolve);
       });
    }
 
-   async update(subgroupId: number, rule: PartialDeep<SubGroupRule>): Promise<Anime> {
+   async update(updateModel: UpdateSubGroupRuleDTO): Promise<SubGroupRule> {
       return new Promise(resolve => {
-         this.socket.emit('update', { subgroupId: subgroupId, rule }, resolve);
+         this.socket.emit('update', updateModel, resolve);
       });
    }
 
-   async remove(subgroupId: number, ruleId: number): Promise<Anime> {
+   async remove(ruleId: number): Promise<Anime> {
       return new Promise(resolve => {
-         this.socket.emit('delete', { subgroupId, ruleId }, resolve);
+         this.socket.emit('delete', ruleId, resolve);
       });
    }
 }

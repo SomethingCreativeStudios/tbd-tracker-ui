@@ -8,6 +8,12 @@ export enum WatchingStatus {
    NOT_WATCHING = 'not_watching',
 }
 
+export enum SortBy {
+   'QUEUE' = 'queue',
+   'NAME' = 'name',
+   'WATCH_STATUS' = 'watch_status',
+}
+
 export interface Anime {
    id: number;
 
@@ -48,6 +54,10 @@ export interface Anime {
    isSyncing: boolean;
 
    hasPotentialSubgroups: boolean;
+
+   showName?: string;
+
+   offset?: number;
 }
 
 export interface NyaaItem {

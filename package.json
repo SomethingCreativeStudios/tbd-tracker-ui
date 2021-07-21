@@ -16,6 +16,8 @@
       "@types/string-similarity": "^4.0.0",
       "@vue/composition-api": "^1.0.0-beta.16",
       "axios": "^0.21.0",
+      "class-transformer": "^0.4.0",
+      "class-validator": "^0.13.1",
       "core-js": "^3.6.5",
       "node-nyaa-api": "^1.0.0",
       "nyaapi": "^2.3.3",

@@ -5,6 +5,11 @@ import io from 'socket.io-client';
 import { PartialDeep } from 'type-fest';
 
 import getEnv from '~/utils/env';
+import { CreateBySeasonDTO } from './dto/CreateBySeasonDTO';
+import { CreateFromMalDTO } from './dto/CreateFromMalDTO';
+import { MalSearchDTO } from './dto/MalSearchDTO';
+import { SearchBySeasonDTO } from './dto/SearchBySeasonDTO';
+import { UpdateSeriesDTO } from './dto/UpdateSeriesDTO';
 
 class SeriesService {
    private socket: SocketIOClient.Socket;
@@ -27,45 +32,45 @@ class SeriesService {
       });
    }
 
-   async createByMal(malId: number, seasonName: SeasonName, seasonYear: number): Promise<Anime> {
+   async createByMal(createModel: CreateFromMalDTO): Promise<Anime> {
       return new Promise(resolve => {
-         this.socket.emit('create-mal', { malId, seasonName, seasonYear }, resolve);
+         this.socket.emit('create-mal', createModel, resolve);
       });
    }
 
-   async createSeason(series: Anime[], seasonName: SeasonName, seasonYear: number): Promise<Anime[]> {
+   async createSeason(createModel: CreateBySeasonDTO): Promise<Anime[]> {
       return new Promise(resolve => {
-         this.socket.emit('create-season', { series, seasonName, seasonYear }, resolve);
+         this.socket.emit('create-season', createModel, resolve);
       });
    }
 
-   async fetchAll(sortBy: 'QUEUE' | 'NAME' | 'WATCH_STATUS' = 'QUEUE', season?: SeasonName, year?: number): Promise<Anime[]> {
+   async fetchAll(searchModel: SearchBySeasonDTO): Promise<Anime[]> {
       return new Promise(resolve => {
-         this.socket.emit('get', { sortBy, season, year }, resolve);
+         this.socket.emit('get', searchModel, resolve);
       });
    }
 
    async searchMAL(seriesName: string): Promise<Anime[]> {
       return new Promise(resolve => {
-         this.socket.emit('mal-search', seriesName, resolve);
+         this.socket.emit('mal/search-name', seriesName, resolve);
       });
    }
 
-   async searchMALBySeason(season: SeasonName, year: number): Promise<Anime[]> {
+   async searchMALBySeason(searchModel: MalSearchDTO): Promise<Anime[]> {
       return new Promise(resolve => {
-         this.socket.emit('season-search', { season, year }, resolve);
+         this.socket.emit('mal/search-season', searchModel, resolve);
       });
    }
 
-   async update(series: PartialDeep<Anime>): Promise<Anime> {
+   async update(updateModel: UpdateSeriesDTO): Promise<Anime> {
       return new Promise(resolve => {
-         this.socket.emit('update', series, resolve);
+         this.socket.emit('update', updateModel, resolve);
       });
    }
 
    async updateWatchStatus(id: number): Promise<WatchingStatus> {
       return new Promise(resolve => {
-         this.socket.emit('watch-status', id, resolve);
+         this.socket.emit('toggle-watch-status', id, resolve);
       });
    }
 

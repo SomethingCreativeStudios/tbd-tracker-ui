@@ -42,6 +42,7 @@
 </template>
 
 <script lang="ts">
+import { RuleType } from '@/models/subgroupRule';
 import Vue from 'vue';
 import { ConfirmDialog } from '~/components/dialogs';
 import { AnimeModule } from '~/store/modules/anime';
@@ -94,7 +95,7 @@ export default Vue.extend({
       },
 
       onRuleAdd() {
-         AnimeModule.addSubgroupRule({ id: this.showId, subgroupId: this.id });
+         AnimeModule.addSubgroupRule({ subgroupId: this.id, rules: [{ text: '', ruleType: RuleType.STARTS_WITH, isPositive: true }] });
       },
 
       onDelete() {
