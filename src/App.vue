@@ -87,7 +87,6 @@
 
 <script>
 import { mapState } from 'vuex';
-import { copySubgroup, downloadShowTest, syncShows } from '~/compositions/series/series';
 import { AnimeModule } from '~/store/modules/anime';
 import { ConfirmDialog } from '~/components/dialogs';
 import { AppModule } from './store/modules/app';
@@ -154,11 +153,11 @@ export default {
    },
    methods: {
       syncShows() {
-         syncShows();
+         // syncShows();
       },
 
       testDownload() {
-         downloadShowTest();
+         // downloadShowTest();
       },
 
       addDownload() {},
@@ -179,7 +178,7 @@ export default {
       },
 
       async onCopySelected() {
-         await copySubgroup(this.showToCopy, this.selectedShows);
+         // await copySubgroup(this.showToCopy, this.selectedShows);
          location.reload();
       },
 

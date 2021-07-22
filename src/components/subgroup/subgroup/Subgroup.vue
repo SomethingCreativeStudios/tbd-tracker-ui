@@ -16,14 +16,7 @@
                <v-combobox label="Subgroup Name" :items="subgroupNames" :value="name" @change="onChange('name', $event)"></v-combobox>
             </v-col>
             <v-col cols="12" sm="6">
-               <v-select
-                  label="Prefered Resultion"
-                  :value="preferedResultion"
-                  :items="resultions"
-                  @change="onChange('preferedResultion', $event)"
-                  item-text="text"
-                  item-value="value"
-               ></v-select>
+               <v-select label="Prefered Resultion" :value="preferedResultion" :items="resultions" @change="onChange('preferedResultion', $event)" item-text="text" item-value="value"></v-select>
             </v-col>
             <v-col cols="12">
                <v-row>
@@ -45,7 +38,8 @@
 import { RuleType } from '@/models/subgroupRule';
 import Vue from 'vue';
 import { ConfirmDialog } from '~/components/dialogs';
-import { AnimeModule } from '~/store/modules/anime';
+import { SubgroupModule } from '~/store/modules/subgroup';
+import { SubgroupRuleModule } from '~/store/modules/subgroupRule';
 import { SettingsModule } from '~/store/modules/settings';
 import SubgroupRule from '../subgroup-rule';
 
@@ -86,7 +80,8 @@ export default Vue.extend({
    },
    computed: {
       subgroupNames() {
-         return AnimeModule.subgroupNames.concat(SettingsModule.defaultSubgroup);
+         return [];
+         // return SubgroupModule.sub.concat(SettingsModule.defaultSubgroup);
       },
    },
    methods: {
@@ -95,15 +90,15 @@ export default Vue.extend({
       },
 
       onRuleAdd() {
-         AnimeModule.addSubgroupRule({ subgroupId: this.id, rules: [{ text: '', ruleType: RuleType.STARTS_WITH, isPositive: true }] });
+         SubgroupRuleModule.createSubgroupRule({ subgroupId: this.id, rules: [{ text: '', ruleType: RuleType.STARTS_WITH, isPositive: true }] });
       },
 
       onDelete() {
-         AnimeModule.removeSubgroup({ id: this.showId, subgroupId: this.id });
+         SubgroupModule.removeSubgroup(this.id);
       },
 
       onSave() {
-         AnimeModule.updateSubgroup({ id: this.showId, subgroupId: this.id, newGroup: this.updatedSubgroup });
+         SubgroupModule.updateSubgroup({ id: this.id, ...this.updatedSubgroup });
       },
    },
 });

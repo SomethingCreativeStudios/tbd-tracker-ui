@@ -4,14 +4,7 @@
          <v-text-field label="Text" :value="text" @change="onChange('text', $event)"></v-text-field>
       </v-col>
       <v-col cols="12" md="4">
-         <v-select
-            label="Rule Type"
-            :items="ruleTypes"
-            :value="ruleType"
-            @change="onChange('ruleType', $event)"
-            item-text="text"
-            item-value="value"
-         ></v-select>
+         <v-select label="Rule Type" :items="ruleTypes" :value="ruleType" @change="onChange('ruleType', $event)" item-text="text" item-value="value"></v-select>
       </v-col>
       <v-col cols="12" md="2">
          <v-select
@@ -43,7 +36,7 @@
 import Vue from 'vue';
 
 import { RuleType } from '~/models/subgroupRule';
-import { AnimeModule } from '~/store/modules/anime';
+import { SubgroupRuleModule } from '~/store/modules/subgroupRule';
 
 export default Vue.extend({
    name: 'subgroup-rule',
@@ -91,11 +84,11 @@ export default Vue.extend({
       },
 
       onSave() {
-         AnimeModule.updateSubgroupRule({ id: this.id, ...this.updatedRule });
+         SubgroupRuleModule.updateSubgroupRule({ id: this.id, ...this.updatedRule });
       },
 
       onDelete() {
-         AnimeModule.removeSubgroupRule(this.id);
+         SubgroupRuleModule.removeSubgroupRule(this.id);
       },
    },
 });

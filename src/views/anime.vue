@@ -26,7 +26,11 @@ export default Vue.extend({
    },
    methods: {
       async addShow({ results, clear }) {
-         AnimeModule.addShows({ shows: results, clear });
+         if (clear) {
+            AnimeModule.setAnime(results);
+         } else {
+            AnimeModule.addAnime(results);
+         }
       },
    },
 });

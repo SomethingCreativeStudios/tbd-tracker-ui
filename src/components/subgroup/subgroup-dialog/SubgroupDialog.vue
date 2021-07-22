@@ -39,8 +39,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
-
 import { AnimeModule } from '~modules/anime';
 import Subgroup from '../subgroup';
 import { service as NyaaService } from '~/websockets/nyaaService';

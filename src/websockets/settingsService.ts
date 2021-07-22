@@ -4,7 +4,7 @@ import { AnimeModule } from '@/store/modules/anime';
 import { SettingsModule } from '@/store/modules/settings';
 import { service as SeriesService } from '~/websockets/seriesService';
 
-import io from 'socket.io-client';
+import io, * as SocketIOClient from 'socket.io-client';
 
 import getEnv from '~/utils/env';
 import { UpdateSettingDTO } from './dto/UpdateSettingDTO';
@@ -34,7 +34,7 @@ class SettingsService {
    private socket: SocketIOClient.Socket;
 
    constructor() {
-      this.socket = io(getEnv('VUE_APP_WEBSOCKET_PATH') + '/settings');
+      this.socket = io(getEnv('VUE_APP_WEBSOCKET_PATH') + '/settings', { transports: ['websocket'] });
 
       this.socket.on('connect', this.loadSettings.bind(this));
    }
@@ -58,9 +58,8 @@ class SettingsService {
       await SettingsModule.setCurrentYear(mapSetting('currentYear', settings, 2020));
       await SettingsModule.setDefaultSubgroup(mapSetting('defaultSubgroup', settings, 'Erai-raws'));
 
-      AnimeModule.addShows({
-         shows: await SeriesService.fetchAll({ sortBy: SortBy.QUEUE, season: SettingsModule.currentSeason, year: SettingsModule.currentYear }),
-      });
+      const anime = await SeriesService.fetchAll({ sortBy: SortBy.QUEUE, season: SettingsModule.currentSeason, year: SettingsModule.currentYear });
+      AnimeModule.setAnime(anime);
    }
 }
 

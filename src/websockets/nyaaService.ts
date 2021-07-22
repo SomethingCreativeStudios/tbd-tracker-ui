@@ -3,7 +3,7 @@ import { AnimeModule } from '~modules/anime';
 import { DownloadModule } from '~modules/download';
 import { MessageModule } from '~modules/message';
 
-import io from 'socket.io-client';
+import io, * as SocketIOClient from 'socket.io-client';
 
 import getEnv from '~/utils/env';
 import Subgroup from '@/components/subgroup/subgroup';
@@ -13,21 +13,19 @@ class NyaaService {
    private socket: SocketIOClient.Socket;
 
    constructor() {
-      this.socket = io(getEnv('VUE_APP_WEBSOCKET_PATH') + '/nyaa');
+      this.socket = io(getEnv('VUE_APP_WEBSOCKET_PATH') + '/nyaa', { transports: ['websocket'] });
 
       this.socket.on('series-syncing', ({ id, type, queue }: { id: number; type: 'STARTING' | 'UPDATE_FOUND' | 'NO_UPDATE'; queue: NyaaItem[] }) => {
          if (type === 'STARTING') {
-            AnimeModule.updateShowSyncing({ showId: id, isSyncing: true });
+            AnimeModule.updateLocalSeries(id, { isSyncing: true });
          }
 
          if (type === 'UPDATE_FOUND') {
-            AnimeModule.updateShowQueue({ count: queue.length, showId: id, nyaaItems: queue });
-            AnimeModule.updateShowSyncing({ showId: id, isSyncing: false });
-            AnimeModule.sortShows('Queue');
+            AnimeModule.updateLocalSeries(id, { isSyncing: false, downloaded: queue.length, showQueue: queue });
          }
 
          if (type === 'NO_UPDATE') {
-            AnimeModule.updateShowSyncing({ showId: id, isSyncing: false });
+            AnimeModule.updateLocalSeries(id, { isSyncing: false });
          }
       });
 

@@ -1,13 +1,10 @@
 import { Anime, WatchingStatus } from '@/models/anime';
-import { SeasonName } from '@/models/season';
 import { AnimeModule } from '@/store/modules/anime';
-import io from 'socket.io-client';
-import { PartialDeep } from 'type-fest';
+import io, * as SocketIOClient from 'socket.io-client';
 
 import getEnv from '~/utils/env';
 import { CreateBySeasonDTO } from './dto/CreateBySeasonDTO';
 import { CreateFromMalDTO } from './dto/CreateFromMalDTO';
-import { MalSearchDTO } from './dto/MalSearchDTO';
 import { SearchBySeasonDTO } from './dto/SearchBySeasonDTO';
 import { UpdateSeriesDTO } from './dto/UpdateSeriesDTO';
 
@@ -15,7 +12,7 @@ class SeriesService {
    private socket: SocketIOClient.Socket;
 
    constructor() {
-      this.socket = io(getEnv('VUE_APP_WEBSOCKET_PATH') + '/series');
+      this.socket = io(getEnv('VUE_APP_WEBSOCKET_PATH') + '/series', { transports: ['websocket'] });
       this.loadSeries();
    }
 
@@ -46,19 +43,7 @@ class SeriesService {
 
    async fetchAll(searchModel: SearchBySeasonDTO): Promise<Anime[]> {
       return new Promise(resolve => {
-         this.socket.emit('get', searchModel, resolve);
-      });
-   }
-
-   async searchMAL(seriesName: string): Promise<Anime[]> {
-      return new Promise(resolve => {
-         this.socket.emit('mal/search-name', seriesName, resolve);
-      });
-   }
-
-   async searchMALBySeason(searchModel: MalSearchDTO): Promise<Anime[]> {
-      return new Promise(resolve => {
-         this.socket.emit('mal/search-season', searchModel, resolve);
+         this.socket.emit('find-by-season', searchModel, resolve);
       });
    }
 
@@ -83,6 +68,18 @@ class SeriesService {
    async folderNames(): Promise<string[]> {
       return new Promise(resolve => {
          this.socket.emit('folder-names', {}, resolve);
+      });
+   }
+
+   async syncWithMal(id: number): Promise<Anime> {
+      return new Promise(resolve => {
+         this.socket.emit('sync-mal', id, resolve);
+      });
+   }
+
+   async syncImageUrl(id: number): Promise<string> {
+      return new Promise(resolve => {
+         this.socket.emit('sync-mal-image', id, resolve);
       });
    }
 

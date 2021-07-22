@@ -148,7 +148,6 @@ import { findBestMatch } from 'string-similarity';
 
 import { WatchingStatus } from '@/models/anime';
 import { AnimeModule } from '~modules/anime';
-import { createNewFolder } from '@/compositions/series/series';
 
 export default {
    name: 'anime-dialog',

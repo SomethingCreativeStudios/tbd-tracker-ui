@@ -1,6 +1,6 @@
 import { Anime } from '@/models/anime';
 import { SubGroup } from '@/models/subgroup';
-import io from 'socket.io-client';
+import io, * as SocketIOClient from 'socket.io-client';
 import { PartialDeep } from 'type-fest';
 
 import getEnv from '~/utils/env';
@@ -11,22 +11,22 @@ class SubGroupService {
    private socket: SocketIOClient.Socket;
 
    constructor() {
-      this.socket = io(getEnv('VUE_APP_WEBSOCKET_PATH') + '/subgroup');
+      this.socket = io(getEnv('VUE_APP_WEBSOCKET_PATH') + '/subgroup', { transports: ['websocket'] });
    }
 
-   async create(createModel: CreateSubGroupDTO): Promise<Anime> {
+   async create(createModel: CreateSubGroupDTO): Promise<SubGroup> {
       return new Promise(resolve => {
          this.socket.emit('create', createModel, resolve);
       });
    }
 
-   async update(updateModel: UpdateSubGroupDTO): Promise<Anime> {
+   async update(updateModel: UpdateSubGroupDTO): Promise<SubGroup> {
       return new Promise(resolve => {
          this.socket.emit('update', updateModel, resolve);
       });
    }
 
-   async remove(id: number): Promise<Anime> {
+   async remove(id: number): Promise<SubGroup> {
       return new Promise(resolve => {
          this.socket.emit('remove', id, resolve);
       });

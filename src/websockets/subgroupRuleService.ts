@@ -1,7 +1,7 @@
 import { Anime } from '@/models/anime';
 import { SubGroup } from '@/models/subgroup';
 import { SubGroupRule } from '@/models/subgroupRule';
-import io from 'socket.io-client';
+import io, * as SocketIOClient from 'socket.io-client';
 import { PartialDeep } from 'type-fest';
 
 import getEnv from '~/utils/env';
@@ -12,7 +12,7 @@ class SubGroupRuleService {
    private socket: SocketIOClient.Socket;
 
    constructor() {
-      this.socket = io(getEnv('VUE_APP_WEBSOCKET_PATH') + '/subgrouprule');
+      this.socket = io(getEnv('VUE_APP_WEBSOCKET_PATH') + '/subgrouprule', { transports: ['websocket'] });
    }
 
    async create(createModel: CreateSubGroupRuleDTO): Promise<SubGroupRule[]> {

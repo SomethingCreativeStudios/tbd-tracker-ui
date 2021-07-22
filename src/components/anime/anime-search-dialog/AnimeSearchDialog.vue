@@ -1,13 +1,5 @@
 <template>
-   <v-dialog
-      :class="`mobile-${$vuetify.breakpoint.mobile}`"
-      v-model="dialog"
-      persistent
-      max-width="60%"
-      scrollable
-      :fullscreen="$vuetify.breakpoint.mobile"
-      :transition="dialogTransition"
-   >
+   <v-dialog :class="`mobile-${$vuetify.breakpoint.mobile}`" v-model="dialog" persistent max-width="60%" scrollable :fullscreen="$vuetify.breakpoint.mobile" :transition="dialogTransition">
       <template #activator="{ on, attrs }">
          <slot name="activator" v-bind:attrs="attrs" v-bind:on="on">
             <v-btn v-bind="attrs" v-on="on">
@@ -56,12 +48,7 @@
                         </v-btn>
                      </v-col>
                   </v-row>
-                  <search-collection
-                     :multiSelect="true"
-                     :defaultSelected="true"
-                     :results="seasonAnime"
-                     @selected="onSelected($event, 'season')"
-                  ></search-collection>
+                  <search-collection :multiSelect="true" :defaultSelected="true" :results="seasonAnime" @selected="onSelected($event, 'season')"></search-collection>
                </v-row>
             </v-tab-item>
          </v-tabs-items>
@@ -83,15 +70,11 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
-import { clone } from 'ramda';
-
-import { WatchingStatus } from '@/models/anime';
-import { AnimeModule } from '~modules/anime';
 import { SeasonName } from '@/models/season';
 import { SettingsModule } from '@/store/modules/settings';
 import { service as SettingService } from '~/websockets/settingsService';
 import { service as SeriesService } from '~/websockets/seriesService';
+import { service as SearchService } from '~/websockets/malQueryService';
 import SearchCollection from './components/search-collection/SearchCollection.vue';
 
 export default {
@@ -140,10 +123,7 @@ export default {
       async onConfirm() {
          this.loading = true;
          console.log(this.malSelected);
-         const results =
-            this.tab === 0
-               ? [await SeriesService.createByMal(this.malSelected[0].malId)]
-               : await SeriesService.createSeason(this.seasonSelected, this.selectedSeason, this.selectedYear);
+         const results = this.tab === 0 ? [await SeriesService.createByMal(this.malSelected[0].malId)] : await SeriesService.createSeason(this.seasonSelected, this.selectedSeason, this.selectedYear);
 
          if (this.tab !== 0) {
             const newYear = await SettingService.setSettings('currentYear', this.selectedYear);
@@ -163,7 +143,7 @@ export default {
          console.log(this.search);
          this.searching = true;
 
-         const results = await SeriesService.searchMAL(text);
+         const results = await SearchService.searchByName(text);
 
          this.$set(this, 'malAnime', results);
 
@@ -172,8 +152,7 @@ export default {
 
       async onSeasonSearch() {
          this.searching = true;
-
-         const results = await SeriesService.searchMALBySeason(this.selectedSeason, this.selectedYear);
+         const results = await SearchService.searchBySeason({ season: this.selectedSeason, year: this.selectedYear });
 
          this.$set(this, 'seasonAnime', results);
 
