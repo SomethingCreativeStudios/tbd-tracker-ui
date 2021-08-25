@@ -13,6 +13,9 @@
          </v-card-title>
          <v-card-text>
             <v-container>
+               <div class="sync-badge">
+                  <v-icon small color="#E5A00D" @click="onSync">fas fa-sync {{ isSyncing ? 'fa-spin' : '' }}</v-icon>
+               </div>
                <v-row>
                   <v-col cols="12" sm="4" md="2">
                      <v-select label="Watch Status" :items="watchingStatus" :value="show.watchStatus" @change="onChange('watchStatus', $event)" item-text="text" item-value="value"></v-select>
@@ -72,7 +75,15 @@
                   </v-col>
                   <v-col cols="12" sm="6">
                      <v-row>
-                        <v-select label="Folder Path" :value="show.folderPath" :items="folderNames" item-text="text" item-value="value" @change="onChange('folderPath', $event)"></v-select>
+                        <v-select
+                           class="folder-select"
+                           label="Folder Path"
+                           :value="show.folderPath"
+                           :items="folderNames"
+                           item-text="text"
+                           item-value="value"
+                           @change="onChange('folderPath', $event)"
+                        ></v-select>
                         <v-icon class="folder-add" @click="makeFolder"> fas fa-plus</v-icon>
                      </v-row>
                   </v-col>
@@ -120,6 +131,7 @@ export default {
          updatedShow: {},
          datePickerMenu: false,
          newFoldersName: [],
+         isSyncing: false,
       };
    },
    computed: {
@@ -177,6 +189,9 @@ export default {
          this.$emit('update:dialog', false);
          this.$emit('confirm');
       },
+      onSync() {
+         console.log('SYNC!');
+      },
       onChange(field, value) {
          this.updatedShow[field] = value;
       },
@@ -203,5 +218,22 @@ export default {
 .folder-add {
    padding-left: 10px;
    padding-right: 10px;
+}
+
+.folder-select {
+   padding-left: 10px;
+   flex: 1;
+}
+
+.sync-badge {
+   position: absolute;
+   top: 12px;
+   right: 19px;
+
+   z-index: 6;
+
+   .v-icon {
+      text-shadow: 1px 2px rgb(8 8 8 / 75%);
+   }
 }
 </style>

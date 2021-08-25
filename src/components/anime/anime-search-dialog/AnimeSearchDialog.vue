@@ -122,11 +122,13 @@ export default {
       },
       async onConfirm() {
          this.loading = true;
-         console.log(this.malSelected);
-         const results = this.tab === 0 ? [await SeriesService.createByMal(this.malSelected[0].malId)] : await SeriesService.createSeason(this.seasonSelected, this.selectedSeason, this.selectedYear);
+         const results =
+            this.tab === 0
+               ? [await SeriesService.createByMal({ malId: this.malSelected[0].malId, seasonYear: SettingsModule.currentYear, seasonName: SettingsModule.currentSeason })]
+               : await SeriesService.createSeason(this.seasonSelected, this.selectedSeason, this.selectedYear);
 
          if (this.tab !== 0) {
-            const newYear =   await SettingsService.setSettings({ key: 'currentYear', value: this.selectedYear, type: 'number' });
+            const newYear = await SettingsService.setSettings({ key: 'currentYear', value: this.selectedYear, type: 'number' });
             const newSeason = await SettingsService.setSettings({ key: 'currentSeason', value: this.selectedSeason, type: 'string' });
 
             await SettingsModule.setCurrentYear(newYear.value);

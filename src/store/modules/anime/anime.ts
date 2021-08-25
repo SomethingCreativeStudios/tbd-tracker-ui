@@ -25,12 +25,16 @@ class AnimeModule extends VuexModule {
 
    @Mutation
    private mut_setAnime(anime: Anime[]) {
-      Vue.set(this, 'shows', anime);
+      Vue.set(
+         this,
+         'shows',
+         anime.map(show => ({ ...show, airingData: new Date(show.airingData), score: Number(show.score) }))
+      );
    }
 
    @Mutation
    private mut_addAnime(anime: Anime[]) {
-      Vue.set(this, 'shows', this.shows.concat(anime));
+      Vue.set(this, 'shows', this.shows.concat(anime.map(show => ({ ...show, airingData: new Date(show.airingData), score: Number(show.score) }))));
    }
 
    @Mutation
