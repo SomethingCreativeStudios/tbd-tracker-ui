@@ -94,3 +94,4 @@ const service = new SeriesService();
 Object.freeze(service);
 
 export { service };
+
