@@ -3,7 +3,6 @@ import Vue from 'vue';
 import { VuexModule, Module, Mutation, Action, getModule } from 'vuex-module-decorators';
 
 import store from '~/store';
-import { PartialDeep } from 'type-fest';
 import { Season } from '@/models/season';
 import { mergeDeepRight } from 'ramda';
 

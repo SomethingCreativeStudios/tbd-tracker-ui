@@ -126,8 +126,8 @@ export default {
          const results = this.tab === 0 ? [await SeriesService.createByMal(this.malSelected[0].malId)] : await SeriesService.createSeason(this.seasonSelected, this.selectedSeason, this.selectedYear);
 
          if (this.tab !== 0) {
-            const newYear = await SettingService.setSettings('currentYear', this.selectedYear);
-            const newSeason = await SettingService.setSettings('currentSeason', this.selectedSeason);
+            const newYear =   await SettingsService.setSettings({ key: 'currentYear', value: this.selectedYear, type: 'number' });
+            const newSeason = await SettingsService.setSettings({ key: 'currentSeason', value: this.selectedSeason, type: 'string' });
 
             await SettingsModule.setCurrentYear(newYear.value);
             await SettingsModule.setCurrentSeason(newSeason.value);

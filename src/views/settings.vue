@@ -38,11 +38,11 @@ export default {
    },
    methods: {
       async onSeasonSelect(newSeason) {
-         const setting = await SettingsService.setSettings('currentSeason', newSeason);
+         const setting = await SettingsService.setSettings({ key: 'currentSeason', value: newSeason, type: 'string' });
          SettingsModule.setCurrentSeason(setting.value);
       },
       async onYearSelect(newYear) {
-         const setting = await SettingsService.setSettings('currentYear', Number(newYear));
+         const setting = await SettingsService.setSettings({ key: 'currentYear', value: Number(newYear), type: 'number' });
          SettingsModule.setCurrentYear(setting.value);
       },
    },

@@ -208,7 +208,7 @@ export default {
          NyaaService.syncShow(this.id);
       },
       onStatusUpdate() {
-         AnimeModule.updateWatchStatus(this.id);
+         AnimeModule.toggleWatchStatus(this.id);
       },
    },
    filters: {

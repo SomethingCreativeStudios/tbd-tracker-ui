@@ -65,7 +65,7 @@ class SeriesService {
       });
    }
 
-   async folderNames(): Promise<string[]> {
+   async getFolderNames(): Promise<string[]> {
       return new Promise(resolve => {
          this.socket.emit('folder-names', {}, resolve);
       });
@@ -85,7 +85,7 @@ class SeriesService {
 
    private async loadSeries() {
       await this.ensureConnection();
-      AnimeModule?.setFolderNames(await this.folderNames());
+      AnimeModule?.setFolderNames(await this.getFolderNames());
    }
 }
 

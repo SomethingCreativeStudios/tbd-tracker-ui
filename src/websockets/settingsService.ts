@@ -41,7 +41,7 @@ class SettingsService {
 
    async fetchSettings(): Promise<Settings[]> {
       return new Promise(resolve => {
-         this.socket.emit('find', {}, resolve);
+         this.socket.emit('search', {}, resolve);
       });
    }
 

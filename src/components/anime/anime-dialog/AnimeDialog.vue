@@ -15,14 +15,7 @@
             <v-container>
                <v-row>
                   <v-col cols="12" sm="4" md="2">
-                     <v-select
-                        label="Watch Status"
-                        :items="watchingStatus"
-                        :value="show.watchStatus"
-                        @change="onChange('watchStatus', $event)"
-                        item-text="text"
-                        item-value="value"
-                     ></v-select>
+                     <v-select label="Watch Status" :items="watchingStatus" :value="show.watchStatus" @change="onChange('watchStatus', $event)" item-text="text" item-value="value"></v-select>
                   </v-col>
                   <v-col cols="12" sm="4" md="2">
                      <v-text-field label="Overall Score" :value="show.score" @change="onChange('score', Number($event))" type="number"></v-text-field>
@@ -31,20 +24,10 @@
                      <v-text-field label="Show Name" :value="show.name" @change="onChange('name', $event)"></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="2" md="1">
-                     <v-text-field
-                        label="Total Downloaded"
-                        :value="show.downloaded"
-                        @change="onChange('downloaded', $event)"
-                        type="number"
-                     ></v-text-field>
+                     <v-text-field label="Total Downloaded" :value="show.downloaded" @change="onChange('downloaded', $event)" type="number"></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="2" md="1">
-                     <v-text-field
-                        label="Total Episodes"
-                        :value="show.numberOfEpisodes"
-                        @change="onChange('numberOfEpisodes', $event)"
-                        type="number"
-                     ></v-text-field>
+                     <v-text-field label="Total Episodes" :value="show.numberOfEpisodes" @change="onChange('numberOfEpisodes', $event)" type="number"></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6">
                      <v-combobox :value="updatedShow.otherNames" label="Show Alt Names" multiple chips @change="onChange('otherNames', $event)">
@@ -59,29 +42,11 @@
                      <v-text-field label="Studio" :value="show.studio" @change="onChange('studio', $event)"></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="3" md="3">
-                     <v-menu
-                        v-model="datePickerMenu"
-                        :close-on-content-click="false"
-                        :nudge-right="40"
-                        transition="scale-transition"
-                        offset-y
-                        min-width="290px"
-                     >
+                     <v-menu v-model="datePickerMenu" :close-on-content-click="false" :nudge-right="40" transition="scale-transition" offset-y min-width="290px">
                         <template v-slot:activator="{ on, attrs }">
-                           <v-text-field
-                              v-model="updatedShow.airingData"
-                              label="Airing Date"
-                              prepend-icon="mdi-calendar"
-                              readonly
-                              v-bind="attrs"
-                              v-on="on"
-                           ></v-text-field>
+                           <v-text-field v-model="updatedShow.airingData" label="Airing Date" prepend-icon="mdi-calendar" readonly v-bind="attrs" v-on="on"></v-text-field>
                         </template>
-                        <v-date-picker
-                           v-model="updatedShow.airingData"
-                           @input="datePickerMenu = false"
-                           @change="onChange('airingData', $event)"
-                        ></v-date-picker>
+                        <v-date-picker v-model="updatedShow.airingData" @input="datePickerMenu = false" @change="onChange('airingData', $event)"></v-date-picker>
                      </v-menu>
                   </v-col>
                   <v-col cols="12">
@@ -107,14 +72,7 @@
                   </v-col>
                   <v-col cols="12" sm="6">
                      <v-row>
-                        <v-select
-                           label="Folder Path"
-                           :value="show.folderPath"
-                           :items="folderNames"
-                           item-text="text"
-                           item-value="value"
-                           @change="onChange('folderPath', $event)"
-                        ></v-select>
+                        <v-select label="Folder Path" :value="show.folderPath" :items="folderNames" item-text="text" item-value="value" @change="onChange('folderPath', $event)"></v-select>
                         <v-icon class="folder-add" @click="makeFolder"> fas fa-plus</v-icon>
                      </v-row>
                   </v-col>
@@ -142,7 +100,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
 import { clone } from 'ramda';
 import { findBestMatch } from 'string-similarity';
 
@@ -202,7 +159,7 @@ export default {
             this.updatedShow.tags = clone(this.show.tags);
             this.updatedShow.genres = clone(this.show.genres);
             this.updatedShow.otherNames = clone(this.show.otherNames);
-            this.updatedShow.airingData = this.show.airingData.toISOString().substr(0, 10);
+            this.updatedShow.airingData = new Date(this.show.airingData);
          },
          immediate: true,
       },
@@ -214,7 +171,7 @@ export default {
          this.$emit('cancel');
       },
       onConfirm() {
-         AnimeModule.updateShowById({ id: this.show.id, newShow: { ...this.updatedShow, airingData: new Date(this.updatedShow.airingData) } });
+         AnimeModule.updateAnime({ id: this.show.id, ...this.updatedShow, airingData: new Date(this.updatedShow.airingData) });
 
          this.dialog = false;
          this.$emit('update:dialog', false);
