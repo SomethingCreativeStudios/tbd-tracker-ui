@@ -1,28 +1,27 @@
-import Vue from 'vue';
-import App from './App.vue';
-import router from './router';
-import store from './store';
-import vuetify from './plugins/vuetify';
-import VueCompositionAPI from '@vue/composition-api';
-import { bootstrap } from '~/bootstrap/bootstrap';
+// register vue composition api globally
+import { ViteSSG } from 'vite-ssg'
+import generatedRoutes from 'virtual:generated-pages'
+import { setupLayouts } from 'virtual:generated-layouts'
+import App from './App.vue'
 
-Vue.config.productionTip = false;
+// windicss layers
+import 'virtual:windi-base.css'
+import 'virtual:windi-components.css'
+// your custom styles here
+import './styles/main.css'
+// windicss utilities should be the last style import
+import 'virtual:windi-utilities.css'
+// windicss devtools support (dev only)
+import 'virtual:windi-devtools'
 
-Vue.use(VueCompositionAPI);
+const routes = setupLayouts(generatedRoutes)
 
-//@ts-ignore
-window.store = store;
-
-new Vue({
-   router,
-   store,
-   // @ts-ignore
-   vuetify,
-   render: h => h(App),
-}).$mount('#app');
-
-async function main() {
-   await bootstrap();
-}
-
-main();
+// https://github.com/antfu/vite-ssg
+export const createApp = ViteSSG(
+  App,
+  { routes },
+  (ctx) => {
+    // install all modules under `modules/`
+    Object.values(import.meta.globEager('./modules/*.ts')).map(i => i.install?.(ctx))
+  },
+)

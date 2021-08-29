@@ -1,26 +1,26 @@
 {
-   "compilerOptions": {
-      "experimentalDecorators": true,
-      "target": "esnext",
-      "module": "esnext",
-      "jsx": "preserve",
-      "importHelpers": true,
-      "moduleResolution": "node",
-      "skipLibCheck": true,
-      "esModuleInterop": true,
-      "strictNullChecks": false,
-      "allowSyntheticDefaultImports": true,
-      "sourceMap": true,
-      "baseUrl": ".",
-      "types": ["webpack-env"],
-      "paths": {
-         "@/*": ["src/*"],
-         "~/*": ["src/*"],
-         "~modules/*": ["src/store/modules/*"],
-         "~dialogs/*": ["src/components/dialogs/*"]
-      },
-      "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
-   },
-   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "tests/**/*.ts", "tests/**/*.tsx"],
-   "exclude": ["node_modules"]
+  "compilerOptions": {
+    "baseUrl": ".",
+    "module": "ESNext",
+    "target": "es2016",
+    "lib": ["DOM", "ESNext"],
+    "strict": true,
+    "esModuleInterop": true,
+    "incremental": false,
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "noUnusedLocals": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
+    "types": [
+      "vite/client",
+      "vite-plugin-pages/client",
+      "vite-plugin-vue-layouts/client"
+    ],
+    "paths": {
+      "~/*": ["src/*"]
+    }
+  },
+  "exclude": ["dist", "node_modules"]
 }
