@@ -33,4 +33,5 @@ export const useSubGroup = defineStore('subgroup', () => {
    return { createSubGroup, updateSubGroup, removeSubGroup };
 });
 
+
 if (import.meta.hot) import.meta.hot.accept(acceptHMRUpdate(useSubGroup, import.meta.hot));

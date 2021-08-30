@@ -45,6 +45,12 @@ class SeriesService {
       });
    }
 
+   async fetchById(id: number): Promise<Series> {
+      return new Promise((resolve) => {
+         this.socket.emit('get-by-it', id, resolve);
+      });
+   }
+
    async update(updateModel: UpdateSeriesDTO): Promise<Series> {
       return new Promise((resolve) => {
          this.socket.emit('update', updateModel, resolve);
@@ -83,7 +89,6 @@ class SeriesService {
 
    private async loadSeries() {
       await this.ensureConnection();
-      AnimeModule?.setFolderNames(await this.getFolderNames());
    }
 }
 

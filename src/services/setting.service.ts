@@ -31,7 +31,7 @@ class SettingsService {
    constructor() {
       this.socket = io(import.meta.env.VITE_APP_WEBSOCKET_PATH + '/settings', { transports: ['websocket'] });
 
-      this.socket.on('connect', this.loadSettings.bind(this));
+      this.socket.on('connect', () => {});
    }
 
    async fetchSettings(): Promise<Settings[]> {
@@ -44,17 +44,6 @@ class SettingsService {
       return new Promise((resolve) => {
          this.socket.emit('update', updateModel, resolve);
       });
-   }
-
-   private async loadSettings() {
-      const settings = await this.fetchSettings();
-
-      await SettingsModule.setCurrentSeason(mapSetting('currentSeason', settings, SeasonName.FALL));
-      await SettingsModule.setCurrentYear(mapSetting('currentYear', settings, 2020));
-      await SettingsModule.setDefaultSubgroup(mapSetting('defaultSubgroup', settings, 'Erai-raws'));
-
-      const anime = await SeriesService.fetchAll({ sortBy: SortBy.QUEUE, season: SettingsModule.currentSeason, year: SettingsModule.currentYear });
-      AnimeModule.setAnime(anime);
    }
 }
 

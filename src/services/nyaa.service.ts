@@ -1,6 +1,12 @@
 import io, * as SocketIOClient from 'socket.io-client';
+import { NyaaItem } from '~/types/nyaa/nyaa-item.model';
 import { Series } from '~/types/series/series.model';
 import { SubGroup } from '~/types/sub-group/sub-group.model';
+import { useSeriesStore } from '~/stores/series';
+import { useDownloadStore } from '~/stores/download';
+
+const seriesStore = useSeriesStore();
+const downloadStore = useDownloadStore();
 
 class NyaaService {
    private socket: SocketIOClient.Socket;
@@ -10,47 +16,38 @@ class NyaaService {
 
       this.socket.on('series-syncing', ({ id, type, queue }: { id: number; type: 'STARTING' | 'UPDATE_FOUND' | 'NO_UPDATE'; queue: NyaaItem[] }) => {
          if (type === 'STARTING') {
-            AnimeModule.updateLocalSeries(id, { isSyncing: true });
+            seriesStore.updateSyncStatus(id, true);
          }
 
          if (type === 'UPDATE_FOUND') {
-            AnimeModule.updateLocalSeries(id, { isSyncing: false, downloaded: queue.length, showQueue: queue });
+            seriesStore.updateSyncStatus(id, false);
+            seriesStore.refreshShow(id);
          }
 
          if (type === 'NO_UPDATE') {
-            AnimeModule.updateLocalSeries(id, { isSyncing: false });
+            seriesStore.updateSyncStatus(id, false);
          }
       });
 
       this.socket.on('start-downloading', function ({ hash, value }) {
-         DownloadModule.addItem({ hash, url: value.url, queued: value.queued });
+         downloadStore.triggerDownload({ hash, value });
       });
 
       this.socket.on('torrent-queued', function ({ url, fileName }) {
          console.log('Queued', url, fileName);
-         DownloadModule.addQueuedItem({ url, name: fileName });
+         downloadStore.addQueue(fileName, url);
       });
 
       this.socket.on('metadata', function ({ hash, value }) {
-         MessageModule.setMessage(`${value.name} added to download queue`);
-         DownloadModule.updateName({ hash, name: value.name });
+         console.log('MetaData', hash);
       });
 
       this.socket.on('downloading', function ({ hash, value }) {
-         DownloadModule.updateProgress({
-            hash,
-            name: value.name,
-            progress: value.progress,
-            timeLeft: value.timeLeft,
-            speed: value.speed,
-            totalDownloaded: value.totalDownloaded,
-         });
+         downloadStore.updateDownload({ hash, value });
       });
 
       this.socket.on('downloaded', function ({ hash, value }) {
-         const { name } = DownloadModule.items.find((show) => show.hash === hash);
-         MessageModule.setMessage(`${name} has downloaded`);
-         DownloadModule.removeItem(hash);
+         downloadStore.completeDownload(hash);
       });
    }
 

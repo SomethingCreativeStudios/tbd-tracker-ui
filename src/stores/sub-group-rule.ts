@@ -1,5 +1,5 @@
 import { acceptHMRUpdate, defineStore } from 'pinia';
-import { CreateRuleDTO, CreateSubGroupRuleDTO } from '~/types/sub-group-rule/dto/CreateSubGroupRuleDTO';
+import { CreateSubGroupRuleDTO } from '~/types/sub-group-rule/dto/CreateSubGroupRuleDTO';
 import { UpdateSubGroupRuleDTO } from '~/types/sub-group-rule/dto/UpdateSubGroupRuleDTO';
 import { SubGroupRule } from '~/types/sub-group-rule/sub-group-rule.model';
 import { service as SubgroupRuleService } from '../services/sub-group-rule.service';
@@ -29,5 +29,6 @@ export const useSubGroupRule = defineStore('subgroupRule', () => {
    }
    return { createRule, removeRule, updateRule };
 });
+
 
 if (import.meta.hot) import.meta.hot.accept(acceptHMRUpdate(useSubGroupRule, import.meta.hot));

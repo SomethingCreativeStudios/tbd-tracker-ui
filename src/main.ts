@@ -17,7 +17,8 @@ import 'virtual:windi-devtools';
 const routes = setupLayouts(generatedRoutes);
 
 // https://github.com/antfu/vite-ssg
-export const createApp = ViteSSG(App, { routes }, (ctx) => {
+export const createApp = ViteSSG(App, { routes }, async (ctx) => {
    // install all modules under `modules/`
    Object.values(import.meta.globEager('./modules/*.ts')).map((i) => i.install?.(ctx));
 });
+
