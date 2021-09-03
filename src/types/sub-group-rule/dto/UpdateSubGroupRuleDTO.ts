@@ -1,5 +1,5 @@
 import { IsBoolean, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
-import { RuleType } from '../models';
+import { RuleType } from '../rule-type.enum';
 
 export class UpdateSubGroupRuleDTO {
   @IsNumber()

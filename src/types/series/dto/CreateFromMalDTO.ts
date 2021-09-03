@@ -1,5 +1,5 @@
 import { IsBoolean, IsEnum, IsNumber, IsOptional } from 'class-validator';
-import { SeasonName } from '~/modules/season/models';
+import { SeasonName } from '../../season/season-name.enum';
 
 export class CreateFromMalDTO {
   @IsNumber()

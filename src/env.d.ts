@@ -1,6 +1,7 @@
-interface ImportMetaEnv {
-   VITE_APP_SERVER_PATH: string;
-   VITE_APP_WEBSOCKET_PATH: string;
-   VITE_APP_USERNAME: string;
-   VITE_APP_PASSWORD: string;
+declare namespace NodeJS {
+  interface ProcessEnv {
+    NODE_ENV: string;
+    VUE_ROUTER_MODE: 'hash' | 'history' | 'abstract' | undefined;
+    VUE_ROUTER_BASE: string | undefined;
+  }
 }

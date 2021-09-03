@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer';
 import { IsArray, IsDate, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
-import { NyaaItem } from '~/modules/nyaa/models/nyaaItem';
-import { WatchingStatus } from '../models';
+import { NyaaItem } from '../../nyaa/nyaa-item.model';
+import { WatchingStatus } from '../../series/watching-status.enum';
 
 export class UpdateSeriesDTO {
   @IsNumber()

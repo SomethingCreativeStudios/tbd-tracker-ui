@@ -1,14 +1,14 @@
-import { Series } from "../series/series.model";
-import { SeasonName } from "./season-name.enum";
+import { Series } from '../series/series.model';
+import { SeasonName } from './season-name.enum';
 
 export class Season {
-   id: number;
+  id: number;
 
-   name: SeasonName;
+  name: SeasonName;
 
-   year: number;
+  year: number;
 
-   overallScore: number;
+  overallScore: number;
 
-   series: Series[];
+  series: Series[];
 }

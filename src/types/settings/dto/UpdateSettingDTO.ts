@@ -1,5 +1,5 @@
 import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { SettingType } from '../models/setting.entity';
+import { SettingType } from '../setting-type.enum';
 
 export class UpdateSettingDTO {
   @IsString()

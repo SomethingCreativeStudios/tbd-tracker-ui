@@ -1,48 +1,48 @@
-import { NyaaItem } from "../nyaa/nyaa-item.model";
-import { Season } from "../season/season.model";
-import { SubGroup } from "../sub-group/sub-group.model";
-import { WatchingStatus } from "./watching-status.enum";
+import { NyaaItem } from '../nyaa/nyaa-item.model';
+import { Season } from '../season/season.model';
+import { SubGroup } from '../sub-group/sub-group.model';
+import { WatchingStatus } from './watching-status.enum';
 
 export class Series {
-   id: number;
+  id: number;
 
-   name: string;
+  name: string;
 
-   otherNames: string[];
+  otherNames: string[];
 
-   studio: string;
+  studio: string;
 
-   folderPath: string;
+  folderPath: string;
 
-   description: string;
+  description: string;
 
-   imageUrl: string;
+  imageUrl: string;
 
-   airingData: Date;
+  airingData: Date;
 
-   numberOfEpisodes: number;
+  numberOfEpisodes: number;
 
-   downloaded: number;
+  downloaded: number;
 
-   score: number;
+  score: number;
 
-   genres: string[];
+  genres: string[];
 
-   tags: string[];
+  tags: string[];
 
-   watchStatus: WatchingStatus;
+  watchStatus: WatchingStatus;
 
-   showName?: string;
+  showName?: string;
 
-   offset?: number;
+  offset?: number;
 
-   continuing: boolean = false;
+  continuing: boolean = false;
 
-   malId: number;
+  malId: number;
 
-   season: Season;
+  season: Season;
 
-   subgroups: SubGroup[];
+  subgroups: SubGroup[];
 
-   showQueue: NyaaItem[];
+  showQueue: NyaaItem[];
 }

@@ -1,5 +1,5 @@
 import { IsBoolean, IsEnum, IsString } from 'class-validator';
-import { NyaaFeed } from '../nyaa.service';
+import { NyaaFeed } from '../nyaa-feed.model';
 
 export class SearchNyaaDTO {
   @IsString()

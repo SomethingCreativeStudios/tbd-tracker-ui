@@ -6,7 +6,7 @@ class QueryService {
    private socket: SocketIOClient.Socket;
 
    constructor() {
-      this.socket = io(import.meta.env.VITE_APP_WEBSOCKET_PATH + '/series', { transports: ['websocket'] });
+      this.socket = io(process.env.VUE_APP_WEBSOCKET_PATH + '/series', { transports: ['websocket'] });
    }
 
    async ensureConnection() {

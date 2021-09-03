@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsArray, IsDate, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
-import { WatchingStatus } from '../models';
+import { WatchingStatus } from '../../series/watching-status.enum';
 
 export class CreateSeriesDTO {
   @IsString()

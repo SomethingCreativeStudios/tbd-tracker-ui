@@ -5,29 +5,37 @@ import { UpdateSubGroupRuleDTO } from '~/types/sub-group-rule/dto/UpdateSubGroup
 import { SubGroupRule } from '~/types/sub-group-rule/sub-group-rule.model';
 
 class SubGroupRuleService {
-   private socket: SocketIOClient.Socket;
+  private socket: SocketIOClient.Socket;
 
-   constructor() {
-      this.socket = io(import.meta.env.VITE_APP_WEBSOCKET_PATH + '/subgrouprule', { transports: ['websocket'] });
-   }
+  constructor() {
+    this.socket = io(process.env.VUE_APP_WEBSOCKET_PATH + '/subgrouprule', {
+      transports: ['websocket'],
+    });
+  }
 
-   async create(createModel: CreateSubGroupRuleDTO): Promise<SubGroupRule[]> {
-      return new Promise((resolve) => {
-         this.socket.emit('create-many', createModel, resolve);
-      });
-   }
+  async create(createModel: CreateSubGroupRuleDTO): Promise<SubGroupRule[]> {
+    return new Promise((resolve) => {
+      this.socket.emit('create-many', createModel, resolve);
+    });
+  }
 
-   async update(updateModel: UpdateSubGroupRuleDTO): Promise<SubGroupRule> {
-      return new Promise((resolve) => {
-         this.socket.emit('update', updateModel, resolve);
-      });
-   }
+  async findBySubgroup(subgroupId: number): Promise<SubGroupRule[]> {
+    return new Promise((resolve) => {
+      this.socket.emit('find-by-subgroup', subgroupId, resolve);
+    });
+  }
 
-   async remove(ruleId: number): Promise<Series> {
-      return new Promise((resolve) => {
-         this.socket.emit('delete', ruleId, resolve);
-      });
-   }
+  async update(updateModel: UpdateSubGroupRuleDTO): Promise<SubGroupRule> {
+    return new Promise((resolve) => {
+      this.socket.emit('update', updateModel, resolve);
+    });
+  }
+
+  async remove(ruleId: number): Promise<Series> {
+    return new Promise((resolve) => {
+      this.socket.emit('delete', ruleId, resolve);
+    });
+  }
 }
 
 const service = new SubGroupRuleService();

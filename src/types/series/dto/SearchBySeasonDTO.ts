@@ -1,5 +1,5 @@
 import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
-import { SortBy } from '../models/series.entity';
+import { SortBy } from '../sort-by.enum';
 
 export class SearchBySeasonDTO {
   @IsOptional()
