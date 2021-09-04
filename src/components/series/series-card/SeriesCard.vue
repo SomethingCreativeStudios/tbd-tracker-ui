@@ -7,9 +7,10 @@
         </div>
       </q-img>
       <q-card-section>
-        <q-icon class="series-card__sync" name="sync" />
+        <q-badge v-if="showsToDownload" class="series-card__sync series-card__sync--badge" rounded color="primiary" :label="showsToDownload" />
+        <q-icon v-else class="series-card__sync" :name="`fas fa-sync ${isSyncing ? 'fa-spin' : ''}`" @click="onSync" />
         <div class="series-card__info text-h6">Have {{ currentEp }} out {{ total }}</div>
-        <div class="series-card__info text-h8">Next: {{ nextAiring }}</div>
+        <div class="series-card__info text-h8">Next: {{ tillDate }}</div>
         <div class="row series-card__tags" v-if="tags.length > 0">
           <template v-for="tag in tags" :key="tag">
             <q-badge rounded color="secondary" :label="tag" />
@@ -33,36 +34,65 @@
 </template>
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
+import { addWeeks, eachWeekOfInterval, formatDistance, isFuture } from 'date-fns';
+import { useSeries } from '~/composables';
+
+const { isSyncing } = useSeries();
 
 export default defineComponent({
   name: 'series-card',
   props: {
+    id: {
+      type: Number,
+      default: 0,
+    },
     title: {
       type: String,
-      default: 'That One Anime With That One Person'
+      default: 'That One Anime With That One Person',
     },
     tags: {
       type: Array as PropType<string[]>,
-      default: () => ['Tag 1', 'Tag 2', 'Tag 3', 'Tag 4', 'Tag 5', 'Tag 6']
+      default: () => ['Tag 1', 'Tag 2', 'Tag 3', 'Tag 4', 'Tag 5', 'Tag 6'],
     },
     currentEp: {
       type: String,
-      default: '9'
+      default: '9',
     },
     total: {
       type: String,
-      default: '12'
+      default: '12',
     },
     nextAiring: {
-      type: String,
-      default: '10 hours, 12 mins'
+      type: Date,
+      default: new Date('2022-09-01'),
     },
     description: {
       type: String,
       default:
-        'That One Anime With That One Person. Featuring that one thing that the one person does. The one person is trying to live a normal adjective life. However in That One Anime, that other person appears'
-    }
-  }
+        'That One Anime With That One Person. Featuring that one thing that the one person does. The one person is trying to live a normal adjective life. However in That One Anime, that other person appears',
+    },
+    showsToDownload: {
+      type: Number,
+      default: 0,
+    },
+  },
+  setup(props) {
+    const showAiringDate = new Date(2021, 7, 21);
+    const currentDay = new Date(2021, 8, 4);
+
+    const range = eachWeekOfInt erval({ start: showAiringDate, end: addWeeks(currentDay, 1) }, { weekStartsOn: showAiringDate.getDay() as any });
+    const distance = formatDistance(showAiringDate, currentDay);
+
+    const findNextDate = range.find((date) => date === currentDay || isFuture(date));
+
+    console.log(findNextDate);
+    return { isSyncing: isSyncing(props.id), tillDate: distance };
+  },
+  methods: {
+    onSync() {
+      console.log('1 2 and Sync');
+    },
+  },
 });
 </script>
 
@@ -72,10 +102,19 @@ export default defineComponent({
   line-height: 1;
 }
 
+.series-card__sync:hover {
+  cursor: pointer;
+}
+
 .series-card__sync {
+  color: #f7b40e;
   position: absolute;
-  right: 5px;
-  top: 5px;
+  right: 7px;
+  top: 7px;
+}
+
+.series-card__sync--badge {
+  color: white;
 }
 
 .series-card__body {
