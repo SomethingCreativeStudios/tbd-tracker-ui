@@ -15,4 +15,5 @@ export default boot(async () => {
   await setUpSeries();
   await setUpSubgroup();
   await setUpSubgroupRule();
+  console.log('DONE?');
 });
