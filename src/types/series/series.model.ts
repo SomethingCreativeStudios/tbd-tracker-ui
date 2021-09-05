@@ -18,7 +18,7 @@ export class Series {
 
   imageUrl: string;
 
-  airingData: Date;
+  airingData: string;
 
   numberOfEpisodes: number;
 

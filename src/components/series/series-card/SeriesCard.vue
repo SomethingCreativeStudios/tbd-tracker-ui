@@ -1,8 +1,8 @@
 <template>
   <q-card class="series-card" flat bordered>
     <q-card-section class="series-card__body" horizontal>
-      <q-img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx120697-72Sf22C9PTQn.jpg">
-        <div class="absolute-bottom text-subtitle2 text-center">
+      <q-img :src="imageUrl">
+        <div class="series-card__title absolute-bottom text-subtitle2 text-center" @click="onEdit">
           {{ title }}
         </div>
       </q-img>
@@ -19,14 +19,11 @@
 
         <div class="series-card__description">
           {{ description }}
-          {{ description }}
-          {{ description }}
-          {{ description }}
         </div>
 
-        <q-card-actions>
-          <q-btn flat>Action 1</q-btn>
-          <q-btn flat>Action 2</q-btn>
+        <q-card-actions class="no-wrap">
+          <q-btn flat color="secondary" @click="onSubgroup">Subgroups</q-btn>
+          <q-btn flat color="negative" @click="onDelete">Delete</q-btn>
         </q-card-actions>
       </q-card-section>
     </q-card-section>
@@ -34,71 +31,82 @@
 </template>
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-import { addWeeks, eachWeekOfInterval, formatDistance, isFuture } from 'date-fns';
-import { useSeries } from '~/composables';
+import { getAiringTime, toDate } from '~/utils/time-helpers';
+
+import { service as NyaaService } from '~/services/nyaa.service';
+import { useSeries, useSidebar } from '~/composables';
+import { SidebarType } from '~/types/sidebar/sidebar.enum';
 
 const { isSyncing } = useSeries();
+const { setType } = useSidebar();
 
 export default defineComponent({
   name: 'series-card',
   props: {
     id: {
       type: Number,
-      default: 0,
+      default: 0
+    },
+    imageUrl: {
+      type: String,
+      default: ''
     },
     title: {
       type: String,
-      default: 'That One Anime With That One Person',
+      default: 'That One Anime With That One Person'
     },
     tags: {
       type: Array as PropType<string[]>,
-      default: () => ['Tag 1', 'Tag 2', 'Tag 3', 'Tag 4', 'Tag 5', 'Tag 6'],
+      default: () => ['Tag 1', 'Tag 2']
     },
     currentEp: {
       type: String,
-      default: '9',
+      default: '9'
     },
     total: {
       type: String,
-      default: '12',
+      default: '12'
     },
-    nextAiring: {
-      type: Date,
-      default: new Date('2022-09-01'),
+    airingData: {
+      type: String,
+      default: '2021-07-09'
     },
     description: {
       type: String,
       default:
-        'That One Anime With That One Person. Featuring that one thing that the one person does. The one person is trying to live a normal adjective life. However in That One Anime, that other person appears',
+        'That One Anime With That One Person. Featuring that one thing that the one person does. The one person is trying to live an adjective life. However in That One Anime, that other person appears'
     },
     showsToDownload: {
       type: Number,
-      default: 0,
-    },
+      default: 0
+    }
   },
   setup(props) {
-    const showAiringDate = new Date(2021, 7, 21);
-    const currentDay = new Date(2021, 8, 4);
-
-    const range = eachWeekOfInt erval({ start: showAiringDate, end: addWeeks(currentDay, 1) }, { weekStartsOn: showAiringDate.getDay() as any });
-    const distance = formatDistance(showAiringDate, currentDay);
-
-    const findNextDate = range.find((date) => date === currentDay || isFuture(date));
-
-    console.log(findNextDate);
-    return { isSyncing: isSyncing(props.id), tillDate: distance };
+    return { isSyncing: isSyncing(props.id), tillDate: getAiringTime(toDate(props.airingData)) };
   },
   methods: {
     onSync() {
       console.log('1 2 and Sync');
+      NyaaService.syncShow(this.id);
     },
-  },
+    onEdit() {
+      console.log('1 2 and Edit');
+      setType(SidebarType.EDIT_SHOW);
+    },
+    onSubgroup() {
+      console.log('1 2 and Subgroup');
+      setType(SidebarType.EDIT_SUBGROUP);
+    },
+    onDelete() {
+      console.log('1 2 and Delete');
+    }
+  }
 });
 </script>
 
 <style scoped lang="scss">
 .series-card {
-  min-height: 265px;
+  height: 265px;
   line-height: 1;
 }
 
@@ -126,6 +134,10 @@ export default defineComponent({
   line-height: 1;
 }
 
+.series-card__title:hover {
+  cursor: pointer;
+}
+
 .series-card__description {
   margin-top: 10px;
 
@@ -145,7 +157,17 @@ export default defineComponent({
   row-gap: 10px;
 }
 
+.q-card__actions {
+  position: absolute;
+  bottom: 0;
+  left: -4px;
+}
+
 @media (max-width: $breakpoint-xs-max) {
+  .series-card {
+    min-height: 265px;
+  }
+
   .series-card__body {
     display: grid;
     grid-template-columns: 1fr;

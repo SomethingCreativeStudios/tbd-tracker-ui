@@ -5,3 +5,4 @@ export * from './useSeries';
 export * from './useSettings';
 export * from './useSubgroup';
 export * from './useSubgroupRule';
+export * from './useSidebar';

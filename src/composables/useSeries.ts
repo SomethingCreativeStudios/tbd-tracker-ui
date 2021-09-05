@@ -9,7 +9,7 @@ import { useSetting } from './useSettings';
 const { getCurrentSeason, getCurrentYear } = useSetting();
 const state = reactive({
   series: [] as Series[],
-  syncingSeries: {} as { [id: number]: boolean },
+  syncingSeries: {} as { [id: number]: boolean }
 });
 
 //@ts-ignore
@@ -32,20 +32,20 @@ async function removeShow(id: number) {
 async function updateShow(updateModel: UpdateSeriesDTO) {
   const show = await SeriesService.update(updateModel);
 
-  state.series = state.series.map((currentShow) => (currentShow.id === show.id ? show : currentShow));
+  state.series = state.series.map(currentShow => (currentShow.id === show.id ? show : currentShow));
 }
 
 async function refreshShow(id: number) {
   const show = await SeriesService.fetchById(id);
 
-  state.series = state.series.map((currentShow) => (currentShow.id === show.id ? show : currentShow));
+  state.series = state.series.map(currentShow => (currentShow.id === show.id ? show : currentShow));
 }
 
 async function syncWithMal(id: number) {
   const show = await SeriesService.syncWithMal(id);
   const imageUrl = await SeriesService.syncImageUrl(id);
 
-  state.series = state.series.map((currentShow) => (currentShow.id === show.id ? { ...show, imageUrl } : currentShow));
+  state.series = state.series.map(currentShow => (currentShow.id === show.id ? { ...show, imageUrl } : currentShow));
 }
 
 async function createBySeason(createModel: CreateBySeasonDTO) {
@@ -59,7 +59,7 @@ function updateSyncStatus(id: number, isSyncing: boolean) {
 async function toggleWatchStatus(id: number) {
   const newWatchStatus = await SeriesService.updateWatchStatus(id);
 
-  state.series = state.series.map((currentShow) => (currentShow.id === id ? { ...currentShow, watchStatus: newWatchStatus } : currentShow));
+  state.series = state.series.map(currentShow => (currentShow.id === id ? { ...currentShow, watchStatus: newWatchStatus } : currentShow));
 }
 
 function isSyncing(id: number) {
@@ -70,7 +70,7 @@ async function setUp() {
   const foundSeries = await SeriesService.fetchAll({
     season: getCurrentSeason.value,
     year: getCurrentYear.value,
-    sortBy: SortBy.QUEUE,
+    sortBy: SortBy.QUEUE
   });
 
   console.log(foundSeries);
@@ -90,6 +90,6 @@ export function useSeries() {
     toggleWatchStatus,
     setUp,
     getSyncing: computed(() => readonly(state.syncingSeries)),
-    getSeries: computed(() => readonly(state.series)),
+    getSeries: computed(() => readonly(state.series))
   };
 }

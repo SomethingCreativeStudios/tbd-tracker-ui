@@ -19,7 +19,8 @@
     </q-header>
 
     <q-drawer v-model="rightDrawerOpen" side="right" bordered>
-      <!-- drawer content -->
+      <sidebar-series v-if="sideBarType === 1"></sidebar-series>
+      <sidebar-subgroup v-if="sideBarType === 2"></sidebar-subgroup>
     </q-drawer>
 
     <q-page-container>
@@ -29,18 +30,36 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
+import { useSidebar } from '~/composables';
+import { SidebarType } from '~/types/sidebar/sidebar.enum';
+import { SidebarSeries, SidebarSubgroup } from '~/components/sidebar';
 
 export default {
+  components: { SidebarSeries, SidebarSubgroup },
   setup() {
+    const { currentType, setType } = useSidebar();
     const rightDrawerOpen = ref(false);
+
+    watch(currentType, () => (rightDrawerOpen.value = currentType.value !== SidebarType.NONE));
+    watch(rightDrawerOpen, () => {
+      if (!rightDrawerOpen.value) {
+        setType(SidebarType.NONE);
+      }
+    });
 
     return {
       rightDrawerOpen,
+      sideBarType: currentType,
       toggleRightDrawer() {
         rightDrawerOpen.value = !rightDrawerOpen.value;
       }
     };
+  },
+  methods: {
+    onClose() {
+      console.log('test');
+    }
   }
 };
 </script>
