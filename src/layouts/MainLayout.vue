@@ -19,8 +19,8 @@
     </q-header>
 
     <q-drawer v-model="rightDrawerOpen" side="right" bordered>
-      <sidebar-series v-if="sideBarType === 1"></sidebar-series>
-      <sidebar-subgroup v-if="sideBarType === 2"></sidebar-subgroup>
+      <sidebar-series v-if="sideBarType === 1" v-bind="params"></sidebar-series>
+      <sidebar-subgroup v-if="sideBarType === 2" v-bind="params"></sidebar-subgroup>
     </q-drawer>
 
     <q-page-container>
@@ -38,7 +38,7 @@ import { SidebarSeries, SidebarSubgroup } from '~/components/sidebar';
 export default {
   components: { SidebarSeries, SidebarSubgroup },
   setup() {
-    const { currentType, setType } = useSidebar();
+    const { currentType, params, setType } = useSidebar();
     const rightDrawerOpen = ref(false);
 
     watch(currentType, () => (rightDrawerOpen.value = currentType.value !== SidebarType.NONE));
@@ -49,18 +49,19 @@ export default {
     });
 
     return {
+      params,
       rightDrawerOpen,
       sideBarType: currentType,
       toggleRightDrawer() {
         rightDrawerOpen.value = !rightDrawerOpen.value;
-      }
+      },
     };
   },
   methods: {
     onClose() {
       console.log('test');
-    }
-  }
+    },
+  },
 };
 </script>
 

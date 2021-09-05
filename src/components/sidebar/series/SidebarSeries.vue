@@ -1,9 +1,71 @@
 <template>
-  SERIES
+  <div class="sidebar-series">
+    <q-input label="Name" v-model="series.name" dense />
+    <q-input label="Studio" v-model="series.studio" dense />
+    <q-input label="Score" v-model="series.score" type="number" dense />
+    <q-input label="Downloaded" v-model="series.downloaded" type="number" dense />
+    <q-input label="Total" v-model="series.numberOfEpisodes" type="number" dense />
+    <q-input label="Description" v-model="series.description" filled autogrow dense />
+    <q-input filled v-model="series.airingData" mask="date" :rules="['date']" dense>
+      <template v-slot:append>
+        <q-icon name="event" class="cursor-pointer">
+          <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
+            <q-date v-model="series.airingData">
+              <div class="row items-center justify-end">
+                <q-btn v-close-popup label="Close" color="primary" flat />
+              </div>
+            </q-date>
+          </q-popup-proxy>
+        </q-icon>
+      </template>
+    </q-input>
+  </div>
 </template>
+<script lang="ts">
+import { defineComponent, computed, ref, watch, onMounted } from 'vue';
+import { clone, equals } from 'ramda';
+import { useSeries } from '~/composables';
+import { Series } from '~/types/series/series.model';
 
-<script>
-export default {};
+const { getSeries } = useSeries();
+
+export default defineComponent({
+  name: 'sidebar-series',
+  props: {
+    id: {
+      type: Number,
+      default: 0,
+    },
+  },
+
+  setup(props) {
+    const updatedSeries = ref({} as Series);
+    const foundSeries = computed(() => getSeries.value?.find((series) => series.id === props.id));
+
+    updatedSeries.value = clone(foundSeries.value) as Series;
+
+    const seriesWatch = watch(foundSeries, (newSeries) => {
+      if (equals(updatedSeries.value, newSeries)) return;
+      updatedSeries.value = clone(foundSeries.value) as Series;
+    });
+
+    onMounted(() => {
+      seriesWatch();
+    });
+
+    return { series: updatedSeries };
+  },
+
+  methods: {
+    onChange(key, value) {
+      this.updatedSeries[key] = value;
+    },
+  },
+});
 </script>
 
-<style scoped></style>
+<style scoped>
+.sidebar-series {
+  margin: 10px;
+}
+</style>

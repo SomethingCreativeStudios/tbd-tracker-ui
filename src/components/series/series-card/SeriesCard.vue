@@ -45,41 +45,41 @@ export default defineComponent({
   props: {
     id: {
       type: Number,
-      default: 0
+      default: 0,
     },
     imageUrl: {
       type: String,
-      default: ''
+      default: '',
     },
     title: {
       type: String,
-      default: 'That One Anime With That One Person'
+      default: 'That One Anime With That One Person',
     },
     tags: {
       type: Array as PropType<string[]>,
-      default: () => ['Tag 1', 'Tag 2']
+      default: () => ['Tag 1', 'Tag 2'],
     },
     currentEp: {
       type: String,
-      default: '9'
+      default: '9',
     },
     total: {
       type: String,
-      default: '12'
+      default: '12',
     },
     airingData: {
       type: String,
-      default: '2021-07-09'
+      default: '2021-07-09',
     },
     description: {
       type: String,
       default:
-        'That One Anime With That One Person. Featuring that one thing that the one person does. The one person is trying to live an adjective life. However in That One Anime, that other person appears'
+        'That One Anime With That One Person. Featuring that one thing that the one person does. The one person is trying to live an adjective life. However in That One Anime, that other person appears',
     },
     showsToDownload: {
       type: Number,
-      default: 0
-    }
+      default: 0,
+    },
   },
   setup(props) {
     return { isSyncing: isSyncing(props.id), tillDate: getAiringTime(toDate(props.airingData)) };
@@ -91,16 +91,16 @@ export default defineComponent({
     },
     onEdit() {
       console.log('1 2 and Edit');
-      setType(SidebarType.EDIT_SHOW);
+      setType(SidebarType.EDIT_SHOW, { id: this.id });
     },
     onSubgroup() {
       console.log('1 2 and Subgroup');
-      setType(SidebarType.EDIT_SUBGROUP);
+      setType(SidebarType.EDIT_SUBGROUP, { id: this.id });
     },
     onDelete() {
       console.log('1 2 and Delete');
-    }
-  }
+    },
+  },
 });
 </script>
 
