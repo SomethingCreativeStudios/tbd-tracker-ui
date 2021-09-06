@@ -5,8 +5,8 @@
     <q-input label="Score" v-model="series.score" type="number" dense />
     <q-input label="Downloaded" v-model="series.downloaded" type="number" dense />
     <q-input label="Total" v-model="series.numberOfEpisodes" type="number" dense />
-    <q-input label="Description" v-model="series.description" filled autogrow dense />
-    <q-input filled v-model="series.airingData" mask="date" :rules="['date']" dense>
+    <q-input label="Description" v-model="series.description" autogrow dense />
+    <q-input v-model="series.airingData" mask="date" :rules="['date']" dense>
       <template v-slot:append>
         <q-icon name="event" class="cursor-pointer">
           <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
@@ -19,6 +19,7 @@
         </q-icon>
       </template>
     </q-input>
+    <q-select label="Genres" v-model="series.genres" use-input use-chips multiple @new-value="onNewValue('genres', $event)" />
   </div>
 </template>
 <script lang="ts">
@@ -34,17 +35,17 @@ export default defineComponent({
   props: {
     id: {
       type: Number,
-      default: 0,
-    },
+      default: 0
+    }
   },
 
   setup(props) {
     const updatedSeries = ref({} as Series);
-    const foundSeries = computed(() => getSeries.value?.find((series) => series.id === props.id));
+    const foundSeries = computed(() => getSeries.value?.find(series => series.id === props.id));
 
     updatedSeries.value = clone(foundSeries.value) as Series;
 
-    const seriesWatch = watch(foundSeries, (newSeries) => {
+    const seriesWatch = watch(foundSeries, newSeries => {
       if (equals(updatedSeries.value, newSeries)) return;
       updatedSeries.value = clone(foundSeries.value) as Series;
     });
@@ -60,7 +61,10 @@ export default defineComponent({
     onChange(key, value) {
       this.updatedSeries[key] = value;
     },
-  },
+    onNewValue(key, val) {
+      this.series[key].push(val);
+    }
+  }
 });
 </script>
 
