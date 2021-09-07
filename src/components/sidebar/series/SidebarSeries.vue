@@ -6,6 +6,8 @@
     <q-input label="Downloaded" v-model="series.downloaded" type="number" dense />
     <q-input label="Total" v-model="series.numberOfEpisodes" type="number" dense />
     <q-input label="Description" v-model="series.description" autogrow dense />
+    <q-input label="Image Url" v-model="series.imageUrl" dense />
+    <q-se label="Folder Path" v-model="series.imageUrl" dense />
     <q-input v-model="series.airingData" mask="date" :rules="['date']" dense>
       <template v-slot:append>
         <q-icon name="event" class="cursor-pointer">
@@ -20,6 +22,8 @@
       </template>
     </q-input>
     <q-select label="Genres" v-model="series.genres" use-input use-chips multiple @new-value="onNewValue('genres', $event)" />
+    <q-select label="Alt Names" v-model="series.otherNames" use-input use-chips multiple @new-value="onNewValue('otherNames', $event)" />
+    <q-select label="Tags" v-model="series.tags" use-input use-chips multiple @new-value="onNewValue('tags', $event)" />
   </div>
 </template>
 <script lang="ts">
