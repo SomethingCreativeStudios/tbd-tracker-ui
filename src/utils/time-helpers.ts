@@ -10,6 +10,10 @@ export function getClosestAiringDate(airingDate: Date, currentDate = new Date())
 }
 
 export function getAiringTime(airingDate: Date, currentDate = new Date()) {
+  if (isFuture(airingDate)) {
+    return formatDistance(airingDate, currentDate);
+  }
+
   const nextDate = getClosestAiringDate(airingDate, currentDate);
 
   return formatDistance(nextDate, currentDate);

@@ -33,6 +33,10 @@ export class UpdateSeriesDTO {
 
   @IsOptional()
   @IsNumber()
+  malId?: number;
+
+  @IsOptional()
+  @IsNumber()
   score?: number;
 
   @IsOptional()

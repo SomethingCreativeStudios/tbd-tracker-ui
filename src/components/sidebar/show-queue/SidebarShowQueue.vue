@@ -80,7 +80,7 @@ const { getFolderNames } = useSetting();
 const { setType } = useSidebar();
 
 export default defineComponent({
-  name: 'sidebar-series',
+  name: 'sidebar-show-queue',
   props: {
     id: {
       type: Number,
