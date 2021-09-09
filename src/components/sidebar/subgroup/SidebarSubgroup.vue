@@ -18,12 +18,13 @@
 <script>
 import { defineComponent, computed } from 'vue';
 import { SubgroupCard } from './components';
-import { useSeries, useSidebar, useSubgroup } from '~/composables';
+import { useSeries, useSidebar, useSubgroup, useSetting } from '~/composables';
 import { SidebarType } from '~/types/sidebar/sidebar.enum';
 
 const { getSeries } = useSeries();
-const { getSubgroups } = useSubgroup();
+const { getSubgroups, createSubgroup } = useSubgroup();
 const { setType } = useSidebar();
+const { getDefaultSubgroup } = useSetting();
 
 export default defineComponent({
   name: 'sidebar-subgroups',
@@ -43,6 +44,7 @@ export default defineComponent({
   methods: {
     onAddGroup() {
       console.log('1 2 and Add');
+      createSubgroup({ seriesId: this.id, name: getDefaultSubgroup.value || 'Subgroup', preferedResultion: '1080' });
     },
     onCancel() {
       setType(SidebarType.NONE);

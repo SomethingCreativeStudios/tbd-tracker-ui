@@ -16,9 +16,7 @@ async function createRule(createModel: CreateSubGroupRuleDTO) {
 
   state.rules = {
     ...state.rules,
-    [createModel.subgroupId]: (
-      this.subgroupRules?.[createModel.subgroupId] ?? []
-    ).concat(newRule),
+    [createModel.subgroupId]: (state.rules?.[createModel.subgroupId] ?? []).concat(newRule)
   };
 }
 
@@ -26,31 +24,25 @@ async function removeRule(ruleId: number) {
   await SubgroupRuleService.remove(ruleId);
 
   state.rules = Object.entries(state.rules).reduce((acc, [groupId, rules]) => {
-    return { ...acc, [groupId]: rules.filter((rule) => rule.id !== ruleId) };
+    return { ...acc, [groupId]: rules.filter(rule => rule.id !== ruleId) };
   }, {} as { [key: number]: SubGroupRule[] });
 }
 
-async function updateRule(updateModel: UpdateSubGroupRuleDTO) {
+async function updateRule(subgroupId: number, updateModel: UpdateSubGroupRuleDTO) {
   const updatedRule = await SubgroupRuleService.update(updateModel);
-  const currentItems = this.subgroupRules?.[updatedRule.subGroup.id] ?? [
-    updatedRule,
-  ];
+
+  const currentItems = state.rules?.[subgroupId] ?? [updatedRule];
 
   state.rules = {
     ...state.rules,
-    [updatedRule.subGroup.id]: currentItems.map((rule) =>
-      rule.id === updatedRule.id ? updatedRule : rule
-    ),
+    [subgroupId]: currentItems.map(rule => (rule.id === updatedRule.id ? updatedRule : rule))
   };
 }
 
 async function setUp() {
   state.rules = {};
 
-  const groups = Object.values(getSubgroups.value).reduce(
-    (acc, groups) => acc.concat(groups),
-    []
-  );
+  const groups = Object.values(getSubgroups.value).reduce((acc, groups) => acc.concat(groups), []);
 
   for await (const group of groups) {
     state.rules[group.id] = await SubgroupRuleService.findBySubgroup(group.id);
@@ -63,6 +55,6 @@ export function useSubgroupRule() {
     createRule,
     removeRule,
     updateRule,
-    getSubgroupRules: computed(() => readonly(state.rules)),
+    getSubgroupRules: computed(() => readonly(state.rules))
   };
 }

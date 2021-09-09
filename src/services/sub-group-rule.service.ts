@@ -9,30 +9,30 @@ class SubGroupRuleService {
 
   constructor() {
     this.socket = io(process.env.VUE_APP_WEBSOCKET_PATH + '/subgrouprule', {
-      transports: ['websocket'],
+      transports: ['websocket']
     });
   }
 
   async create(createModel: CreateSubGroupRuleDTO): Promise<SubGroupRule[]> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       this.socket.emit('create-many', createModel, resolve);
     });
   }
 
   async findBySubgroup(subgroupId: number): Promise<SubGroupRule[]> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       this.socket.emit('find-by-subgroup', subgroupId, resolve);
     });
   }
 
   async update(updateModel: UpdateSubGroupRuleDTO): Promise<SubGroupRule> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       this.socket.emit('update', updateModel, resolve);
     });
   }
 
   async remove(ruleId: number): Promise<Series> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       this.socket.emit('delete', ruleId, resolve);
     });
   }
