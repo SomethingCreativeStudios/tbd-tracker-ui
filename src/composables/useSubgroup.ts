@@ -7,7 +7,7 @@ import { UpdateSubGroupDTO } from '~/types/sub-group/dto/UpdateSubGroupDTO';
 
 const { getSeries } = useSeries();
 const state = reactive({
-  subgroups: {} as { [seriesId: number]: SubGroup[] },
+  subgroups: {} as { [seriesId: number]: SubGroup[] }
 });
 
 //@ts-ignore
@@ -18,39 +18,34 @@ async function createSubgroup(createModel: CreateSubGroupDTO) {
 
   state.subgroups = {
     ...state.subgroups,
-    [createModel.seriesId]: (
-      state.subgroups?.[createModel.seriesId] ?? []
-    ).concat(group),
+    [createModel.seriesId]: (state.subgroups?.[createModel.seriesId] ?? []).concat(group)
   };
+
+  return group;
 }
 
 async function updateSubgroup(updateModel: UpdateSubGroupDTO) {
   const updatedGroup = await SubgroupService.update(updateModel);
 
-  const currentItems = state.subgroups?.[updatedGroup.series.id] ?? [
-    updatedGroup,
-  ];
+  const currentItems = state.subgroups?.[updatedGroup.series.id] ?? [updatedGroup];
 
   state.subgroups = {
     ...state.subgroups,
-    [updatedGroup.series.id]: currentItems.map((group: SubGroup) =>
-      group.id === updatedGroup.id ? updatedGroup : group
-    ),
+    [updatedGroup.series.id]: currentItems.map((group: SubGroup) => (group.id === updatedGroup.id ? updatedGroup : group))
   };
+
+  return updatedGroup;
 }
 
 async function removeSubgroup(subgroupId: number) {
   await SubgroupService.remove(subgroupId);
 
-  state.subgroups = Object.entries(state.subgroups).reduce(
-    (acc, [seriesId, groups]) => {
-      return {
-        ...acc,
-        [seriesId]: groups.filter((group) => group.id !== subgroupId),
-      };
-    },
-    {} as { [key: number]: SubGroup[] }
-  );
+  state.subgroups = Object.entries(state.subgroups).reduce((acc, [seriesId, groups]) => {
+    return {
+      ...acc,
+      [seriesId]: groups.filter(group => group.id !== subgroupId)
+    };
+  }, {} as { [key: number]: SubGroup[] });
 }
 
 async function setUp() {
@@ -67,6 +62,6 @@ export function useSubgroup() {
     createSubgroup,
     updateSubgroup,
     removeSubgroup,
-    getSubgroups: computed(() => readonly(state.subgroups)),
+    getSubgroups: computed(() => readonly(state.subgroups))
   };
 }

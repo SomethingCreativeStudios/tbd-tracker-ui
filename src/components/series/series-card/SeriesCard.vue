@@ -15,7 +15,14 @@
         </template>
       </q-img>
       <q-card-section>
-        <q-badge v-if="showsToDownload" class="series-card__sync series-card__sync--badge" rounded color="primiary" :label="showsToDownload" />
+        <q-badge
+          v-if="queueItems.length"
+          class="series-card__sync series-card__sync--badge"
+          rounded
+          color="primiary"
+          @click="onQueue"
+          :label="queueItems.length"
+        />
         <q-icon v-else class="series-card__sync" :name="`fas fa-sync ${isSyncing ? 'fa-spin' : ''}`" @click="onSync" />
         <div class="series-card__info text-h6">Have {{ currentEp }} out {{ total }}</div>
         <div class="series-card__info text-h8">Next: {{ tillDate }}</div>
@@ -45,7 +52,7 @@ import { service as NyaaService } from '~/services/nyaa.service';
 import { useSeries, useSidebar } from '~/composables';
 import { SidebarType } from '~/types/sidebar/sidebar.enum';
 
-const { isSyncing } = useSeries();
+const { isSyncing, getFilteredQueue, removeShow } = useSeries();
 const { setType } = useSidebar();
 
 export default defineComponent({
@@ -90,7 +97,8 @@ export default defineComponent({
     }
   },
   setup(props) {
-    return { isSyncing: isSyncing(props.id), tillDate: computed(() => getAiringTime(toDate(props.airingData))) };
+    const queueItems = getFilteredQueue(props.id, true);
+    return { queueItems, isSyncing: isSyncing(props.id), tillDate: computed(() => getAiringTime(toDate(props.airingData))) };
   },
   methods: {
     onSync() {
@@ -107,6 +115,11 @@ export default defineComponent({
     },
     onDelete() {
       console.log('1 2 and Delete');
+      removeShow(this.id);
+    },
+    onQueue() {
+      console.log('1 2 and Queue');
+      setType(SidebarType.EDIT_QUEUE, { id: this.id });
     }
   }
 });
@@ -176,6 +189,7 @@ export default defineComponent({
 @media (max-width: $breakpoint-xs-max) {
   .series-card {
     min-height: 265px;
+    height: 650px;
   }
 
   .series-card__body {

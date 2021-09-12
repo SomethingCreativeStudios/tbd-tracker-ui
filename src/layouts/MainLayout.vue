@@ -21,6 +21,9 @@
     <q-drawer v-model="rightDrawerOpen" side="right" bordered overlay :width="sideBarWidth">
       <sidebar-series v-if="sideBarType === 1" v-bind="params"></sidebar-series>
       <sidebar-subgroup v-if="sideBarType === 2" v-bind="params"></sidebar-subgroup>
+      <sidebar-show-queue v-if="sideBarType === 3" v-bind="params"></sidebar-show-queue>
+      <sidebar-search-series v-if="sideBarType === 4" v-bind="params"></sidebar-search-series>
+      <sidebar-search-season v-if="sideBarType === 5" v-bind="params"></sidebar-search-season>
     </q-drawer>
 
     <q-page-container>
@@ -34,10 +37,10 @@ import { ref, watch } from 'vue';
 import { useSidebar } from '~/composables';
 import { useQuasar } from 'quasar';
 import { SidebarType } from '~/types/sidebar/sidebar.enum';
-import { SidebarSeries, SidebarSubgroup } from '~/components/sidebar';
+import { SidebarSeries, SidebarSubgroup, SidebarShowQueue, SidebarSearchSeries, SidebarSearchSeason } from '~/components/sidebar';
 
 export default {
-  components: { SidebarSeries, SidebarSubgroup },
+  components: { SidebarSeries, SidebarSubgroup, SidebarShowQueue, SidebarSearchSeries, SidebarSearchSeason },
   setup() {
     const { currentType, params, setType } = useSidebar();
     const { screen } = useQuasar();

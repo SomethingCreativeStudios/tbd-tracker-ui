@@ -5,6 +5,9 @@ import { UpdateSeriesDTO } from '~/types/season/dto/UpdateSeriesDTO';
 import { CreateBySeasonDTO } from '~/types/season/dto/CreateBySeasonDTO';
 import { SortBy } from '~/types/series/sort-by.enum';
 import { useSetting } from './useSettings';
+import { useSubgroup } from './useSubgroup';
+import { SubGroup } from '~/types/sub-group/sub-group.model';
+import { NyaaItem } from '~/types/nyaa/nyaa-item.model';
 
 const { getCurrentSeason, getCurrentYear } = useSetting();
 const state = reactive({
@@ -62,6 +65,17 @@ async function toggleWatchStatus(id: number) {
   state.series = state.series.map(currentShow => (currentShow.id === id ? { ...currentShow, watchStatus: newWatchStatus } : currentShow));
 }
 
+function getFilteredQueue(id: number, doFilter = true) {
+  const { getSubgroups } = useSubgroup();
+  const groups = getSubgroups.value[id];
+
+  return computed(() => {
+    const foundSeries = state.series.find(series => series.id === id);
+
+    return doFilter ? foundSeries.showQueue.filter(queue => meetsSubgroup(queue as NyaaItem, groups as SubGroup[])) : foundSeries.showQueue;
+  });
+}
+
 function isSyncing(id: number) {
   return computed(() => state.syncingSeries[id]);
 }
@@ -88,8 +102,15 @@ export function useSeries() {
     createBySeason,
     updateSyncStatus,
     toggleWatchStatus,
+    getFilteredQueue,
     setUp,
     getSyncing: computed(() => readonly(state.syncingSeries)),
     getSeries: computed(() => readonly(state.series))
   };
+}
+
+function meetsSubgroup(queueItem: NyaaItem, groups: SubGroup[]) {
+  const foundGroup = groups.find(group => (group.name = queueItem.subGroupName));
+
+  return foundGroup.preferedResultion === queueItem.resolution;
 }

@@ -1,36 +1,37 @@
 <template>
   <div class="sidebar-series">
-    <div class="text-h6 title">Series: {{ startingSeries.name }}</div>
+    <div class="text-h6 title">{{ startingSeries.name }}</div>
     <div class="row row_body">
       <div class="row_body--body">
         <div class="row q-col-gutter-lg">
-          <q-input class="col-12 col-md-3" label="Score" v-model="series.score" type="number" dense />
-          <q-input class="col-12 col-md-3" label="Downloaded" v-model="series.downloaded" type="number" dense />
-          <q-input class="col-12 col-md-3" label="Total" v-model="series.numberOfEpisodes" type="number" dense />
-          <q-input class="col-12 col-md-3" label="MAL Id" v-model="series.malId" type="number" dense />
+          <q-input class="col-12 col-md-3" color="secondary" label="Score" v-model="series.score" type="number" dense />
+          <q-input class="col-12 col-md-3" color="secondary" label="Downloaded" v-model="series.downloaded" type="number" dense />
+          <q-input class="col-12 col-md-3" color="secondary" label="Total" v-model="series.numberOfEpisodes" type="number" dense />
+          <q-input class="col-12 col-md-3" color="secondary" label="MAL Id" v-model="series.malId" type="number" dense />
         </div>
 
         <q-separator color="secondary" inset />
 
         <div class="row">
-          <q-input class="col-12" label="Name" v-model="series.name" dense />
+          <q-input class="col-12" label="Name" color="secondary" v-model="series.name" dense />
           <q-select
             class="col-12"
             label="Alt Names"
+            color="secondary"
             v-model="series.otherNames"
             use-input
             use-chips
             multiple
             @new-value="onNewValue('otherNames', $event)"
           />
-          <q-input class="col-12" label="Description" v-model="series.description" autogrow dense />
+          <q-input class="col-12" color="secondary" label="Description" v-model="series.description" autogrow dense />
         </div>
 
         <q-separator color="secondary" inset />
 
         <div class="row q-col-gutter-lg">
-          <q-input class="col-12 col-md-6" label="Studio" v-model="series.studio" dense />
-          <q-input class="col-12 col-md-6" v-model="series.airingData" mask="date" :rules="['date']" dense>
+          <q-input class="col-12 col-md-6" color="secondary" label="Studio" v-model="series.studio" dense />
+          <q-input class="col-12 col-md-6" color="secondary" v-model="series.airingData" mask="date" :rules="['date']" dense>
             <template v-slot:append>
               <q-icon name="event" class="cursor-pointer">
                 <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
@@ -47,13 +48,20 @@
 
         <q-separator color="secondary" inset />
 
-        <q-select label="Genres" v-model="series.genres" use-input use-chips multiple @new-value="onNewValue('genres', $event)" />
-        <q-select label="Tags" v-model="series.tags" use-input use-chips multiple @new-value="onNewValue('tags', $event)" />
+        <q-select label="Genres" color="secondary" v-model="series.genres" use-input use-chips multiple @new-value="onNewValue('genres', $event)" />
+        <q-select label="Tags" color="secondary" v-model="series.tags" use-input use-chips multiple @new-value="onNewValue('tags', $event)" />
 
         <q-separator color="secondary" inset />
 
-        <q-input label="Image Url" v-model="series.imageUrl" dense />
-        <q-select label="Folder Path" v-model="series.folderPath" :options="folderNames" use-input @new-value="onNewValue('tags', $event)">
+        <q-input label="Image Url" color="secondary" v-model="series.imageUrl" dense />
+        <q-select
+          label="Folder Path"
+          color="secondary"
+          v-model="series.folderPath"
+          :options="folderNames"
+          use-input
+          @new-value="onNewValue('tags', $event)"
+        >
           <template v-slot:append>
             <q-btn round dense flat icon="add" @click="onFolderAdd" />
           </template>

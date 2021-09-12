@@ -2,8 +2,8 @@
   <q-card class="subgroup-card">
     <q-card-section class="subgroup-card__body" horizontal>
       <div class="row q-col-gutter-lg subgroup-card__body--title-block">
-        <q-input class="col-12 col-md-9" label="Name" v-model="group.name" dense />
-        <q-select class="col-12 col-md-3" label="Resolution" :options="resOptions" v-model="group.preferedResultion" dense />
+        <q-input class="col-12 col-md-9" color="secondary" label="Name" v-model="group.name" dense />
+        <q-select class="col-12 col-md-3" color="secondary" label="Resolution" :options="resOptions" v-model="group.preferedResultion" dense />
       </div>
       <div class="subgroup-card__rules">
         <template v-for="rule in rules" :key="rule.id">
@@ -25,7 +25,7 @@ import { useSubgroupRule, useSubgroup } from '~/composables';
 import SubgroupRuleCard from '../subgroup-rule-card';
 import { RuleType } from '~/types/sub-group-rule/rule-type.enum';
 
-const { updateSubgroup } = useSubgroup();
+const { updateSubgroup, removeSubgroup } = useSubgroup();
 const { getSubgroupRules, createRule } = useSubgroupRule();
 
 export default defineComponent({
@@ -63,6 +63,7 @@ export default defineComponent({
     },
     onDelete() {
       console.log('1 2 and Delete');
+      removeSubgroup(this.id);
     }
   }
 });

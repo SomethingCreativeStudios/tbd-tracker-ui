@@ -1,9 +1,19 @@
 <template>
   <div class="row q-col-gutter-lg subgroup-card__body--title-block">
-    <q-input class="col-12 col-md-4" label="Query" v-model="rule.text" dense />
-    <q-select class="col-12 col-md-3" label="Type" :options="ruleTypes" v-model="rule.ruleType" map-options emit-value dense behavior="menu" />
-    <q-checkbox class="col-12 col-md-2" label="Match" v-model="rule.isPositive" dense />
-    <q-icon class="subgroup-card__body--delete col-12 col-md-2" name="fas fa-trash" @click="onDelete"></q-icon>
+    <q-input class="col-12 col-md-4" color="secondary" label="Query" v-model="rule.text" dense />
+    <q-select
+      class="col-12 col-md-3"
+      color="secondary"
+      label="Type"
+      :options="ruleTypes"
+      v-model="rule.ruleType"
+      map-options
+      emit-value
+      dense
+      behavior="menu"
+    />
+    <q-checkbox class="col-8 col-md-2" color="secondary" label="Match" v-model="rule.isPositive" dense />
+    <q-icon class="subgroup-card__body--delete col-2 col-md-2" name="fas fa-trash" @click="onDelete"></q-icon>
   </div>
 </template>
 

@@ -3,36 +3,36 @@ import { MalSearchDTO } from '~/types/series/dto/MalSearchDTO';
 import { Series } from '~/types/series/series.model';
 
 class QueryService {
-   private socket: SocketIOClient.Socket;
+  private socket: SocketIOClient.Socket;
 
-   constructor() {
-      this.socket = io(process.env.VUE_APP_WEBSOCKET_PATH + '/series', { transports: ['websocket'] });
-   }
+  constructor() {
+    this.socket = io(process.env.VUE_APP_WEBSOCKET_PATH + '/series', { transports: ['websocket'] });
+  }
 
-   async ensureConnection() {
-      return new Promise((resolve) => {
-         this.socket.on('connect', () => {
-            console.log('connected');
-            resolve(true);
-         });
-
-         if (this.socket.connected) {
-            resolve(true);
-         }
+  async ensureConnection() {
+    return new Promise(resolve => {
+      this.socket.on('connect', () => {
+        console.log('connected');
+        resolve(true);
       });
-   }
 
-   async searchByName(name: string): Promise<Series[]> {
-      return new Promise((resolve) => {
-         this.socket.emit('mal/search-name', name, resolve);
-      });
-   }
+      if (this.socket.connected) {
+        resolve(true);
+      }
+    });
+  }
 
-   async searchBySeason(searchModel: MalSearchDTO): Promise<Series[]> {
-      return new Promise((resolve) => {
-         this.socket.emit('mal/search-season', searchModel, resolve);
-      });
-   }
+  async searchByName(name: string): Promise<Series[]> {
+    return new Promise(resolve => {
+      this.socket.emit('mal/search-name', name, resolve);
+    });
+  }
+
+  async searchBySeason(searchModel: MalSearchDTO): Promise<Series[]> {
+    return new Promise(resolve => {
+      this.socket.emit('mal/search-season', searchModel, resolve);
+    });
+  }
 }
 
 const service = new QueryService();

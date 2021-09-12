@@ -2,10 +2,9 @@ import { reactive, computed, readonly } from 'vue';
 import { DownloadItem } from '~/types/download/download-type.model';
 import { DownloadingModel } from '~/types/download/downloading.model';
 import { StartDownload } from '~/types/download/start-download.model';
-
 const state = reactive({
   downloads: {} as { [hash: string]: DownloadItem },
-  queue: [] as { fileName: string; url: string }[],
+  queue: [] as { fileName: string; url: string }[]
 });
 
 //@ts-ignore
@@ -16,7 +15,7 @@ function exists(hash: string) {
 }
 
 function removeFromQueue(url: string) {
-  state.queue = state.queue.filter((item) => item.url !== url);
+  state.queue = state.queue.filter(item => item.url !== url);
 }
 
 function addToQueue(fileName: string, url: string) {
@@ -36,8 +35,8 @@ function triggerDownload(newDownload: StartDownload) {
       speed: 0,
       timeLeft: '',
       totalDownloaded: 0,
-      queued: false,
-    },
+      queued: false
+    }
   };
 }
 
@@ -50,17 +49,13 @@ function updateDownload({ hash, value }: DownloadingModel) {
       totalDownloaded: value.totalDownloaded,
       progress: value.progress,
       speed: value.speed,
-      timeLeft: value.timeLeft,
-    },
+      timeLeft: value.timeLeft
+    }
   };
 }
 
 function completeDownload(hash: string) {
-  state.downloads = Object.entries(state.downloads).reduce(
-    (acc, [hashC, value]) =>
-      hash !== hashC ? { ...acc, [hashC]: value } : acc,
-    {}
-  );
+  state.downloads = Object.entries(state.downloads).reduce((acc, [hashC, value]) => (hash !== hashC ? { ...acc, [hashC]: value } : acc), {});
 }
 
 export function useDownload() {
@@ -72,6 +67,6 @@ export function useDownload() {
     updateDownload,
     completeDownload,
     getDownloads: computed(() => readonly(state.downloads)),
-    getQueued: computed(() => readonly(state.queue)),
+    getQueued: computed(() => readonly(state.queue))
   };
 }
