@@ -4,7 +4,7 @@ export function toDate(dateString: string) {
   return addDays(new Date(dateString), 1);
 }
 export function getClosestAiringDate(airingDate: Date, currentDate = new Date()) {
-  const range = eachWeekOfInterval({ start: airingDate, end: addWeeks(currentDate, 1) }, { weekStartsOn: currentDate.getDay() as any });
+  const range = eachWeekOfInterval({ start: airingDate, end: addWeeks(currentDate, 1) }, { weekStartsOn: airingDate.getDay() as any });
 
   return range.find(date => isSameDay(date, currentDate) || isFuture(date));
 }

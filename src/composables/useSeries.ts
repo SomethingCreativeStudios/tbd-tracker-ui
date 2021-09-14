@@ -110,7 +110,10 @@ export function useSeries() {
 }
 
 function meetsSubgroup(queueItem: NyaaItem, groups: SubGroup[]) {
-  const foundGroup = groups.find(group => (group.name = queueItem.subGroupName));
+  const foundGroup = groups?.find(group => (group.name = queueItem.subGroupName));
+  if (!foundGroup) {
+    return false;
+  }
 
   return foundGroup.preferedResultion === queueItem.resolution;
 }

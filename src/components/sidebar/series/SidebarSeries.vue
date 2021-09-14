@@ -66,6 +66,11 @@
             <q-btn round dense flat icon="add" @click="onFolderAdd" />
           </template>
         </q-select>
+        <div class="row q-col-gutter-lg">
+          <q-input class="col-12 col-md-6" label="Override File Name" color="secondary" v-model="series.showName" dense />
+          <q-input class="col-12 col-md-6" label="Override Offset" color="secondary" type="number" v-model="series.offset" dense />
+        </div>
+        <q-btn class="migrate-button col-12" color="secondary" @click="() => (showMigrate = true)">Mirgrate</q-btn>
       </div>
     </div>
     <div class="no-wrap sidebar-actions row">
@@ -74,14 +79,44 @@
       <q-btn class="col-4" flat color="negative" @click="onCancel">Cancel</q-btn>
     </div>
   </div>
+
+  <q-dialog v-model="showMigrate">
+    <q-card style="width: 300px">
+      <q-card-section>
+        <div class="text-h6">Migrate To:</div>
+      </q-card-section>
+
+      <q-card-section class="q-pt-none">
+        <div class="row settings q-col-gutter-lg">
+          <div class="col-12 col-md-6">
+            <q-select label="Season" color="secondary" v-model="migrateModel.season" :options="seasons" />
+          </div>
+          <div class="col-12 col-md-6">
+            <q-select
+              label="Year"
+              color="secondary"
+              v-model="migrateModel.year"
+              :options="['2021', '2022', '2023', '2024', '2025', '2026', '2027']"
+            />
+          </div>
+        </div>
+      </q-card-section>
+
+      <q-card-actions align="right">
+        <q-btn flat label="OK" @click="onMirgrate" />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
 <script lang="ts">
 import { defineComponent, computed, ref, watch, onMounted } from 'vue';
 import { clone, equals } from 'ramda';
 import { diff } from 'deep-object-diff';
 import { useSeries, useSetting, useSidebar } from '~/composables';
+import { service as SeriesService } from '~/services/series.service';
 import { Series } from '~/types/series/series.model';
 import { SidebarType } from '~/types/sidebar/sidebar.enum';
+import { SeasonName } from '~/types/season/season-name.enum';
 
 const { getSeries, updateShow, syncWithMal } = useSeries();
 const { getFolderNames } = useSetting();
@@ -111,7 +146,14 @@ export default defineComponent({
       seriesWatch();
     });
 
-    return { series: updatedSeries, startingSeries: foundSeries, folderNames: getFolderNames };
+    return {
+      series: updatedSeries,
+      showMigrate: ref(false),
+      migrateModel: ref({ season: SeasonName.FALL, year: 2021 }),
+      seasons: [SeasonName.FALL, SeasonName.WINTER, SeasonName.SUMMER, SeasonName.SPRING],
+      startingSeries: foundSeries,
+      folderNames: getFolderNames
+    };
   },
 
   methods: {
@@ -134,6 +176,15 @@ export default defineComponent({
     },
     onCancel() {
       setType(SidebarType.NONE);
+    },
+    async onMirgrate() {
+      console.log('1 2 and Migrate', this.migrateModel);
+      await SeriesService.migrateSeries({ id: this.id, season: this.migrateModel.season, year: this.migrateModel.year });
+      setType(SidebarType.NONE);
+      //@ts-ignore
+      await window.refresh();
+
+      this.showMigrate = false;
     }
   }
 });
@@ -175,5 +226,10 @@ export default defineComponent({
 .q-separator {
   margin-top: 20px;
   margin-bottom: 20px;
+}
+
+.migrate-button {
+  width: 100%;
+  margin-top: 10px;
 }
 </style>

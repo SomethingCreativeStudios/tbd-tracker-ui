@@ -44,7 +44,7 @@
       </div>
     </div>
     <div class="no-wrap sidebar-actions row">
-      <q-btn class="col-6" flat color="primary" @click="onAddSeason">Add Shows</q-btn>
+      <q-btn class="col-6" flat color="secondary" @click="onAddSeason">Add Shows</q-btn>
       <q-btn class="col-6" flat color="negative" @click="onCancel">Cancel</q-btn>
     </div>
   </div>

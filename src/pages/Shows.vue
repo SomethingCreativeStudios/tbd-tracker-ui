@@ -9,7 +9,7 @@
           label="Year"
           color="secondary"
           v-model="searchModel.year"
-          @change="onSeason"
+          @update:model-value="onSeason"
           :options="['2021', '2022', '2023', '2024', '2025', '2026', '2027']"
         />
       </div>
@@ -65,10 +65,11 @@ export default defineComponent({
       setType(SidebarType.ADD_SEASON);
     },
     async onSeason() {
-      const { setUp } = useSeries();
       await setCurrentSeason(this.searchModel.season);
-      await setCurrentYear(this.searchModel.year);
-      setUp();
+      await setCurrentYear(Number(this.searchModel.year));
+
+      //@ts-ignore
+      await window.refresh();
     }
   }
 });

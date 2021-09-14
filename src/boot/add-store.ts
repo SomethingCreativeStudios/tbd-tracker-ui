@@ -6,14 +6,21 @@ import { useSeries, useSetting, useSubgroup, useSubgroupRule } from '~/composabl
 export default boot(async () => {
   console.log('test');
 
-  const { setUp: setUpSeries } = useSeries();
-  const { setUp: setUpSetting } = useSetting();
-  const { setUp: setUpSubgroup } = useSubgroup();
-  const { setUp: setUpSubgroupRule } = useSubgroupRule();
+  //@ts-ignore
+  window.refresh = async () => {
+    const { setUp: setUpSeries } = useSeries();
+    const { setUp: setUpSetting } = useSetting();
+    const { setUp: setUpSubgroup } = useSubgroup();
+    const { setUp: setUpSubgroupRule } = useSubgroupRule();
 
-  await setUpSetting();
-  await setUpSeries();
-  await setUpSubgroup();
-  await setUpSubgroupRule();
+    await setUpSetting();
+    await setUpSeries();
+    await setUpSubgroup();
+    await setUpSubgroupRule();
+  };
+
+  //@ts-ignore
+  await window.refresh();
+
   console.log('DONE?');
 });

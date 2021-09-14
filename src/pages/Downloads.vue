@@ -5,7 +5,7 @@
         <template v-for="item in downloads" :key="item.downloadLink">
           <q-item v-ripple>
             <q-item-section>
-              <q-item-label>{{ item.name }} - {{item.totalDownloaded}}</q-item-label>
+              <q-item-label>{{ item.name }} - {{ item.timeLeft }}</q-item-label>
               <q-item-label caption>
                 <q-linear-progress size="25px" :value="item.progress" color="accent">
                   <div class="absolute-full flex flex-center">

@@ -3,6 +3,7 @@ import { CreateBySeasonDTO } from '~/types/season/dto/CreateBySeasonDTO';
 import { CreateFromMalDTO } from '~/types/season/dto/CreateFromMalDTO';
 import { SearchBySeasonDTO } from '~/types/season/dto/SearchBySeasonDTO';
 import { UpdateSeriesDTO } from '~/types/season/dto/UpdateSeriesDTO';
+import { MigrateSeriesDTO } from '~/types/series/dto/MigrateSeriesDTO';
 import { Series } from '~/types/series/series.model';
 import { WatchingStatus } from '~/types/series/watching-status.enum';
 
@@ -36,6 +37,12 @@ class SeriesService {
   async createSeason(createModel: CreateBySeasonDTO): Promise<Series[]> {
     return new Promise((resolve) => {
       this.socket.emit('create-season', createModel, resolve);
+    });
+  }
+
+  async migrateSeries(migrateModel: MigrateSeriesDTO): Promise<Series[]> {
+    return new Promise((resolve) => {
+      this.socket.emit('migrate-series', migrateModel, resolve);
     });
   }
 
