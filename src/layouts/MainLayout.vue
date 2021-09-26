@@ -18,7 +18,7 @@
       </q-tabs>
     </q-header>
 
-    <q-drawer v-model="rightDrawerOpen" side="right" bordered overlay :width="sideBarWidth">
+    <q-drawer v-model="rightDrawerOpen" side="right" bordered overlay :width="sideBarWidth" behavior="mobile">
       <sidebar-series v-if="sideBarType === 1" v-bind="params"></sidebar-series>
       <sidebar-subgroup v-if="sideBarType === 2" v-bind="params"></sidebar-subgroup>
       <sidebar-show-queue v-if="sideBarType === 3" v-bind="params"></sidebar-show-queue>

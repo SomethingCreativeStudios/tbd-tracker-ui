@@ -11,16 +11,16 @@ const { configure } = require('quasar/wrappers');
 const envparser = require('./src/config/envparser.js');
 const path = require('path');
 
-module.exports = configure(function (ctx) {
+module.exports = configure(function(ctx) {
   return {
     // https://v2.quasar.dev/quasar-cli/supporting-ts
     supportTS: {
       tsCheckerConfig: {
         eslint: {
           enabled: true,
-          files: './src/**/*.{ts,tsx,js,jsx,vue}',
-        },
-      },
+          files: './src/**/*.{ts,tsx,js,jsx,vue}'
+        }
+      }
     },
 
     // https://v2.quasar.dev/quasar-cli/prefetch-feature
@@ -46,7 +46,7 @@ module.exports = configure(function (ctx) {
 
       'roboto-font', // optional, you are not bound to it
       'material-icons', // optional, you are not bound to it
-      'fontawesome-v5',
+      'fontawesome-v5'
     ],
 
     // Full list of options: https://v2.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
@@ -79,16 +79,16 @@ module.exports = configure(function (ctx) {
       extendWebpack(cfg) {
         cfg.resolve.alias = {
           ...cfg.resolve.alias,
-          '~': path.resolve(__dirname, './src'),
+          '~': path.resolve(__dirname, './src')
         };
-      },
+      }
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer
     devServer: {
       https: false,
       port: 8080,
-      open: true, // opens browser window automatically
+      open: false // opens browser window automatically
     },
 
     // https://v2.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework
@@ -105,8 +105,9 @@ module.exports = configure(function (ctx) {
           positive: '#21BA45',
           negative: '#C10015',
           info: '#2e005c',
-          warning: '#F2C037',
+          warning: '#F2C037'
         },
+        notify: {}
       },
 
       iconSet: 'fontawesome-v5', // Quasar icon set
@@ -120,7 +121,7 @@ module.exports = configure(function (ctx) {
       // directives: [],
 
       // Quasar plugins
-      plugins: [],
+      plugins: ['Notify']
     },
 
     // animations: 'all', // --- includes all animations
@@ -146,8 +147,8 @@ module.exports = configure(function (ctx) {
 
       middlewares: [
         ctx.prod ? 'compression' : '',
-        'render', // keep this as last one
-      ],
+        'render' // keep this as last one
+      ]
     },
 
     // https://v2.quasar.dev/quasar-cli/developing-pwa/configuring-pwa
@@ -173,30 +174,30 @@ module.exports = configure(function (ctx) {
           {
             src: 'icons/icon-128x128.png',
             sizes: '128x128',
-            type: 'image/png',
+            type: 'image/png'
           },
           {
             src: 'icons/icon-192x192.png',
             sizes: '192x192',
-            type: 'image/png',
+            type: 'image/png'
           },
           {
             src: 'icons/icon-256x256.png',
             sizes: '256x256',
-            type: 'image/png',
+            type: 'image/png'
           },
           {
             src: 'icons/icon-384x384.png',
             sizes: '384x384',
-            type: 'image/png',
+            type: 'image/png'
           },
           {
             src: 'icons/icon-512x512.png',
             sizes: '512x512',
-            type: 'image/png',
-          },
-        ],
-      },
+            type: 'image/png'
+          }
+        ]
+      }
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli/developing-cordova-apps/configuring-cordova
@@ -206,7 +207,7 @@ module.exports = configure(function (ctx) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli/developing-capacitor-apps/configuring-capacitor
     capacitor: {
-      hideSplashscreen: true,
+      hideSplashscreen: true
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli/developing-electron-apps/configuring-electron
@@ -227,7 +228,7 @@ module.exports = configure(function (ctx) {
       builder: {
         // https://www.electron.build/configuration/configuration
 
-        appId: 'tbd-tracker-ui',
+        appId: 'tbd-tracker-ui'
       },
 
       // "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
@@ -240,7 +241,7 @@ module.exports = configure(function (ctx) {
       chainWebpackPreload(/* chain */) {
         // do something with the Electron main process Webpack cfg
         // extendWebpackPreload also available besides this chainWebpackPreload
-      },
-    },
+      }
+    }
   };
 });

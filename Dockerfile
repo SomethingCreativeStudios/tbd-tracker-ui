@@ -1,22 +1,18 @@
-# build stage
-FROM node:lts-alpine as develop-stage
+# develop stage
+FROM node:12.22.1-alpine as develop-stage
 WORKDIR /app
-ENV PATH app/node_modules/.bin:$PATH
 COPY package*.json ./
-RUN npm install
-RUN npm install -g @vue/cli
+RUN yarn global add @quasar/cli
 COPY . .
+COPY .env.prod .env
 
+# build stage
 FROM develop-stage as build-stage
-RUN npm run-script build:prod
-
+RUN yarn --ignore-engines
+RUN quasar build
 
 # production stage
-FROM nginx:stable-alpine as production-stage
-COPY --from=build-stage /app/dist /usr/share/nginx/html
-COPY entrypoint.sh /usr/share/nginx/
-RUN chmod +x /usr/share/nginx/entrypoint.sh
-ENTRYPOINT ["/usr/share/nginx/entrypoint.sh"]
-
+FROM nginx:1.17.5-alpine as production-stage
+COPY --from=build-stage /app/dist/spa /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]

@@ -5,13 +5,20 @@
         <q-select label="Season" color="secondary" v-model="searchModel.season" @update:model-value="onSeason" :options="seasons" />
       </div>
       <div class="col-12 col-md-6">
-        <q-select
-          label="Year"
-          color="secondary"
-          v-model="searchModel.year"
-          @update:model-value="onSeason"
-          :options="['2021', '2022', '2023', '2024', '2025', '2026', '2027']"
-        />
+        <div class="row">
+          <div class="col-10">
+            <q-select
+              label="Year"
+              color="secondary"
+              v-model="searchModel.year"
+              @update:model-value="onSeason"
+              :options="['2021', '2022', '2023', '2024', '2025', '2026', '2027']"
+            />
+          </div>
+          <div class="col-2">
+            <q-icon class="series-card__sync" :name="`fas fa-sync`" @click="onSync" />
+          </div>
+        </div>
       </div>
     </div>
     <div class="row q-col-gutter-lg">
@@ -19,6 +26,7 @@
         <div class="col-12 col-md-3">
           <series-card
             :airing-data="show.airingData"
+            :next-airing-date="show.nextAiringDate"
             :current-ep="String(show.downloaded)"
             :description="show.description"
             :total="String(show.numberOfEpisodes)"
@@ -39,6 +47,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
+import { service as NyaaService } from '~/services/nyaa.service';
 import { useSeries, useSidebar, useSetting } from '~/composables';
 import { SeriesCard } from '~/components/series';
 import { SidebarType } from '~/types/sidebar/sidebar.enum';
@@ -53,6 +62,7 @@ export default defineComponent({
   setup() {
     const searchModel = ref({ season: getCurrentSeason.value, year: getCurrentYear.value });
     const { getSeries } = useSeries();
+
     return { series: getSeries, searchModel, seasons: [SeasonName.FALL, SeasonName.WINTER, SeasonName.SUMMER, SeasonName.SPRING] };
   },
   methods: {
@@ -70,6 +80,10 @@ export default defineComponent({
 
       //@ts-ignore
       await window.refresh();
+    },
+    onSync() {
+      console.log('1 2 and Sync All');
+      NyaaService.syncShow();
     }
   }
 });
@@ -87,5 +101,17 @@ export default defineComponent({
 
 .settings {
   margin-bottom: 25px;
+}
+
+.series-card__sync:hover {
+  cursor: pointer;
+}
+
+.series-card__sync {
+  color: #f7b40e;
+  position: relative;
+  top: 24px;
+  left: 35px;
+  font-size: 30px;
 }
 </style>

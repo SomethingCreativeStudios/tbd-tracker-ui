@@ -18,7 +18,7 @@ export class Series {
 
   imageUrl: string;
 
-  airingData: string;
+  airingData: Date;
 
   numberOfEpisodes: number;
 
@@ -45,4 +45,6 @@ export class Series {
   subgroups: SubGroup[];
 
   showQueue: NyaaItem[];
+
+  nextAiringDate?: Date;
 }

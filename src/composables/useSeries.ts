@@ -87,8 +87,6 @@ async function setUp() {
     sortBy: SortBy.QUEUE
   });
 
-  console.log(foundSeries);
-
   setSeries(foundSeries);
 }
 

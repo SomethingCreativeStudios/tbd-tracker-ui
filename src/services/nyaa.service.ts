@@ -1,4 +1,5 @@
 import io, * as SocketIOClient from 'socket.io-client';
+import { Notify } from 'quasar';
 import { NyaaItem } from '~/types/nyaa/nyaa-item.model';
 import { Series } from '~/types/series/series.model';
 import { SubGroup } from '~/types/sub-group/sub-group.model';
@@ -32,10 +33,12 @@ class NyaaService {
 
     this.socket.on('start-downloading', function ({ hash, value }) {
       triggerDownload({ hash, value });
+      Notify.create({ type: 'info', message: `Downloading ${value.name as string}`, position: 'top-right', progress: true });
     });
 
     this.socket.on('torrent-queued', function ({ url, fileName }) {
       console.log('Queued', url, fileName);
+      Notify.create({ type: 'info', message: `Queued ${fileName as string}`, position: 'top-right', progress: true });
       addToQueue(fileName, url);
     });
 
@@ -47,8 +50,9 @@ class NyaaService {
       updateDownload({ hash, value });
     });
 
-    this.socket.on('downloaded', function ({ hash }) {
+    this.socket.on('downloaded', function ({ hash, value }) {
       completeDownload(hash);
+      Notify.create({ type: 'positive', message: `Downloaded ${value.name as string}`, position: 'top-right', progress: true });
     });
   }
 

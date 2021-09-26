@@ -46,7 +46,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, PropType, computed } from 'vue';
-import { getAiringTime, toDate } from '~/utils/time-helpers';
+import { getAiringTime } from '~/utils/time-helpers';
 
 import { service as NyaaService } from '~/services/nyaa.service';
 import { useSeries, useSidebar } from '~/composables';
@@ -83,8 +83,8 @@ export default defineComponent({
       default: '12'
     },
     airingData: {
-      type: String,
-      default: '2021-07-09'
+      type: Date,
+      default: new Date('2021-07-09')
     },
     description: {
       type: String,
@@ -94,11 +94,15 @@ export default defineComponent({
     showsToDownload: {
       type: Number,
       default: 0
+    },
+    nextAiringDate: {
+      type: Date,
+      default: new Date()
     }
   },
   setup(props) {
     const queueItems = getFilteredQueue(props.id, true);
-    return { queueItems, isSyncing: isSyncing(props.id), tillDate: computed(() => getAiringTime(toDate(props.airingData))) };
+    return { queueItems, isSyncing: isSyncing(props.id), tillDate: computed(() => getAiringTime(props.airingData, props.nextAiringDate)) };
   },
   methods: {
     onSync() {
@@ -140,6 +144,8 @@ export default defineComponent({
   position: absolute;
   right: 7px;
   top: 7px;
+
+  text-shadow: 2px 2px rgb(0 0 0 / 75%);
 }
 
 .series-card__sync--badge {
@@ -147,10 +153,13 @@ export default defineComponent({
 }
 
 .series-card__body {
+  width: 100%;
   height: 100%;
 
   display: inline-grid;
   grid-template-columns: 185px auto;
+
+  position: initial;
 }
 
 .series-card__title {
