@@ -12,7 +12,7 @@ class NyaaService {
   private socket: SocketIOClient.Socket;
 
   constructor() {
-    this.socket = io(process.env.VUE_APP_WEBSOCKET_PATH + '/nyaa', {
+    this.socket = io(`${window.location.hostname}:${process.env.VUE_APP_WEBSOCKET_PORT}` + '/nyaa', {
       transports: ['websocket'],
     });
 

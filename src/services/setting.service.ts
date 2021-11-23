@@ -28,7 +28,7 @@ class SettingsService {
   private socket: SocketIOClient.Socket;
 
   constructor() {
-    this.socket = io(process.env.VUE_APP_WEBSOCKET_PATH + '/settings', { transports: ['websocket'] });
+    this.socket = io(`${window.location.hostname}:${process.env.VUE_APP_WEBSOCKET_PORT}` + '/settings', { transports: ['websocket'] });
 
     this.socket.on('connect', () => {});
   }

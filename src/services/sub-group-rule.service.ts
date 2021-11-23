@@ -8,7 +8,7 @@ class SubGroupRuleService {
   private socket: SocketIOClient.Socket;
 
   constructor() {
-    this.socket = io(process.env.VUE_APP_WEBSOCKET_PATH + '/subgrouprule', {
+    this.socket = io(`${window.location.hostname}:${process.env.VUE_APP_WEBSOCKET_PORT}` + '/subgrouprule', {
       transports: ['websocket']
     });
   }
