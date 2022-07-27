@@ -1,4 +1,5 @@
 import { reactive, computed } from 'vue';
+import io, * as SocketIOClient from 'socket.io-client';
 import { service as SeriesService } from '~/services/series.service';
 import { service as SettingService } from '~/services/setting.service';
 import { Settings } from '~/types/settings/setting.model';
@@ -21,12 +22,8 @@ function setFolderNames(folderNames: string[]) {
 
 function setSettings(settings: Settings[]) {
   const currentYear = settings.find(({ key }) => key === 'currentYear')?.value;
-  const currentSeason = settings.find(
-    ({ key }) => key === 'currentSeason'
-  )?.value;
-  const defaultSubgroup = settings.find(
-    ({ key }) => key === 'defaultSubgroup'
-  )?.value;
+  const currentSeason = settings.find(({ key }) => key === 'currentSeason')?.value;
+  const defaultSubgroup = settings.find(({ key }) => key === 'defaultSubgroup')?.value;
 
   if (currentYear) {
     state.currentYear = Number(currentYear);
@@ -71,6 +68,12 @@ async function setDefaultSubgroup(groupName: string) {
   state.defaultSubgroup = groupName;
 }
 
+function buildIO(route: string) {
+  const port = process.env.VUE_APP_WEBSOCKET_PORT;
+  const path = window.location.hostname;
+
+  return `${path}${port ? `:${port}` : ''}` + route;
+}
 async function setUp() {
   setSettings(await SettingService.fetchSettings());
   setFolderNames(await SeriesService.getFolderNames());
@@ -79,6 +82,7 @@ async function setUp() {
 export function useSetting() {
   return {
     setUp,
+    buildIO,
     setCurrentYear,
     setCurrentSeason,
     setDefaultSubgroup,

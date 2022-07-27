@@ -2,12 +2,15 @@ import io, * as SocketIOClient from 'socket.io-client';
 import { CreateSubGroupDTO } from '~/types/sub-group/dto/CreateSubGroupDTO';
 import { UpdateSubGroupDTO } from '~/types/sub-group/dto/UpdateSubGroupDTO';
 import { SubGroup } from '~/types/sub-group/sub-group.model';
+import { useSetting } from '~/composables/useSettings';
+
+const { buildIO } = useSetting();
 
 class SubGroupService {
   private socket: SocketIOClient.Socket;
 
   constructor() {
-    this.socket = io(`${window.location.hostname}:${process.env.VUE_APP_WEBSOCKET_PORT}` + '/subgroup', {
+    this.socket = io(buildIO('/subgroup'), {
       transports: ['websocket'],
     });
   }

@@ -6,12 +6,14 @@ import { UpdateSeriesDTO } from '~/types/season/dto/UpdateSeriesDTO';
 import { MigrateSeriesDTO } from '~/types/series/dto/MigrateSeriesDTO';
 import { Series } from '~/types/series/series.model';
 import { WatchingStatus } from '~/types/series/watching-status.enum';
+import { useSetting } from '~/composables/useSettings';
 
+const { buildIO } = useSetting();
 class SeriesService {
   private socket: SocketIOClient.Socket;
 
   constructor() {
-    this.socket = io(`${window.location.hostname}:${process.env.VUE_APP_WEBSOCKET_PORT}` + '/series', { transports: ['websocket'] });
+    this.socket = io(buildIO('/series'), { transports: ['websocket'] });
     this.loadSeries();
   }
 

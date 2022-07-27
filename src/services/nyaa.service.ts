@@ -3,16 +3,17 @@ import { Notify } from 'quasar';
 import { NyaaItem } from '~/types/nyaa/nyaa-item.model';
 import { Series } from '~/types/series/series.model';
 import { SubGroup } from '~/types/sub-group/sub-group.model';
-import { useSeries, useDownload } from '~/composables';
+import { useSeries, useDownload, useSetting } from '~/composables';
 
 const { updateSyncStatus, refreshShow } = useSeries();
 const { triggerDownload, addToQueue, updateDownload, completeDownload } = useDownload();
+const { buildIO } = useSetting();
 
 class NyaaService {
   private socket: SocketIOClient.Socket;
 
   constructor() {
-    this.socket = io(`${window.location.hostname}:${process.env.VUE_APP_WEBSOCKET_PORT}` + '/nyaa', {
+    this.socket = io(buildIO('/nyaa'), {
       transports: ['websocket'],
     });
 
@@ -33,12 +34,12 @@ class NyaaService {
 
     this.socket.on('start-downloading', function ({ hash, value }) {
       triggerDownload({ hash, value });
-      Notify.create({ type: 'info', message: `Downloading ${value.name as string}`, position: 'top-right', progress: true });
+      Notify.create({ type: 'info', message: `Downloading ${value.name as string}`, position: 'bottom-right', progress: true });
     });
 
     this.socket.on('torrent-queued', function ({ url, fileName }) {
       console.log('Queued', url, fileName);
-      Notify.create({ type: 'info', message: `Queued ${fileName as string}`, position: 'top-right', progress: true });
+      Notify.create({ type: 'info', message: `Queued ${fileName as string}`, position: 'bottom-right', progress: true });
       addToQueue(fileName, url);
     });
 
@@ -52,7 +53,7 @@ class NyaaService {
 
     this.socket.on('downloaded', function ({ hash, value }) {
       completeDownload(hash);
-      Notify.create({ type: 'positive', message: `Downloaded ${value.name as string}`, position: 'top-right', progress: true });
+      // Notify.create({ type: 'positive', message: `Downloaded ${value as string}`, position: 'bottom-right', progress: true });
     });
   }
 

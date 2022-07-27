@@ -1,14 +1,12 @@
 <template>
-  <q-card class="series-card" flat bordered>
+  <q-card class="series-card" flat bordered :class="mainClass">
     <q-card-section class="series-card__body" horizontal>
       <q-img :src="imageUrl" loading="lazy">
         <div class="series-card__title absolute-bottom text-subtitle2 text-center" @click="onEdit">
           {{ title }}
         </div>
         <template v-slot:error>
-          <div class="absolute-full flex flex-center bg-negative text-white">
-            RIP Image
-          </div>
+          <div class="absolute-full flex flex-center bg-negative text-white">RIP Image</div>
           <div class="series-card__title absolute-bottom text-subtitle2 text-center" @click="onEdit">
             {{ title }}
           </div>
@@ -60,49 +58,54 @@ export default defineComponent({
   props: {
     id: {
       type: Number,
-      default: 0
+      default: 0,
     },
     imageUrl: {
       type: String,
-      default: ''
+      default: '',
     },
     title: {
       type: String,
-      default: 'That One Anime With That One Person'
+      default: 'That One Anime With That One Person',
     },
     tags: {
       type: Array as PropType<string[]>,
-      default: () => ['Tag 1', 'Tag 2']
+      default: () => ['Tag 1', 'Tag 2'],
     },
     currentEp: {
       type: String,
-      default: '9'
+      default: '9',
     },
     total: {
       type: String,
-      default: '12'
+      default: '12',
     },
     airingData: {
       type: Date,
-      default: new Date('2021-07-09')
+      default: new Date('2021-07-09'),
     },
     description: {
       type: String,
       default:
-        'That One Anime With That One Person. Featuring that one thing that the one person does. The one person is trying to live an adjective life. However in That One Anime, that other person appears'
+        'That One Anime With That One Person. Featuring that one thing that the one person does. The one person is trying to live an adjective life. However in That One Anime, that other person appears',
     },
     showsToDownload: {
       type: Number,
-      default: 0
+      default: 0,
     },
     nextAiringDate: {
       type: Date,
-      default: new Date()
-    }
+      default: new Date(),
+    },
   },
   setup(props) {
     const queueItems = getFilteredQueue(props.id, true);
-    return { queueItems, isSyncing: isSyncing(props.id), tillDate: computed(() => getAiringTime(props.airingData, props.nextAiringDate)) };
+
+    const mainClass = computed(() => ({
+      'has-tags': props.tags.length > 0,
+    }));
+
+    return { queueItems, mainClass, isSyncing: isSyncing(props.id), tillDate: computed(() => getAiringTime(props.airingData, props.nextAiringDate)) };
   },
   methods: {
     onSync() {
@@ -124,8 +127,8 @@ export default defineComponent({
     onQueue() {
       console.log('1 2 and Queue');
       setType(SidebarType.EDIT_QUEUE, { id: this.id });
-    }
-  }
+    },
+  },
 });
 </script>
 
@@ -176,6 +179,10 @@ export default defineComponent({
   line-height: 1.2;
   overflow: hidden;
   height: 97px;
+}
+
+.has-tags .series-card__description {
+  height: 84px;
 }
 
 .series-card__description:hover {

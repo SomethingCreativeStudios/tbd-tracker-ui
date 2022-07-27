@@ -9,7 +9,8 @@
     "dev": "quasar dev",
     "build": "quasar build",
     "lint": "eslint --ext .js,.ts,.vue ./",
-    "test": "echo \"No test specified\" && exit 0"
+    "test": "echo \"No test specified\" && exit 0",
+    "publish:docker": "docker build -t ericlo417/tbd-tracker-ui . && docker push ericlo417/tbd-tracker-ui"
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",

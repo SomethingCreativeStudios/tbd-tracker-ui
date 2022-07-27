@@ -2,6 +2,9 @@ import io, * as SocketIOClient from 'socket.io-client';
 import { UpdateSettingDTO } from '~/types/settings/dto/UpdateSettingDTO';
 import { SettingType } from '~/types/settings/setting-type.enum';
 import { Settings } from '~/types/settings/setting.model';
+import { useSetting } from '~/composables/useSettings';
+
+const { buildIO } = useSetting();
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function mapSetting(key: string, settings: Settings[], fallback: any) {
@@ -28,7 +31,7 @@ class SettingsService {
   private socket: SocketIOClient.Socket;
 
   constructor() {
-    this.socket = io(`${window.location.hostname}:${process.env.VUE_APP_WEBSOCKET_PORT}` + '/settings', { transports: ['websocket'] });
+    this.socket = io(buildIO('/settings'), { transports: ['websocket'] });
 
     this.socket.on('connect', () => {});
   }
