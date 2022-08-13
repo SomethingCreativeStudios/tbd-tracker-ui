@@ -1,5 +1,4 @@
 import { reactive, computed } from 'vue';
-import io, * as SocketIOClient from 'socket.io-client';
 import { service as SeriesService } from '~/services/series.service';
 import { service as SettingService } from '~/services/setting.service';
 import { Settings } from '~/types/settings/setting.model';
@@ -71,8 +70,11 @@ async function setDefaultSubgroup(groupName: string) {
 function buildIO(route: string) {
   const port = process.env.VUE_APP_WEBSOCKET_PORT;
   const path = window.location.hostname;
+  const baseHasPort = !!window.location.port;
 
-  return `${path}${port ? `:${port}` : ''}` + route;
+  console.log('port', window.location.port, port, window.location.port);
+
+  return `${path}${baseHasPort ? `:${port}` : ''}` + route;
 }
 async function setUp() {
   setSettings(await SettingService.fetchSettings());

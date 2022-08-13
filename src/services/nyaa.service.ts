@@ -51,9 +51,9 @@ class NyaaService {
       updateDownload({ hash, value });
     });
 
-    this.socket.on('downloaded', function ({ hash, value }) {
+    this.socket.on('downloaded', function ({ hash, name }) {
       completeDownload(hash);
-      // Notify.create({ type: 'positive', message: `Downloaded ${value as string}`, position: 'bottom-right', progress: true });
+      Notify.create({ type: 'positive', message: `Downloaded ${name as string}`, position: 'bottom-right', progress: true });
     });
   }
 
