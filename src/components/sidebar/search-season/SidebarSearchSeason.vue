@@ -2,7 +2,7 @@
   <div class="sidebar-search-season">
     <div class="text-h6 title">
       Add Season
-      <div class="row  q-col-gutter-lg">
+      <div class="row q-col-gutter-lg">
         <div class="col-12 col-md-6">
           <q-select label="Season" color="secondary" v-model="search.season" :options="seasons" />
         </div>
@@ -25,9 +25,7 @@
                   {{ show.name }}
                 </div>
                 <template v-slot:error>
-                  <div class="absolute-full flex flex-center bg-negative text-white">
-                    RIP Image
-                  </div>
+                  <div class="absolute-full flex flex-center bg-negative text-white">RIP Image</div>
                   <div class="series-card__title absolute-bottom text-subtitle2 text-center">
                     {{ show.name }}
                   </div>
@@ -51,15 +49,15 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { useSeries, useSidebar } from '~/composables';
+import { useSeries, useSidebar, useGlobal } from '~/composables';
 import { SidebarType } from '~/types/sidebar/sidebar.enum';
 import { service as SearchService } from '~/services/query.service';
-import { service as SeriesService } from '~/services/series.service';
 import { Series } from '~/types/series/series.model';
 import { SeasonName } from '~/types/season/season-name.enum';
 
 const { setType } = useSidebar();
-const { setUp } = useSeries();
+const { createBySeason } = useSeries();
+const { setUpStores } = useGlobal();
 
 export default defineComponent({
   name: 'sidebar-search-season',
@@ -86,8 +84,9 @@ export default defineComponent({
       this.loading = false;
     },
     async onAddSeason() {
-      await SeriesService.createSeason({ seasonName: this.search.season, seasonYear: this.search.year, malIds: this.selected });
-      setUp();
+      await createBySeason({ seasonName: this.search.season, seasonYear: this.search.year, malIds: this.selected });
+      await setUpStores();
+      setType(SidebarType.NONE);
     },
     onAddShow(id: number) {
       const indexOf = this.selected.indexOf(id);
@@ -99,9 +98,9 @@ export default defineComponent({
       }
     },
     isSelected(showId: number) {
-      return this.selected.find(id => id === showId) !== undefined;
-    }
-  }
+      return this.selected.find((id) => id === showId) !== undefined;
+    },
+  },
 });
 </script>
 

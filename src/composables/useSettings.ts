@@ -13,7 +13,7 @@ const state = reactive({
 });
 
 //@ts-ignore
-window.state.series = state;
+window.state.settings = state;
 
 function setFolderNames(folderNames: string[]) {
   state.folderNames = folderNames;

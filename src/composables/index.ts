@@ -6,3 +6,5 @@ export * from './useSettings';
 export * from './useSubgroup';
 export * from './useSubgroupRule';
 export * from './useSidebar';
+export * from './useAuth';
+export * from './useGlobal';

@@ -1,17 +1,20 @@
-import io, * as SocketIOClient from 'socket.io-client';
+import io from 'socket.io-client';
 import { Series } from '~/types/series/series.model';
 import { CreateSubGroupRuleDTO } from '~/types/sub-group-rule/dto/CreateSubGroupRuleDTO';
 import { UpdateSubGroupRuleDTO } from '~/types/sub-group-rule/dto/UpdateSubGroupRuleDTO';
 import { SubGroupRule } from '~/types/sub-group-rule/sub-group-rule.model';
 import { useSetting } from '~/composables/useSettings';
+import { BaseService } from './base.service';
 
 const { buildIO } = useSetting();
-class SubGroupRuleService {
-  private socket: SocketIOClient.Socket;
+class SubGroupRuleService extends BaseService {
 
   constructor() {
+    super();
+
     this.socket = io(buildIO('/subgrouprule'), {
       transports: ['websocket'],
+      auth: { token: localStorage.getItem('accessToken') }
     });
   }
 

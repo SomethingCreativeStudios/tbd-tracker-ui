@@ -22,10 +22,6 @@ function setSeries(series: Series[]) {
   state.series = series;
 }
 
-function addSeries(newSeries: Series[]) {
-  state.series = state.series.concat(newSeries);
-}
-
 async function removeShow(id: number) {
   await SeriesService.remove(id);
 
@@ -52,7 +48,7 @@ async function syncWithMal(id: number) {
 }
 
 async function createBySeason(createModel: CreateBySeasonDTO) {
-  addSeries(await SeriesService.createSeason(createModel));
+  await SeriesService.createSeason(createModel);
 }
 
 function updateSyncStatus(id: number, isSyncing: boolean) {
@@ -67,9 +63,9 @@ async function toggleWatchStatus(id: number) {
 
 function getFilteredQueue(id: number, doFilter = true) {
   const { getSubgroups } = useSubgroup();
-  const groups = getSubgroups.value[id];
 
   return computed(() => {
+    const groups = getSubgroups.value[id];
     const foundSeries = state.series.find(series => series.id === id);
 
     return doFilter ? foundSeries.showQueue.filter(queue => meetsSubgroup(queue as NyaaItem, groups as SubGroup[])) : foundSeries.showQueue;

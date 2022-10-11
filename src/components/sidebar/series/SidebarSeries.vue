@@ -112,7 +112,7 @@
 import { defineComponent, computed, ref, watch, onMounted } from 'vue';
 import { clone, equals } from 'ramda';
 import { diff } from 'deep-object-diff';
-import { useSeries, useSetting, useSidebar } from '~/composables';
+import { useSeries, useSetting, useSidebar, useGlobal } from '~/composables';
 import { service as SeriesService } from '~/services/series.service';
 import { Series } from '~/types/series/series.model';
 import { SidebarType } from '~/types/sidebar/sidebar.enum';
@@ -127,17 +127,17 @@ export default defineComponent({
   props: {
     id: {
       type: Number,
-      default: 0
-    }
+      default: 0,
+    },
   },
 
   setup(props) {
     const updatedSeries = ref({} as Series);
-    const foundSeries = computed(() => getSeries.value?.find(series => series.id === props.id));
+    const foundSeries = computed(() => getSeries.value?.find((series) => series.id === props.id));
 
     updatedSeries.value = clone(foundSeries.value) as Series;
 
-    const seriesWatch = watch(foundSeries, newSeries => {
+    const seriesWatch = watch(foundSeries, (newSeries) => {
       if (equals(updatedSeries.value, newSeries)) return;
       updatedSeries.value = clone(foundSeries.value) as Series;
     });
@@ -152,7 +152,7 @@ export default defineComponent({
       migrateModel: ref({ season: SeasonName.FALL, year: 2021 }),
       seasons: [SeasonName.FALL, SeasonName.WINTER, SeasonName.SUMMER, SeasonName.SPRING],
       startingSeries: foundSeries,
-      folderNames: getFolderNames
+      folderNames: getFolderNames,
     };
   },
 
@@ -182,11 +182,11 @@ export default defineComponent({
       await SeriesService.migrateSeries({ id: this.id, season: this.migrateModel.season, year: this.migrateModel.year });
       setType(SidebarType.NONE);
       //@ts-ignore
-      await window.refresh();
+      await useGlobal().refresh();
 
       this.showMigrate = false;
-    }
-  }
+    },
+  },
 });
 </script>
 

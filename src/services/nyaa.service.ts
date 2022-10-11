@@ -1,20 +1,23 @@
-import io, * as SocketIOClient from 'socket.io-client';
+import io from 'socket.io-client';
 import { Notify } from 'quasar';
 import { NyaaItem } from '~/types/nyaa/nyaa-item.model';
 import { Series } from '~/types/series/series.model';
 import { SubGroup } from '~/types/sub-group/sub-group.model';
 import { useSeries, useDownload, useSetting } from '~/composables';
+import { BaseService } from './base.service';
 
 const { updateSyncStatus, refreshShow } = useSeries();
 const { triggerDownload, addToQueue, updateDownload, completeDownload } = useDownload();
 const { buildIO } = useSetting();
 
-class NyaaService {
-  private socket: SocketIOClient.Socket;
+class NyaaService extends BaseService {
 
   constructor() {
+    super();
+
     this.socket = io(buildIO('/nyaa'), {
       transports: ['websocket'],
+      auth: { token: localStorage.getItem('accessToken') }
     });
 
     this.socket.on('series-syncing', ({ id, type }: { id: number; type: 'STARTING' | 'UPDATE_FOUND' | 'NO_UPDATE'; queue: NyaaItem[] }) => {

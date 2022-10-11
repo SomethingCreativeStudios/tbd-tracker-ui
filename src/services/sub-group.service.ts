@@ -1,17 +1,20 @@
-import io, * as SocketIOClient from 'socket.io-client';
 import { CreateSubGroupDTO } from '~/types/sub-group/dto/CreateSubGroupDTO';
 import { UpdateSubGroupDTO } from '~/types/sub-group/dto/UpdateSubGroupDTO';
 import { SubGroup } from '~/types/sub-group/sub-group.model';
 import { useSetting } from '~/composables/useSettings';
+import { io } from 'socket.io-client';
+import { BaseService } from './base.service';
 
 const { buildIO } = useSetting();
 
-class SubGroupService {
-  private socket: SocketIOClient.Socket;
+class SubGroupService extends BaseService {
 
   constructor() {
+    super();
+
     this.socket = io(buildIO('/subgroup'), {
       transports: ['websocket'],
+      auth: { token: localStorage.getItem('accessToken') }
     });
   }
 

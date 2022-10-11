@@ -1,8 +1,9 @@
-import io, * as SocketIOClient from 'socket.io-client';
+import io from 'socket.io-client';
 import { UpdateSettingDTO } from '~/types/settings/dto/UpdateSettingDTO';
 import { SettingType } from '~/types/settings/setting-type.enum';
 import { Settings } from '~/types/settings/setting.model';
 import { useSetting } from '~/composables/useSettings';
+import { BaseService } from './base.service';
 
 const { buildIO } = useSetting();
 
@@ -27,13 +28,14 @@ function mapSetting(key: string, settings: Settings[], fallback: any) {
   }
 }
 
-class SettingsService {
-  private socket: SocketIOClient.Socket;
+class SettingsService extends BaseService {
 
   constructor() {
-    this.socket = io(buildIO('/settings'), { transports: ['websocket'] });
+    super();
 
-    this.socket.on('connect', () => {});
+    this.socket = io(buildIO('/settings'), { transports: ['websocket'], auth: { token: localStorage.getItem('accessToken') } });
+
+    this.socket.on('connect', () => { });
   }
 
   async fetchSettings(): Promise<Settings[]> {

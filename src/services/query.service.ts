@@ -1,14 +1,16 @@
-import io, * as SocketIOClient from 'socket.io-client';
+import io from 'socket.io-client';
 import { MalSearchDTO } from '~/types/series/dto/MalSearchDTO';
 import { Series } from '~/types/series/series.model';
 import { useSetting } from '~/composables/useSettings';
+import { BaseService } from './base.service';
 
 const { buildIO } = useSetting();
-class QueryService {
-  private socket: SocketIOClient.Socket;
+class QueryService extends BaseService {
 
   constructor() {
-    this.socket = io(buildIO('/series'), { transports: ['websocket'] });
+    super();
+
+    this.socket = io(buildIO('/series'), { transports: ['websocket'], auth: { token: localStorage.getItem('accessToken') } });
   }
 
   async ensureConnection() {

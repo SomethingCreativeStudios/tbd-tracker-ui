@@ -2,7 +2,13 @@
   <div class="shows q-pa-md">
     <div class="row settings q-col-gutter-lg">
       <div class="col-12 col-md-6">
-        <q-select label="Season" color="secondary" v-model="searchModel.season" @update:model-value="onSeason" :options="seasons" />
+        <q-select
+          label="Season"
+          color="secondary"
+          v-model="currentSeason"
+          @update:model-value="($event) => onSeason($event, 'season')"
+          :options="seasons"
+        />
       </div>
       <div class="col-12 col-md-6">
         <div class="row">
@@ -10,13 +16,16 @@
             <q-select
               label="Year"
               color="secondary"
-              v-model="searchModel.year"
-              @update:model-value="onSeason"
-              :options="['2021', '2022', '2023', '2024', '2025', '2026', '2027']"
+              v-model="currentYear"
+              @update:model-value="($event) => onSeason($event, 'year')"
+              :options="[2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027]"
             />
           </div>
-          <div class="col-2">
-            <q-icon class="series-card__sync" :name="`fas fa-sync`" @click="onSync" />
+          <div class="col-1">
+            <q-icon class="series-card__sync series-card--icon" :name="`fas fa-sync`" @click="onSync" />
+          </div>
+          <div class="col-1">
+            <q-icon class="series-card__signin series-card--icon" :name="`fas fa-sign-in-alt`" @click="onSignIn" />
           </div>
         </div>
       </div>
@@ -48,13 +57,15 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { service as NyaaService } from '~/services/nyaa.service';
-import { useSeries, useSidebar, useSetting } from '~/composables';
+import { service as MalService } from '~/services/mal.service';
+import { useSeries, useSidebar, useSetting, useGlobal } from '~/composables';
 import { SeriesCard } from '~/components/series';
 import { SidebarType } from '~/types/sidebar/sidebar.enum';
 import { SeasonName } from '~/types/season/season-name.enum';
 
 const { setType } = useSidebar();
 const { getCurrentSeason, getCurrentYear, setCurrentSeason, setCurrentYear } = useSetting();
+const { reload } = useGlobal();
 
 export default defineComponent({
   name: 'show',
@@ -63,29 +74,40 @@ export default defineComponent({
     const searchModel = ref({ season: getCurrentSeason.value, year: getCurrentYear.value });
     const { getSeries } = useSeries();
 
-    return { series: getSeries, searchModel, seasons: [SeasonName.FALL, SeasonName.WINTER, SeasonName.SUMMER, SeasonName.SPRING] };
+    return {
+      series: getSeries,
+      searchModel,
+      currentSeason: getCurrentSeason,
+      currentYear: getCurrentYear,
+      seasons: [SeasonName.FALL, SeasonName.WINTER, SeasonName.SUMMER, SeasonName.SPRING],
+    };
   },
   methods: {
     onAddShow() {
-      console.log('1 2 and Add Show');
       setType(SidebarType.ADD_SHOW);
     },
     onAddSeason() {
-      console.log('1 2 and Add Season');
       setType(SidebarType.ADD_SEASON);
     },
-    async onSeason() {
-      await setCurrentSeason(this.searchModel.season);
-      await setCurrentYear(Number(this.searchModel.year));
+    async onSeason(newValue: string, field: string) {
+      if (field === 'season') {
+        await setCurrentSeason(newValue as any);
+      } else {
+        await setCurrentYear(Number(newValue));
+      }
 
       //@ts-ignore
-      await window.refresh();
+      await reload();
     },
     onSync() {
-      console.log('1 2 and Sync All');
       NyaaService.syncShow();
-    }
-  }
+    },
+    async onSignIn() {
+      const { url } = await MalService.getAuthURL();
+
+      window.location.href = decodeURIComponent(url);
+    },
+  },
 });
 </script>
 
@@ -103,10 +125,11 @@ export default defineComponent({
   margin-bottom: 25px;
 }
 
-.series-card__sync:hover {
+.series-card--icon:hover {
   cursor: pointer;
 }
 
+.series-card__signin,
 .series-card__sync {
   color: #f7b40e;
   position: relative;

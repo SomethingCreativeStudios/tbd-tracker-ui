@@ -1,4 +1,4 @@
-import io, * as SocketIOClient from 'socket.io-client';
+import io from 'socket.io-client';
 import { CreateBySeasonDTO } from '~/types/season/dto/CreateBySeasonDTO';
 import { CreateFromMalDTO } from '~/types/season/dto/CreateFromMalDTO';
 import { SearchBySeasonDTO } from '~/types/season/dto/SearchBySeasonDTO';
@@ -7,13 +7,15 @@ import { MigrateSeriesDTO } from '~/types/series/dto/MigrateSeriesDTO';
 import { Series } from '~/types/series/series.model';
 import { WatchingStatus } from '~/types/series/watching-status.enum';
 import { useSetting } from '~/composables/useSettings';
+import { BaseService } from './base.service';
 
 const { buildIO } = useSetting();
-class SeriesService {
-  private socket: SocketIOClient.Socket;
+class SeriesService extends BaseService {
 
   constructor() {
-    this.socket = io(buildIO('/series'), { transports: ['websocket'] });
+    super();
+
+    this.socket = io(buildIO('/series'), { transports: ['websocket'], auth: { token: localStorage.getItem('accessToken') } });
     this.loadSeries();
   }
 
@@ -99,6 +101,8 @@ class SeriesService {
   private async loadSeries() {
     await this.ensureConnection();
   }
+
+
 }
 
 const service = new SeriesService();

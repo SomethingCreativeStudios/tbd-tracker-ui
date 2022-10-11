@@ -6,7 +6,9 @@ import {
   createWebHistory,
 } from 'vue-router';
 import routes from './routes';
+import { useAuth } from '~/composables';
 
+const { isLoggedIn } = useAuth();
 /*
  * If not building with SSR mode, you can
  * directly export the Router instantiation;
@@ -15,6 +17,8 @@ import routes from './routes';
  * async/await or return a Promise which resolves
  * with the Router instance.
  */
+//@ts-ignore
+window.router = null;
 
 export default route(function (/* { store, ssrContext } */) {
   const createHistory = process.env.SERVER
@@ -32,6 +36,19 @@ export default route(function (/* { store, ssrContext } */) {
       process.env.MODE === 'ssr' ? void 0 : process.env.VUE_ROUTER_BASE
     ),
   });
+
+  Router.beforeEach((to) => {
+    if (!isLoggedIn() && to.name !== 'Login') {
+      // redirect the user to the login page
+      return { name: 'Login' }
+    }
+    if (isLoggedIn() && to.name === 'Login') {
+      return '/';
+    }
+  })
+
+  //@ts-ignore
+  window.router = Router;
 
   return Router;
 });
