@@ -12,7 +12,7 @@ import { NyaaItem } from '~/types/nyaa/nyaa-item.model';
 const { getCurrentSeason, getCurrentYear } = useSetting();
 const state = reactive({
   series: [] as Series[],
-  syncingSeries: {} as { [id: number]: boolean }
+  syncingSeries: {} as { [id: number]: boolean },
 });
 
 //@ts-ignore
@@ -31,20 +31,20 @@ async function removeShow(id: number) {
 async function updateShow(updateModel: UpdateSeriesDTO) {
   const show = await SeriesService.update(updateModel);
 
-  state.series = state.series.map(currentShow => (currentShow.id === show.id ? show : currentShow));
+  state.series = state.series.map((currentShow) => (currentShow.id === show.id ? show : currentShow));
 }
 
 async function refreshShow(id: number) {
   const show = await SeriesService.fetchById(id);
 
-  state.series = state.series.map(currentShow => (currentShow.id === show.id ? show : currentShow));
+  state.series = state.series.map((currentShow) => (currentShow.id === show.id ? show : currentShow));
 }
 
 async function syncWithMal(id: number) {
   const show = await SeriesService.syncWithMal(id);
   const imageUrl = await SeriesService.syncImageUrl(id);
 
-  state.series = state.series.map(currentShow => (currentShow.id === show.id ? { ...show, imageUrl } : currentShow));
+  state.series = state.series.map((currentShow) => (currentShow.id === show.id ? { ...show, imageUrl } : currentShow));
 }
 
 async function createBySeason(createModel: CreateBySeasonDTO) {
@@ -58,7 +58,7 @@ function updateSyncStatus(id: number, isSyncing: boolean) {
 async function toggleWatchStatus(id: number) {
   const newWatchStatus = await SeriesService.updateWatchStatus(id);
 
-  state.series = state.series.map(currentShow => (currentShow.id === id ? { ...currentShow, watchStatus: newWatchStatus } : currentShow));
+  state.series = state.series.map((currentShow) => (currentShow.id === id ? { ...currentShow, watchStatus: newWatchStatus } : currentShow));
 }
 
 function getFilteredQueue(id: number, doFilter = true) {
@@ -66,9 +66,9 @@ function getFilteredQueue(id: number, doFilter = true) {
 
   return computed(() => {
     const groups = getSubgroups.value[id];
-    const foundSeries = state.series.find(series => series.id === id);
+    const foundSeries = state.series.find((series) => series.id === id);
 
-    return doFilter ? foundSeries.showQueue.filter(queue => meetsSubgroup(queue as NyaaItem, groups as SubGroup[])) : foundSeries.showQueue;
+    return doFilter ? foundSeries.showQueue.filter((queue) => meetsSubgroup(queue as NyaaItem, groups as SubGroup[])) : foundSeries.showQueue;
   });
 }
 
@@ -80,10 +80,16 @@ async function setUp() {
   const foundSeries = await SeriesService.fetchAll({
     season: getCurrentSeason.value,
     year: getCurrentYear.value,
-    sortBy: SortBy.QUEUE
+    sortBy: SortBy.QUEUE,
   });
 
-  setSeries(foundSeries);
+  const leftOvers = await SeriesService.findLeftOvers({
+    season: getCurrentSeason.value,
+    year: getCurrentYear.value,
+    sortBy: SortBy.QUEUE,
+  });
+
+  setSeries([...leftOvers, ...foundSeries]);
 }
 
 export function useSeries() {
@@ -99,12 +105,12 @@ export function useSeries() {
     getFilteredQueue,
     setUp,
     getSyncing: computed(() => readonly(state.syncingSeries)),
-    getSeries: computed(() => readonly(state.series))
+    getSeries: computed(() => readonly(state.series)),
   };
 }
 
 function meetsSubgroup(queueItem: NyaaItem, groups: SubGroup[]) {
-  const foundGroup = groups?.find(group => (group.name = queueItem.subGroupName));
+  const foundGroup = groups?.find((group) => (group.name = queueItem.subGroupName));
   if (!foundGroup) {
     return false;
   }

@@ -11,7 +11,6 @@ import { BaseService } from './base.service';
 
 const { buildIO } = useSetting();
 class SeriesService extends BaseService {
-
   constructor() {
     super();
 
@@ -53,6 +52,12 @@ class SeriesService extends BaseService {
   async fetchAll(searchModel: SearchBySeasonDTO): Promise<Series[]> {
     return new Promise((resolve) => {
       this.socket.emit('find-by-season', searchModel, resolve);
+    });
+  }
+
+  async findLeftOvers(searchModel: SearchBySeasonDTO): Promise<Series[]> {
+    return new Promise((resolve) => {
+      this.socket.emit('find-leftovers', searchModel, resolve);
     });
   }
 
@@ -101,8 +106,6 @@ class SeriesService extends BaseService {
   private async loadSeries() {
     await this.ensureConnection();
   }
-
-
 }
 
 const service = new SeriesService();
