@@ -14,6 +14,8 @@
 
       <q-tabs align="left">
         <q-route-tab to="/shows" label="Shows" />
+        <q-route-tab to="/western-shows" label="Western Shows" />
+        <q-route-tab to="/movies" label="Movies" />
         <q-route-tab to="/downloads" label="Downloads" />
       </q-tabs>
     </q-header>
