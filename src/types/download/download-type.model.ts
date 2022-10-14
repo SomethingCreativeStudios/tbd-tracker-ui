@@ -7,4 +7,5 @@ export interface DownloadItem {
    timeLeft: string;
    isDone: boolean;
    queued: boolean;
+   id: number;
 }

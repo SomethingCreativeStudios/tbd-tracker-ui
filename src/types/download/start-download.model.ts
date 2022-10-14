@@ -4,5 +4,6 @@ export interface StartDownload {
       name: string;
       url: string;
       queued: boolean;
+      id: number;
    };
 }

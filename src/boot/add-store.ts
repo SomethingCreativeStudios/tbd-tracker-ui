@@ -1,5 +1,6 @@
 import { boot } from 'quasar/wrappers';
 import { service as MalService } from '~/services/mal.service';
+import { service as NyaaService } from '~/services/nyaa.service';
 import { useGlobal } from '~/composables';
 
 // "async" is optional;
@@ -17,3 +18,9 @@ export default boot(async () => {
     }
   }
 });
+
+
+// @ts-ignore
+window.testDownload = function () {
+  NyaaService.testDownload();
+}

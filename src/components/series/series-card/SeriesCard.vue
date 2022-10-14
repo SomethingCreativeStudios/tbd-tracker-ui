@@ -40,6 +40,7 @@
         </q-card-actions>
       </q-card-section>
     </q-card-section>
+    <q-linear-progress v-if="downloadItem" class="series-card__progress q-mt-md" :value="downloadItem" />
   </q-card>
 </template>
 <script lang="ts">
@@ -47,11 +48,12 @@ import { defineComponent, PropType, computed } from 'vue';
 import { getAiringTime } from '~/utils/time-helpers';
 
 import { service as NyaaService } from '~/services/nyaa.service';
-import { useSeries, useSidebar } from '~/composables';
+import { useSeries, useSidebar, useDownload } from '~/composables';
 import { SidebarType } from '~/types/sidebar/sidebar.enum';
 
 const { isSyncing, getFilteredQueue, removeShow } = useSeries();
 const { setType } = useSidebar();
+const { downloadById } = useDownload();
 
 export default defineComponent({
   name: 'series-card',
@@ -105,7 +107,16 @@ export default defineComponent({
       'has-tags': props.tags.length > 0,
     }));
 
-    return { queueItems, mainClass, isSyncing: isSyncing(props.id), tillDate: computed(() => getAiringTime(props.airingData, props.nextAiringDate)) };
+    return {
+      queueItems,
+      mainClass,
+      isSyncing: isSyncing(props.id),
+      tillDate: computed(() => getAiringTime(props.airingData, props.nextAiringDate)),
+      downloadItem: computed(() => {
+        const downloadItem = downloadById(props.id);
+        return downloadItem.value?.progress;
+      }),
+    };
   },
   methods: {
     onSync() {
@@ -179,6 +190,11 @@ export default defineComponent({
   line-height: 1.2;
   overflow: hidden;
   height: 97px;
+}
+
+.series-card__progress {
+  position: absolute;
+  bottom: 0;
 }
 
 .has-tags .series-card__description {

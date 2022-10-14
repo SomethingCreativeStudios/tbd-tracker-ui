@@ -1,3 +1,5 @@
+import { reactive, computed } from 'vue';
+
 import { service as AuthService } from '~/services/auth.service';
 import { service as SeriesService } from '~/services/series.service';
 import { service as NyaaService } from '~/services/nyaa.service';
@@ -7,6 +9,11 @@ import { service as SubGroupRuleService } from '~/services/sub-group-rule.servic
 import { service as SubGroupService } from '~/services/sub-group.service';
 import { service as MalService } from '~/services/mal.service';
 import { useSeries, useSetting, useSubgroup, useSubgroupRule } from '~/composables';
+
+const state = reactive({ isLoading: true });
+
+//@ts-ignore
+window.state.global = state;
 
 function refreshAuthToken() {
     AuthService.refreshToken();
@@ -20,6 +27,8 @@ function refreshAuthToken() {
 }
 
 async function setUpStores() {
+    state.isLoading = true;
+
     const { setUp: setUpSeries } = useSeries();
     const { setUp: setUpSetting } = useSetting();
     const { setUp: setUpSubgroup } = useSubgroup();
@@ -29,6 +38,8 @@ async function setUpStores() {
     await setUpSeries();
     await setUpSubgroup();
     await setUpSubgroupRule();
+
+    state.isLoading = false;
 }
 
 async function reload() {
@@ -36,6 +47,10 @@ async function reload() {
     await setUpStores();
 }
 
+function isLoading() {
+    return computed(() => state.isLoading);
+}
+
 export function useGlobal() {
-    return { reload, refreshAuthToken, setUpStores }
+    return { reload, refreshAuthToken, setUpStores, isLoading }
 }

@@ -8,5 +8,6 @@ export interface DownloadingModel {
       progress: number;
       timeLeft: string;
       ratio: number;
+      id: number;
    };
 }

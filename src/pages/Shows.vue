@@ -1,61 +1,68 @@
 <template>
-  <div class="shows q-pa-md">
-    <div class="row settings q-col-gutter-lg">
-      <div class="col-12 col-md-6">
-        <q-select
-          label="Season"
-          color="secondary"
-          v-model="currentSeason"
-          @update:model-value="($event) => onSeason($event, 'season')"
-          :options="seasons"
-        />
-      </div>
-      <div class="col-12 col-md-6">
-        <div class="row">
-          <div class="col-10">
-            <q-select
-              label="Year"
-              color="secondary"
-              v-model="currentYear"
-              @update:model-value="($event) => onSeason($event, 'year')"
-              :options="[2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027]"
-            />
-          </div>
-          <div class="col-1">
-            <q-icon class="series-card__sync series-card--icon" :name="`fas fa-sync`" @click="onSync" />
-          </div>
-          <div class="col-1">
-            <q-icon class="series-card__signin series-card--icon" :name="`fas fa-sign-in-alt`" @click="onSignIn" />
+  <div class="shows q-pa-md" :class="{ 'is-mobile': isMobile }">
+    <template v-if="isLoading">
+      <q-inner-loading :showing="isLoading" label="Please wait..." label-class="text-teal" label-style="font-size: 3.1em" size="18vw" />
+    </template>
+    <template v-else>
+      <div class="row settings q-col-gutter-lg">
+        <div class="col-12 col-md-6">
+          <q-select
+            label="Season"
+            color="secondary"
+            v-model="currentSeason"
+            @update:model-value="($event) => onSeason($event, 'season')"
+            :options="seasons"
+          />
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="row">
+            <div class="col-8 col-lg-10">
+              <q-select
+                label="Year"
+                color="secondary"
+                v-model="currentYear"
+                @update:model-value="($event) => onSeason($event, 'year')"
+                :options="[2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027]"
+              />
+            </div>
+            <div class="col-2 col-lg-1">
+              <q-icon class="series-card__sync series-card--icon" :name="`fas fa-sync`" @click="onSync" />
+            </div>
+            <div class="col-2 col-lg-1">
+              <q-icon class="series-card__signin series-card--icon" :name="`fas fa-sign-in-alt`" @click="onSignIn" />
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="row q-col-gutter-lg">
-      <template v-for="show in series" :key="show.id">
-        <div class="col-12 col-md-3">
-          <series-card
-            :airing-data="show.airingData"
-            :next-airing-date="show.nextAiringDate"
-            :current-ep="String(show.downloaded)"
-            :description="show.description"
-            :total="String(show.numberOfEpisodes)"
-            :shows-to-download="show.showQueue.length"
-            :id="show.id"
-            :title="show.name"
-            :image-url="show.imageUrl"
-            :tags="[].concat(show.tags)"
-          ></series-card>
-        </div>
-      </template>
-    </div>
-    <q-fab color="secondary" class="floating-button" icon="keyboard_arrow_up" direction="up">
-      <q-fab-action color="secondary" @click="onAddShow" label="Add Show" icon="fas fa-search-plus" />
-      <q-fab-action color="secondary" @click="onAddSeason" label="Add Season" icon="fas fa-folder-plus" />
-    </q-fab>
+      <div class="shows__items row q-col-gutter-lg">
+        <template v-for="show in series" :key="show.id">
+          <div class="col-12 col-md-3">
+            <series-card
+              :airing-data="show.airingData"
+              :next-airing-date="show.nextAiringDate"
+              :current-ep="String(show.downloaded)"
+              :description="show.description"
+              :total="String(show.numberOfEpisodes)"
+              :shows-to-download="show.showQueue.length"
+              :id="show.id"
+              :title="show.name"
+              :image-url="show.imageUrl"
+              :tags="[].concat(show.tags)"
+            ></series-card>
+          </div>
+        </template>
+      </div>
+
+      <q-fab color="secondary" class="floating-button" icon="keyboard_arrow_up" direction="up">
+        <q-fab-action color="secondary" @click="onAddShow" label="Add Show" icon="fas fa-search-plus" />
+        <q-fab-action color="secondary" @click="onAddSeason" label="Add Season" icon="fas fa-folder-plus" />
+      </q-fab>
+    </template>
   </div>
 </template>
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
+import { useQuasar } from 'quasar';
 import { service as NyaaService } from '~/services/nyaa.service';
 import { service as MalService } from '~/services/mal.service';
 import { useSeries, useSidebar, useSetting, useGlobal } from '~/composables';
@@ -65,7 +72,7 @@ import { SeasonName } from '~/types/season/season-name.enum';
 
 const { setType } = useSidebar();
 const { getCurrentSeason, getCurrentYear, setCurrentSeason, setCurrentYear } = useSetting();
-const { reload } = useGlobal();
+const { reload, isLoading } = useGlobal();
 
 export default defineComponent({
   name: 'show',
@@ -73,12 +80,17 @@ export default defineComponent({
   setup() {
     const searchModel = ref({ season: getCurrentSeason.value, year: getCurrentYear.value });
     const { getSeries } = useSeries();
+    const $q = useQuasar();
+
+    console.log($q.platform.is);
 
     return {
       series: getSeries,
       searchModel,
       currentSeason: getCurrentSeason,
       currentYear: getCurrentYear,
+      isLoading: isLoading(),
+      isMobile: $q.platform.is.mobile,
       seasons: [SeasonName.FALL, SeasonName.WINTER, SeasonName.SUMMER, SeasonName.SPRING],
     };
   },
@@ -114,7 +126,10 @@ export default defineComponent({
 <style scoped lang="scss">
 .shows {
   margin: 20px;
+  display: flex;
+  flex-direction: column;
 }
+
 .floating-button {
   position: fixed;
   bottom: 30px;
@@ -122,11 +137,23 @@ export default defineComponent({
 }
 
 .settings {
-  margin-bottom: 25px;
+  margin-bottom: 45px;
 }
 
 .series-card--icon:hover {
   cursor: pointer;
+}
+
+.shows__items {
+  overflow: auto;
+  padding-right: 20px;
+  height: 77vh;
+}
+
+.is-mobile {
+  .shows__items {
+    height: 63vh;
+  }
 }
 
 .series-card__signin,

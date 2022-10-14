@@ -31,6 +31,7 @@ function triggerDownload(newDownload: StartDownload) {
       hash: newDownload.hash,
       isDone: false,
       name: newDownload.value.name,
+      id: newDownload.value.id,
       progress: 0,
       speed: 0,
       timeLeft: '',
@@ -49,13 +50,18 @@ function updateDownload({ hash, value }: DownloadingModel) {
       totalDownloaded: value.totalDownloaded,
       progress: value.progress,
       speed: value.speed,
-      timeLeft: value.timeLeft
+      timeLeft: value.timeLeft,
+      id: value.id,
     }
   };
 }
 
 function completeDownload(hash: string) {
   state.downloads = Object.entries(state.downloads).reduce((acc, [hashC, value]) => (hash !== hashC ? { ...acc, [hashC]: value } : acc), {});
+}
+
+function downloadById(id: number) {
+  return computed(() => Object.values(state.downloads).find(download => download.id === id));
 }
 
 export function useDownload() {
@@ -66,6 +72,7 @@ export function useDownload() {
     triggerDownload,
     updateDownload,
     completeDownload,
+    downloadById,
     getDownloads: computed(() => readonly(state.downloads)),
     getQueued: computed(() => readonly(state.queue))
   };

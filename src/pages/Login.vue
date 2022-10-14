@@ -35,7 +35,7 @@ export default defineComponent({
         const router = window.router;
 
         // @ts-ignore
-        useGlobal().refresh();
+        useGlobal().reload();
 
         router.push({ path: '/' });
       }
