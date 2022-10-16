@@ -15,42 +15,51 @@ const state = reactive({ isLoading: true });
 //@ts-ignore
 window.state.global = state;
 
-function refreshAuthToken() {
-    AuthService.refreshToken();
-    SeriesService.refreshToken();
-    NyaaService.refreshToken();
-    QueryService.refreshToken();
-    SettingService.refreshToken();
-    SubGroupRuleService.refreshToken();
-    SubGroupService.refreshToken();
-    MalService.refreshToken();
+async function refreshAuthToken() {
+  await AuthService.refreshToken();
+  console.log('Auth Connected');
+  await SeriesService.refreshToken();
+  console.log('Series Connected');
+  await NyaaService.refreshToken();
+  console.log('Nyaa Connected');
+  await QueryService.refreshToken();
+  console.log('Query Connected');
+  await SettingService.refreshToken();
+  console.log('Setting Connected');
+  await SubGroupRuleService.refreshToken();
+  console.log('Rule Connected');
+  await SubGroupService.refreshToken();
+  console.log('Sub Connected');
+  await MalService.refreshToken();
+  console.log('Mal Connected');
 }
 
 async function setUpStores() {
-    state.isLoading = true;
+  console.log('Loading Stores');
+  state.isLoading = true;
 
-    const { setUp: setUpSeries } = useSeries();
-    const { setUp: setUpSetting } = useSetting();
-    const { setUp: setUpSubgroup } = useSubgroup();
-    const { setUp: setUpSubgroupRule } = useSubgroupRule();
+  const { setUp: setUpSeries } = useSeries();
+  const { setUp: setUpSetting } = useSetting();
+  const { setUp: setUpSubgroup } = useSubgroup();
+  const { setUp: setUpSubgroupRule } = useSubgroupRule();
 
-    await setUpSetting();
-    await setUpSeries();
-    await setUpSubgroup();
-    await setUpSubgroupRule();
+  await setUpSetting();
+  await setUpSeries();
+  await setUpSubgroup();
+  await setUpSubgroupRule();
 
-    state.isLoading = false;
+  state.isLoading = false;
 }
 
 async function reload() {
-    refreshAuthToken();
-    await setUpStores();
+  await refreshAuthToken();
+  await setUpStores();
 }
 
 function isLoading() {
-    return computed(() => state.isLoading);
+  return computed(() => state.isLoading);
 }
 
 export function useGlobal() {
-    return { reload, refreshAuthToken, setUpStores, isLoading }
+  return { reload, refreshAuthToken, setUpStores, isLoading };
 }

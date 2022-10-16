@@ -91,5 +91,6 @@ module.exports = {
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': ['warn'],
     '@typescript-eslint/no-floating-promises': 0,
+    '@typescript-eslint/await-thenable': 0,
   },
 };
