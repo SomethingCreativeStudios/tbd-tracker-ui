@@ -1,31 +1,54 @@
-import Vue from 'vue';
-import VueRouter from 'vue-router';
-import Anime from '../views/anime.vue';
-import Downloads from '../views/downloads.vue';
-import Settings from '../views/settings.vue';
+import { route } from 'quasar/wrappers';
+import {
+  createMemoryHistory,
+  createRouter,
+  createWebHashHistory,
+  createWebHistory,
+} from 'vue-router';
+import routes from './routes';
+import { useAuth } from '~/composables';
 
-Vue.use(VueRouter);
+const { isLoggedIn } = useAuth();
+/*
+ * If not building with SSR mode, you can
+ * directly export the Router instantiation;
+ *
+ * The function below can be async too; either use
+ * async/await or return a Promise which resolves
+ * with the Router instance.
+ */
+//@ts-ignore
+window.router = null;
 
-const routes = [
-   {
-      path: '/',
-      name: 'anime',
-      component: Anime,
-   },
-   {
-      path: '/downloads',
-      name: 'downloads',
-      component: Downloads,
-   },
-   {
-      path: '/settings',
-      name: 'settings',
-      component: Settings,
-   },
-];
+export default route(function (/* { store, ssrContext } */) {
+  const createHistory = process.env.SERVER
+    ? createMemoryHistory
+    : (process.env.VUE_ROUTER_MODE === 'history' ? createWebHistory : createWebHashHistory);
 
-const router = new VueRouter({
-   routes,
+  const Router = createRouter({
+    scrollBehavior: () => ({ left: 0, top: 0 }),
+    routes,
+
+    // Leave this as is and make changes in quasar.conf.js instead!
+    // quasar.conf.js -> build -> vueRouterMode
+    // quasar.conf.js -> build -> publicPath
+    history: createHistory(
+      process.env.MODE === 'ssr' ? void 0 : process.env.VUE_ROUTER_BASE
+    ),
+  });
+
+  Router.beforeEach((to) => {
+    if (!isLoggedIn() && to.name !== 'Login') {
+      // redirect the user to the login page
+      return { name: 'Login' }
+    }
+    if (isLoggedIn() && to.name === 'Login') {
+      return '/';
+    }
+  })
+
+  //@ts-ignore
+  window.router = Router;
+
+  return Router;
 });
-
-export default router;
