@@ -8,8 +8,6 @@
           </q-avatar>
           TBD Tracker
         </q-toolbar-title>
-
-        <q-btn dense flat round icon="menu" @click="toggleRightDrawer" />
       </q-toolbar>
 
       <q-tabs align="left">
@@ -62,14 +60,14 @@ export default {
       sideBarType: currentType,
       toggleRightDrawer() {
         rightDrawerOpen.value = !rightDrawerOpen.value;
-      }
+      },
     };
   },
   methods: {
     onClose() {
       console.log('test');
-    }
-  }
+    },
+  },
 };
 </script>
 

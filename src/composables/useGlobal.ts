@@ -8,6 +8,7 @@ import { service as SettingService } from '~/services/setting.service';
 import { service as SubGroupRuleService } from '~/services/sub-group-rule.service';
 import { service as SubGroupService } from '~/services/sub-group.service';
 import { service as MalService } from '~/services/mal.service';
+import { service as TorrentService } from '~/services/torrent.service';
 import { useSeries, useSetting, useSubgroup, useSubgroupRule } from '~/composables';
 
 const state = reactive({ isLoading: true });
@@ -32,6 +33,8 @@ async function refreshAuthToken() {
   console.log('Sub Connected');
   await MalService.refreshToken();
   console.log('Mal Connected');
+  await TorrentService.refreshToken();
+  console.log('Torrent Connected');
 }
 
 async function setUpStores() {

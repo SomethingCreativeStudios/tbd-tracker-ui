@@ -29,6 +29,7 @@ class MalService extends BaseService {
                 this.socket.emit('login', { authCode, codeVerifier: localStorage.getItem('mal_codeChallenge') }, resolve);
             } catch {
                 console.log('Error');
+                debugger;
                 error();
             }
         });

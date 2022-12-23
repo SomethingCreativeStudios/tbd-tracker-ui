@@ -8,19 +8,19 @@ import { useGlobal } from '~/composables';
 export default boot(async () => {
   const urlParams = new URLSearchParams(window.location.search);
 
-  useGlobal().reload();
+  await useGlobal().reload();
 
   if (urlParams.get('code') as any) {
     try {
       await MalService.login(urlParams.get('code'));
+      location.replace(window.location.href.split('?')[0]);
     } catch {
       console.log('error auth');
     }
   }
 });
 
-
 // @ts-ignore
 window.testDownload = function () {
   NyaaService.testDownload();
-}
+};

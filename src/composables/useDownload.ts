@@ -4,7 +4,7 @@ import { DownloadingModel } from '~/types/download/downloading.model';
 import { StartDownload } from '~/types/download/start-download.model';
 const state = reactive({
   downloads: {} as { [hash: string]: DownloadItem },
-  queue: [] as { fileName: string; url: string }[]
+  queue: [] as { fileName: string; url: string }[],
 });
 
 //@ts-ignore
@@ -15,7 +15,7 @@ function exists(hash: string) {
 }
 
 function removeFromQueue(url: string) {
-  state.queue = state.queue.filter(item => item.url !== url);
+  state.queue = state.queue.filter((item) => item.url !== url);
 }
 
 function addToQueue(fileName: string, url: string) {
@@ -31,13 +31,13 @@ function triggerDownload(newDownload: StartDownload) {
       hash: newDownload.hash,
       isDone: false,
       name: newDownload.value.name,
-      id: newDownload.value.id,
+      id: +newDownload.value.id,
       progress: 0,
       speed: 0,
       timeLeft: '',
       totalDownloaded: 0,
-      queued: false
-    }
+      queued: false,
+    },
   };
 }
 
@@ -51,8 +51,8 @@ function updateDownload({ hash, value }: DownloadingModel) {
       progress: value.progress,
       speed: value.speed,
       timeLeft: value.timeLeft,
-      id: value.id,
-    }
+      id: +value.id,
+    },
   };
 }
 
@@ -61,7 +61,7 @@ function completeDownload(hash: string) {
 }
 
 function downloadById(id: number) {
-  return computed(() => Object.values(state.downloads).find(download => download.id === id));
+  return computed(() => Object.values(state.downloads).find((download) => download.id === id));
 }
 
 export function useDownload() {
@@ -74,6 +74,6 @@ export function useDownload() {
     completeDownload,
     downloadById,
     getDownloads: computed(() => readonly(state.downloads)),
-    getQueued: computed(() => readonly(state.queue))
+    getQueued: computed(() => readonly(state.queue)),
   };
 }
