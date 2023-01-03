@@ -18,6 +18,17 @@ const state = reactive({ isLoading: true });
 window.state.global = state;
 
 async function refreshAuthToken() {
+  const isValid = await AuthService.validateToken(localStorage.getItem('accessToken'));
+
+  if (!isValid) {
+    // @ts-ignore
+    const router = window.router as Router;
+    localStorage.removeItem('accessToken');
+
+    router.push({ path: 'login' });
+    return;
+  }
+
   await AuthService.refreshToken();
   console.log('Auth Connected');
   await SeriesService.refreshToken();

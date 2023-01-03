@@ -16,6 +16,9 @@ export class BaseService {
 
       // @ts-ignore
       this.socket.on('connect', () => resolve(true));
+      this.socket.on('error', () => {
+        console.log('Test', 'Error!!!');
+      });
     });
   }
 }
