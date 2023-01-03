@@ -6,9 +6,9 @@ const state = reactive({ type: SidebarType.NONE, params: {} as any });
 //@ts-ignore
 window.state.sidebar = state;
 
-function setType(type: SidebarType, params?: any) {
+function setType(type: SidebarType, params?: any, returnValue?: (item) => void) {
   state.type = type;
-  state.params = params;
+  state.params = { ...(params || {}), returnValue };
 }
 
 export function useSidebar() {

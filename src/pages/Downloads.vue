@@ -1,6 +1,11 @@
 <template>
   <div class="downloads">
     <div class="row row_body">
+      <div class="row_body--add">
+        <q-input style="flex: 4" filled v-model="magUrl" label="URL/MAG" />
+        <q-btn style="flex: 5" color="primary" text-color="white" :label="'Pick Location (' + downloadLocation + ')'" @click="onLocation()" />
+        <q-btn style="flex: 1" color="primary" text-color="white" label="+ Add" @click="onAddDownload()" />
+      </div>
       <div class="row_body--body">
         <template v-for="item in downloads" :key="item.downloadLink">
           <q-item v-ripple>
@@ -39,22 +44,39 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { useDownload } from '~/composables';
+import { defineComponent, ref } from 'vue';
+import { useDownload, useSidebar } from '~/composables';
 import { useQuasar } from 'quasar';
-import { service as NyaaService } from '~/services/nyaa.service';
+import { service as TorrentService } from '~/services/torrent.service';
+import { SidebarType } from '~/types/sidebar/sidebar.enum';
 
 const { getDownloads, getQueued } = useDownload();
+const { setType } = useSidebar();
 
 export default defineComponent({
   name: 'download',
   setup() {
     const { screen } = useQuasar();
-    return { downloads: getDownloads, queued: getQueued, height: `${screen.height - 123}px` };
+
+    return {
+      magUrl: ref(''),
+      downloadLocation: ref(''),
+      downloads: getDownloads,
+      queued: getQueued,
+      height: `${screen.height - 123}px`,
+    };
   },
   methods: {
     onTest() {
-      NyaaService.testDownload();
+      TorrentService.testDownload();
+    },
+    onLocation() {
+      setType(SidebarType.FILE_DIALOG, {}, (value) => {
+        this.downloadLocation = value;
+      });
+    },
+    onAddDownload() {
+      TorrentService.addDownload(this.magUrl, this.realDownloadPath);
     },
     getDownloadSpeed(speed: number) {
       const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
@@ -62,8 +84,8 @@ export default defineComponent({
       const i = parseInt(`${Math.floor(Math.log(speed) / Math.log(1024))}`);
       if (i == 0) return `${speed} ${sizes[i]}`;
       return (speed / Math.pow(1024, i)).toFixed(1) + ' ' + sizes[i];
-    }
-  }
+    },
+  },
 });
 </script>
 
@@ -86,5 +108,19 @@ export default defineComponent({
 .row_body--body {
   width: 100%;
   position: absolute;
+
+  padding-top: 103px;
+  pointer-events: none;
+}
+
+.row_body--add {
+  display: flex;
+  height: min-content;
+  width: 100%;
+  column-gap: 10px;
+
+  padding-top: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 </style>

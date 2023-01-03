@@ -8,3 +8,4 @@ export * from './useSubgroupRule';
 export * from './useSidebar';
 export * from './useAuth';
 export * from './useGlobal';
+export * from './useMovies';

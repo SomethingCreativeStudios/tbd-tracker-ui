@@ -45,12 +45,6 @@ class NyaaService extends BaseService {
     });
   }
 
-  async testDownload(): Promise<Series> {
-    return new Promise((resolve) => {
-      this.socket.emit('test-download', {}, resolve);
-    });
-  }
-
   async suggestSubgroups(name: string, altNames: string[]): Promise<SubGroup[]> {
     return new Promise((resolve) => {
       this.socket.emit('suggest-subgroups', { showName: name, altNames }, resolve);

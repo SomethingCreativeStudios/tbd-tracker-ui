@@ -39,6 +39,18 @@ class TorrentService extends BaseService {
       Notify.create({ type: 'positive', message: `Downloaded ${name as string}`, position: 'bottom-right', progress: true });
     });
   }
+
+  async testDownload() {
+    return new Promise((resolve) => {
+      this.socket.emit('test-download', {}, resolve);
+    });
+  }
+
+  async addDownload(magUrl: string, downloadLocaion: string) {
+    return new Promise((resolve) => {
+      this.socket.emit('direct-download', { fileName: '', url: magUrl, path: downloadLocaion }, resolve);
+    });
+  }
 }
 
 const service = new TorrentService();

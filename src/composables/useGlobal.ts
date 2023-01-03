@@ -9,6 +9,7 @@ import { service as SubGroupRuleService } from '~/services/sub-group-rule.servic
 import { service as SubGroupService } from '~/services/sub-group.service';
 import { service as MalService } from '~/services/mal.service';
 import { service as TorrentService } from '~/services/torrent.service';
+import { service as MovieService } from '~/services/movie.service';
 import { useSeries, useSetting, useSubgroup, useSubgroupRule } from '~/composables';
 
 const state = reactive({ isLoading: true });
@@ -35,6 +36,8 @@ async function refreshAuthToken() {
   console.log('Mal Connected');
   await TorrentService.refreshToken();
   console.log('Torrent Connected');
+  await MovieService.refreshToken();
+  console.log('Movie Connected');
 }
 
 async function setUpStores() {
@@ -47,16 +50,24 @@ async function setUpStores() {
   const { setUp: setUpSubgroupRule } = useSubgroupRule();
 
   await setUpSetting();
+  console.log('Loaded Settings');
   await setUpSeries();
+  console.log('Loaded Series');
   await setUpSubgroup();
+  console.log('Loaded Subgroups');
   await setUpSubgroupRule();
+  console.log('Loaded Subgroup Rules');
 
   state.isLoading = false;
+  console.log('Loaded Stores');
 }
 
 async function reload() {
   await refreshAuthToken();
-  await setUpStores();
+
+  if (localStorage.getItem('accessToken')) {
+    await setUpStores();
+  }
 }
 
 function isLoading() {

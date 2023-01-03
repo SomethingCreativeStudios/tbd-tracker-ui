@@ -4,5 +4,6 @@ export enum SidebarType {
   EDIT_SUBGROUP,
   EDIT_QUEUE,
   ADD_SHOW,
-  ADD_SEASON
+  ADD_SEASON,
+  FILE_DIALOG
 }
