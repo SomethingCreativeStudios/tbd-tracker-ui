@@ -71,6 +71,7 @@
           <q-input class="col-12 col-md-6" label="Override Offset" color="secondary" type="number" v-model="series.offset" dense />
         </div>
         <q-btn class="migrate-button col-12" color="secondary" @click="() => (showMigrate = true)">Mirgrate</q-btn>
+        <q-btn class="migrate-button col-12" color="secondary" @click="openInMal()">Open in Mal</q-btn>
       </div>
     </div>
     <div class="no-wrap sidebar-actions row">
@@ -162,6 +163,9 @@ export default defineComponent({
     },
     onNewValue(key, val) {
       this.series[key].push(val);
+    },
+    openInMal() {
+      window.open(`https://myanimelist.net/anime/${this.series?.malId as string}`);
     },
     onSync() {
       syncWithMal(this.series.id);

@@ -21,7 +21,7 @@
           @click="onQueue"
           :label="queueItems.length"
         />
-        <q-icon v-else class="series-card__sync" :name="`fas fa-sync ${isSyncing ? 'fa-spin' : ''}`" @click="onSync" />
+        <q-icon v-else class="series-card__sync" :name="currentEp === '0' ? 'fas fa-exclamation' :`fas fa-sync ${isSyncing ? 'fa-spin' : ''}`" @click="onSync" />
         <div class="series-card__info text-h6">Have {{ currentEp }} out {{ total }}</div>
         <div class="series-card__info text-h8">Next: {{ tillDate }}</div>
         <div class="row series-card__tags" v-if="tags.length > 0">
@@ -116,6 +116,7 @@ export default defineComponent({
         const downloadItem = downloadById(props.id);
         return downloadItem.value?.progress;
       }),
+
     };
   },
   methods: {

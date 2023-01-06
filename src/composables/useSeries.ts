@@ -110,6 +110,10 @@ export function useSeries() {
 }
 
 function meetsSubgroup(queueItem: NyaaItem, groups: SubGroup[]) {
+  if (queueItem.itemName.toLocaleLowerCase().includes('[batch]')) {
+    return;
+  }
+
   const foundGroup = groups?.find((group) => (group.name = queueItem.subGroupName));
   if (!foundGroup) {
     return false;
