@@ -2,6 +2,7 @@ import io from 'socket.io-client';
 import { Notify } from 'quasar';
 import { useDownload, useSetting } from '~/composables';
 import { BaseService } from './base.service';
+import { MediaType } from '~/types/movie/movie.models';
 
 const { triggerDownload, addToQueue, updateDownload, completeDownload } = useDownload();
 const { buildIO } = useSetting();
@@ -46,9 +47,9 @@ class TorrentService extends BaseService {
     });
   }
 
-  async addDownload(magUrl: string, downloadLocaion: string) {
+  async addDownload(magUrl: string, type: MediaType) {
     return new Promise((resolve) => {
-      this.socket.emit('direct-download', { fileName: '', url: magUrl, path: downloadLocaion }, resolve);
+      this.socket.emit('direct-download', { fileName: '', url: magUrl, type }, resolve);
     });
   }
 }

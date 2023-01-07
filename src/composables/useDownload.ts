@@ -64,6 +64,10 @@ function downloadById(id: number) {
   return computed(() => Object.values(state.downloads).find((download) => download.id === id));
 }
 
+function downloadByName(name: string) {
+  return computed(() => Object.values(state.downloads).find((download) => download.name === name));
+}
+
 export function useDownload() {
   return {
     exists,
@@ -73,6 +77,7 @@ export function useDownload() {
     updateDownload,
     completeDownload,
     downloadById,
+    downloadByName,
     getDownloads: computed(() => readonly(state.downloads)),
     getQueued: computed(() => readonly(state.queue)),
   };

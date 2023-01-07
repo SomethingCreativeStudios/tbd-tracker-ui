@@ -15,6 +15,7 @@
         <q-route-tab to="/western-shows" label="Western Shows" />
         <q-route-tab to="/movies" label="Movies" />
         <q-route-tab to="/downloads" label="Downloads" />
+        <q-route-tab to="/plex" label="Plex" />
       </q-tabs>
     </q-header>
 
@@ -38,10 +39,10 @@ import { ref, watch } from 'vue';
 import { useSidebar } from '~/composables';
 import { useQuasar } from 'quasar';
 import { SidebarType } from '~/types/sidebar/sidebar.enum';
-import { SidebarSeries, SidebarSubgroup, SidebarShowQueue, SidebarSearchSeries, SidebarSearchSeason,FileDialogSidebar } from '~/components/sidebar';
+import { SidebarSeries, SidebarSubgroup, SidebarShowQueue, SidebarSearchSeries, SidebarSearchSeason, FileDialogSidebar } from '~/components/sidebar';
 
 export default {
-  components: { SidebarSeries, SidebarSubgroup, SidebarShowQueue, SidebarSearchSeries, SidebarSearchSeason,FileDialogSidebar },
+  components: { SidebarSeries, SidebarSubgroup, SidebarShowQueue, SidebarSearchSeries, SidebarSearchSeason, FileDialogSidebar },
   setup() {
     const { currentType, params, setType } = useSidebar();
     const { screen } = useQuasar();

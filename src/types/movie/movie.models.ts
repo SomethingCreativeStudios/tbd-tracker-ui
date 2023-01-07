@@ -12,6 +12,11 @@ export interface MediaLink {
   url: string;
 }
 
+export enum MediaType {
+  MOVIE = 'movie',
+  TV_SHOW = 'tv-show',
+}
+
 export class MediaCollection {
   items: MediaItem[];
   link: string;

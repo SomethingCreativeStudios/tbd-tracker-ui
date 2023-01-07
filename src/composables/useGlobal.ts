@@ -10,6 +10,7 @@ import { service as SubGroupService } from '~/services/sub-group.service';
 import { service as MalService } from '~/services/mal.service';
 import { service as TorrentService } from '~/services/torrent.service';
 import { service as MovieService } from '~/services/movie.service';
+import { service as PlexService } from '~/services/plex.service';
 import { useSeries, useSetting, useSubgroup, useSubgroupRule } from '~/composables';
 
 const state = reactive({ isLoading: true });
@@ -49,6 +50,8 @@ async function refreshAuthToken() {
   console.log('Torrent Connected');
   await MovieService.refreshToken();
   console.log('Movie Connected');
+  await PlexService.refreshToken();
+  console.log('Plex Connected');
 }
 
 async function setUpStores() {

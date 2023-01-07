@@ -21,7 +21,12 @@
           @click="onQueue"
           :label="queueItems.length"
         />
-        <q-icon v-else class="series-card__sync" :name="currentEp === '0' ? 'fas fa-exclamation' :`fas fa-sync ${isSyncing ? 'fa-spin' : ''}`" @click="onSync" />
+        <q-icon
+          v-else
+          :class="`series-card__sync ${currentEp === '0' ? 'series-card__sync--error' : ''}`"
+          :name="currentEp === '0' ? 'fas fa-exclamation' : `fas fa-sync ${isSyncing ? 'fa-spin' : ''}`"
+          @click="onSync"
+        />
         <div class="series-card__info text-h6">Have {{ currentEp }} out {{ total }}</div>
         <div class="series-card__info text-h8">Next: {{ tillDate }}</div>
         <div class="row series-card__tags" v-if="tags.length > 0">
@@ -116,7 +121,6 @@ export default defineComponent({
         const downloadItem = downloadById(props.id);
         return downloadItem.value?.progress;
       }),
-
     };
   },
   methods: {
@@ -161,6 +165,10 @@ export default defineComponent({
   top: 7px;
 
   text-shadow: 2px 2px rgb(0 0 0 / 75%);
+}
+
+.series-card__sync--error {
+  color: #d23601;
 }
 
 .series-card__sync--badge {

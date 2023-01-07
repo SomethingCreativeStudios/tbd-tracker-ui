@@ -30,19 +30,22 @@
 
         <q-card-actions class="no-wrap">
           <q-btn flat color="secondary" @click="onMeta()">Find Meta</q-btn>
-          <q-btn flat color="secondary">Download</q-btn>
+          <q-btn flat color="secondary" @click="onDownload()">Download</q-btn>
         </q-card-actions>
       </q-card-section>
     </q-card-section>
-    <!-- <q-linear-progress v-if="downloadItem" class="movie-card__progress q-mt-md" :value="downloadItem" />-->
+    <q-linear-progress v-if="downloadItem" class="movie-card__progress q-mt-md" :value="downloadItem" />
   </q-card>
 </template>
 <script lang="ts">
 import { defineComponent, computed } from 'vue';
-import { useMovies } from '~/composables';
+import { useMovies, useDownload } from '~/composables';
 import { service as MovieService } from '~/services/movie.service';
+import { service as TorrentService } from '~/services/torrent.service';
+import { MediaType } from '~/types/movie/movie.models';
 
 const { setMeta } = useMovies();
+const { downloadByName } = useDownload();
 
 export default defineComponent({
   name: 'movie-card',
@@ -89,6 +92,10 @@ export default defineComponent({
   },
   setup(props) {
     return {
+      downloadItem: computed(() => {
+        const downloadItem = downloadByName(props.name);
+        return downloadItem.value?.progress;
+      }),
       resColor: computed(() => {
         if (props.parsedResolution === '1080') return 'primary';
         if (props.parsedResolution === '720') return 'yellow';
@@ -103,6 +110,9 @@ export default defineComponent({
       const items = await MovieService.findMeta(this.parsedName);
 
       setMeta(this.link, items);
+    },
+    onDownload() {
+      TorrentService.addDownload(this.link, MediaType.MOVIE);
     },
   },
 });

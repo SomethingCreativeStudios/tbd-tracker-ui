@@ -10,6 +10,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'downloads', component: () => import('pages/Downloads.vue') },
       { path: 'western-shows', component: () => import('pages/WesternShows.vue') },
       { path: 'movies', component: () => import('pages/Movies.vue') },
+      { path: 'plex', component: () => import('pages/Plex.vue') },
     ],
   },
   {

@@ -20,7 +20,7 @@
               :image-path="result.items[result.selectedItem || 0]?.imagePath"
               :description="result.items[result.selectedItem || 0]?.description"
               :display-name="result.items[result.selectedItem || 0]?.displayName"
-              :release-date="result.items[result.selectedItem || 0]?.releaseDate"
+              :release-date="new Date(result.items[result.selectedItem || 0]?.releaseDate)"
               :alternative-count="result.items.length"
               :name="result.name"
               :link="result.link"
