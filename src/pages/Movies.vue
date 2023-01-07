@@ -24,6 +24,7 @@
               :alternative-count="result.items.length"
               :name="result.name"
               :link="result.link"
+              :parsed-resolution="result.parsedResolution"
               :parsed-name="result.parsedName"
             ></movie-card>
           </div>

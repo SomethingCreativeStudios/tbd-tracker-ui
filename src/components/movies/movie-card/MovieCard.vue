@@ -19,7 +19,7 @@
         </div>
       </q-img>
       <q-card-section>
-        <q-badge v-if="alternativeCount > 1" class="movie-card__sync movie-card__sync--badge" rounded color="primiary" :label="alternativeCount" />
+        <q-badge class="movie-card__sync movie-card__sync--badge" rounded :color="resColor" :label="parsedResolution" />
 
         <div class="movie-card__title movie-card__title--sub text-subtitle2 text-center">
           {{ name }}
@@ -38,7 +38,7 @@
   </q-card>
 </template>
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, computed } from 'vue';
 import { useMovies } from '~/composables';
 import { service as MovieService } from '~/services/movie.service';
 
@@ -54,6 +54,10 @@ export default defineComponent({
     parsedName: {
       type: String,
       default: '',
+    },
+    parsedResolution: {
+      type: String,
+      default: 'NOT_FOUND',
     },
     link: {
       type: String,
@@ -83,13 +87,21 @@ export default defineComponent({
       default: new Date(),
     },
   },
-  setup() {
-    return {};
+  setup(props) {
+    return {
+      resColor: computed(() => {
+        if (props.parsedResolution === '1080') return 'primary';
+        if (props.parsedResolution === '720') return 'yellow';
+        if (props.parsedResolution === '480') return 'orange';
+
+        return 'red';
+      }),
+    };
   },
   methods: {
     async onMeta() {
       const items = await MovieService.findMeta(this.parsedName);
-      debugger;
+
       setMeta(this.link, items);
     },
   },

@@ -17,6 +17,7 @@ export class MediaCollection {
   link: string;
   name: string;
   parsedName: string;
+  parsedResolution: '720' | '1080' | '480' | 'NOT_FOUND';
   selectedItem = 0;
 }
 
