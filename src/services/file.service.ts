@@ -6,7 +6,7 @@ const { buildIO } = useSetting();
 
 class FileService extends BaseService {
   constructor() {
-    super();
+    super('File');
 
     this.socket = io(buildIO('/file'), {
       transports: ['websocket'],

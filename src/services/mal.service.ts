@@ -5,7 +5,7 @@ const { buildIO } = useSetting();
 
 class MalService extends BaseService {
   constructor() {
-    super();
+    super('mal');
 
     this.socket = io(buildIO('/mal'), {
       transports: ['websocket'],

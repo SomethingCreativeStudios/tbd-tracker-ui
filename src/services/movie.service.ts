@@ -7,7 +7,7 @@ const { buildIO } = useSetting();
 
 class MovieService extends BaseService {
   constructor() {
-    super();
+    super('movie');
 
     this.socket = io(buildIO('/movie'), {
       transports: ['websocket'],

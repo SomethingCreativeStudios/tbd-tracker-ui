@@ -31,32 +31,20 @@ async function refreshAuthToken() {
   }
 
   await AuthService.refreshToken();
-  console.log('Auth Connected');
   await SeriesService.refreshToken();
-  console.log('Series Connected');
   await NyaaService.refreshToken();
-  console.log('Nyaa Connected');
   await QueryService.refreshToken();
-  console.log('Query Connected');
   await SettingService.refreshToken();
-  console.log('Setting Connected');
   await SubGroupRuleService.refreshToken();
-  console.log('Rule Connected');
   await SubGroupService.refreshToken();
-  console.log('Sub Connected');
   await MalService.refreshToken();
-  console.log('Mal Connected');
   await TorrentService.refreshToken();
-  console.log('Torrent Connected');
   await MovieService.refreshToken();
-  console.log('Movie Connected');
   await PlexService.refreshToken();
-  console.log('Plex Connected');
 }
 
 async function setUpStores() {
   console.log('Loading Stores');
-  state.isLoading = true;
 
   const { setUp: setUpSeries } = useSeries();
   const { setUp: setUpSetting } = useSetting();
@@ -72,16 +60,18 @@ async function setUpStores() {
   await setUpSubgroupRule();
   console.log('Loaded Subgroup Rules');
 
-  state.isLoading = false;
   console.log('Loaded Stores');
 }
 
 async function reload() {
+  state.isLoading = true;
   await refreshAuthToken();
 
   if (localStorage.getItem('accessToken')) {
     await setUpStores();
   }
+
+  state.isLoading = false;
 }
 
 function isLoading() {

@@ -12,7 +12,7 @@ import { BaseService } from './base.service';
 const { buildIO } = useSetting();
 class SeriesService extends BaseService {
   constructor() {
-    super();
+    super('series');
 
     this.socket = io(buildIO('/series'), { transports: ['websocket'], auth: { token: localStorage.getItem('accessToken') } });
     this.loadSeries();
@@ -21,7 +21,6 @@ class SeriesService extends BaseService {
   async ensureConnection() {
     return new Promise((resolve) => {
       this.socket.on('connect', () => {
-        console.log('connected');
         resolve(true);
       });
 

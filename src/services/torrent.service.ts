@@ -9,7 +9,7 @@ const { buildIO } = useSetting();
 
 class TorrentService extends BaseService {
   constructor() {
-    super();
+    super('torrent');
 
     this.socket = io(buildIO('/torrent'), {
       transports: ['websocket'],

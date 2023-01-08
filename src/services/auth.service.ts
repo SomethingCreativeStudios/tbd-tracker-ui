@@ -6,7 +6,7 @@ const { buildIO } = useSetting();
 class AuthService extends BaseService {
 
     constructor() {
-        super();
+        super('auth');
 
         this.socket = io(buildIO('/auth'), {
             transports: ['websocket'],

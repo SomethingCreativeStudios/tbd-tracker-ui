@@ -8,7 +8,7 @@ const { buildIO } = useSetting();
 class QueryService extends BaseService {
 
   constructor() {
-    super();
+    super('query');
 
     this.socket = io(buildIO('/series'), { transports: ['websocket'], auth: { token: localStorage.getItem('accessToken') } });
   }

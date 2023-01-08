@@ -10,7 +10,7 @@ const { buildIO } = useSetting();
 
 class NyaaService extends BaseService {
   constructor() {
-    super();
+    super('nyaa');
 
     this.socket = io(buildIO('/nyaa'), {
       transports: ['websocket'],

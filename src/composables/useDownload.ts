@@ -42,9 +42,8 @@ function triggerDownload(newDownload: StartDownload) {
 }
 
 function updateDownload({ hash, value }: DownloadingModel) {
-  state.downloads = {
-    ...state.downloads,
-    [hash]: {
+  if (!state.downloads[hash]) {
+    state.downloads[hash] = {
       ...state.downloads[hash],
       name: value.name,
       totalDownloaded: value.totalDownloaded,
@@ -52,8 +51,15 @@ function updateDownload({ hash, value }: DownloadingModel) {
       speed: value.speed,
       timeLeft: value.timeLeft,
       id: +value.id,
-    },
-  };
+    }
+  }
+
+  state.downloads[hash].totalDownloaded = value.totalDownloaded;
+  state.downloads[hash].name = value.name;
+  state.downloads[hash].progress = value.progress;
+  state.downloads[hash].speed = value.speed;
+  state.downloads[hash].timeLeft = value.timeLeft;
+  state.downloads[hash].id = +value.id;
 }
 
 function completeDownload(hash: string) {

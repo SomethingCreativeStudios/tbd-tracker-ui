@@ -7,7 +7,7 @@ const { buildIO } = useSetting();
 
 class PlexService extends BaseService {
   constructor() {
-    super();
+    super('plex');
 
     this.socket = io(buildIO('/plex'), {
       transports: ['websocket'],

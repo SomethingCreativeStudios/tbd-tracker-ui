@@ -31,11 +31,9 @@ function mapSetting(key: string, settings: Settings[], fallback: any) {
 class SettingsService extends BaseService {
 
   constructor() {
-    super();
+    super('setting');
 
     this.socket = io(buildIO('/settings'), { transports: ['websocket'], auth: { token: localStorage.getItem('accessToken') } });
-
-    this.socket.on('connect', () => { });
   }
 
   async fetchSettings(): Promise<Settings[]> {

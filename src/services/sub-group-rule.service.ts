@@ -10,7 +10,7 @@ const { buildIO } = useSetting();
 class SubGroupRuleService extends BaseService {
 
   constructor() {
-    super();
+    super('sub-group-rule');
 
     this.socket = io(buildIO('/subgrouprule'), {
       transports: ['websocket'],
