@@ -1,4 +1,3 @@
-
 export class NyaaItem {
   subGroupName: string;
   itemName: string;
@@ -6,4 +5,5 @@ export class NyaaItem {
   publishedDate: Date;
   resolution: string;
   episodeName: number;
+  isIgnored: boolean;
 }

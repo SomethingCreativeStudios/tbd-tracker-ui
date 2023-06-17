@@ -53,7 +53,7 @@ async function setUpStores() {
 
   await setUpSetting();
   console.log('Loaded Settings');
-  await setUpSeries();
+  await setUpSeries(await NyaaService.fetchIgnoreLinks());
   console.log('Loaded Series');
   await setUpSubgroup();
   console.log('Loaded Subgroups');

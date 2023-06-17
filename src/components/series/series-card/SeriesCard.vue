@@ -106,7 +106,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const queueItems = getFilteredQueue(props.id, true);
+    const queueItems = getFilteredQueue(props.id, false);
 
     const mainClass = computed(() => ({
       'has-tags': props.tags.length > 0,

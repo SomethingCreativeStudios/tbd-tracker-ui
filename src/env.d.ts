@@ -5,3 +5,15 @@ declare namespace NodeJS {
     VUE_ROUTER_BASE: string | undefined;
   }
 }
+
+
+interface ImportMetaEnv {
+  readonly VUE_APP_WEBSOCKET_PATH: string;
+  readonly VUE_APP_USERNAME: string;
+  readonly VUE_APP_PASSWORD: string;
+  readonly VUE_APP_WEBSOCKET_PORT: number;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv
+}

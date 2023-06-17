@@ -5,9 +5,7 @@ import { SubGroup } from '~/types/sub-group/sub-group.model';
 import { useSeries, useSetting } from '~/composables';
 import { BaseService } from './base.service';
 
-const { updateSyncStatus, refreshShow } = useSeries();
 const { buildIO } = useSetting();
-
 class NyaaService extends BaseService {
   constructor() {
     super('nyaa');
@@ -18,6 +16,8 @@ class NyaaService extends BaseService {
     });
 
     this.socket.on('series-syncing', ({ id, type }: { id: number; type: 'STARTING' | 'UPDATE_FOUND' | 'NO_UPDATE'; queue: NyaaItem[] }) => {
+      const { updateSyncStatus, refreshShow } = useSeries();
+
       if (type === 'STARTING') {
         updateSyncStatus(id, true);
       }
@@ -48,6 +48,24 @@ class NyaaService extends BaseService {
   async suggestSubgroups(name: string, altNames: string[]): Promise<SubGroup[]> {
     return new Promise((resolve) => {
       this.socket.emit('suggest-subgroups', { showName: name, altNames }, resolve);
+    });
+  }
+
+  async ignoreItem(link: string) {
+    return new Promise((resolve) => {
+      this.socket.emit('ignore', { link }, resolve);
+    });
+  }
+
+  async unignoreItem(link: string) {
+    return new Promise((resolve) => {
+      this.socket.emit('unignore', { link }, resolve);
+    });
+  }
+
+  async fetchIgnoreLinks(): Promise<string[]> {
+    return new Promise((resolve) => {
+      this.socket.emit('ignore-links', {}, resolve);
     });
   }
 }

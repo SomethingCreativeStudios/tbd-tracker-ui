@@ -13,13 +13,21 @@ const { getCurrentSeason, getCurrentYear } = useSetting();
 const state = reactive({
   series: [] as Series[],
   syncingSeries: {} as { [id: number]: boolean },
+  ignoreLinks: [] as string[],
 });
 
 //@ts-ignore
 window.state.series = state;
 
 function setSeries(series: Series[]) {
-  state.series = series;
+  state.series = series.map((series) => ({
+    ...series,
+    showQueue: series.showQueue.map((queue) => ({ ...queue, isIgnored: state.ignoreLinks.includes(queue.downloadLink) })),
+  }));
+}
+
+function setIgnoreLinks(links: string[]) {
+  state.ignoreLinks = links;
 }
 
 async function removeShow(id: number) {
@@ -61,14 +69,16 @@ async function toggleWatchStatus(id: number) {
   state.series = state.series.map((currentShow) => (currentShow.id === id ? { ...currentShow, watchStatus: newWatchStatus } : currentShow));
 }
 
-function getFilteredQueue(id: number, doFilter = true) {
+function getFilteredQueue(id: number, showIgnored = false) {
   const { getSubgroups } = useSubgroup();
 
   return computed(() => {
     const groups = getSubgroups.value[id];
     const foundSeries = state.series.find((series) => series.id === id);
 
-    return doFilter ? foundSeries.showQueue.filter((queue) => meetsSubgroup(queue as NyaaItem, groups as SubGroup[])) : foundSeries.showQueue;
+    const filtered = foundSeries.showQueue.filter((queue) => meetsSubgroup(queue as NyaaItem, groups as SubGroup[]));
+
+    return showIgnored ? filtered : filtered.filter((queue) => !queue.isIgnored);
   });
 }
 
@@ -76,7 +86,18 @@ function isSyncing(id: number) {
   return computed(() => state.syncingSeries[id]);
 }
 
-async function setUp() {
+function toggleIgnored(id: number, link: string) {
+  state.series = state.series.map((series) =>
+    series.id === id
+      ? {
+          ...series,
+          showQueue: series.showQueue.map((queue) => (queue.downloadLink === link ? { ...queue, isIgnored: !queue.isIgnored } : queue)),
+        }
+      : series
+  );
+}
+
+async function setUp(ignoreLinks: string[]) {
   const foundSeries = await SeriesService.fetchAll({
     season: getCurrentSeason.value,
     year: getCurrentYear.value,
@@ -89,6 +110,7 @@ async function setUp() {
     sortBy: SortBy.QUEUE,
   });
 
+  setIgnoreLinks(ignoreLinks);
   setSeries([...leftOvers, ...foundSeries]);
 }
 
@@ -104,8 +126,10 @@ export function useSeries() {
     toggleWatchStatus,
     getFilteredQueue,
     setUp,
+    toggleIgnored,
     getSyncing: computed(() => readonly(state.syncingSeries)),
     getSeries: computed(() => readonly(state.series)),
+    getIgnoreLinks: computed(() => readonly(state.ignoreLinks)),
   };
 }
 

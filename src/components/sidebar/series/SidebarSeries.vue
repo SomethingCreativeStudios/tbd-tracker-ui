@@ -67,7 +67,10 @@
           </template>
         </q-select>
         <div class="row q-col-gutter-lg">
-          <q-input class="col-12 col-md-6" label="Override File Name" color="secondary" v-model="series.showName" dense />
+          <q-input class="col-12 col-md-12" label="Override File Name" color="secondary" v-model="series.showName" dense />
+        </div>
+        <div class="row q-col-gutter-lg">
+          <q-input class="col-12 col-md-6" label="Regex For Ep Count" color="secondary" v-model="series.episodeRegex" dense />
           <q-input class="col-12 col-md-6" label="Override Offset" color="secondary" type="number" v-model="series.offset" dense />
         </div>
         <q-btn class="migrate-button col-12" color="secondary" @click="() => (showMigrate = true)">Mirgrate</q-btn>

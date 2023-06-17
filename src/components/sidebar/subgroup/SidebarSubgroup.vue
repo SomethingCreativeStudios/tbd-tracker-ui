@@ -4,11 +4,11 @@
     <div class="row row_body">
       <div class="row_body--body">
         <q-expansion-item v-if="suggestedSeries.length" icon="far fa-question-circle" label="Suggested Groups">
-          <template v-for="group in suggestedSeries" :key="group.name + group.preferedResultion">
-            <q-item clickable v-ripple @click="onItem(group)">
+          <template v-for="suggestion in suggestedSeries" :key="suggestion.subgroup.name + suggestion.subgroup.preferedResultion">
+            <q-item clickable v-ripple @click="onItem(suggestion)">
               <q-item-section>
-                <q-item-label>{{ group.name }}</q-item-label>
-                <q-item-label caption>{{ group.preferedResultion }}</q-item-label>
+                <q-item-label :class="{ trusted: suggestion.isTrusted, remake: suggestion.isRemake }">{{ suggestion.subgroup.name }}</q-item-label>
+                <q-item-label caption>{{ suggestion.subgroup.preferedResultion }}</q-item-label>
               </q-item-section>
             </q-item>
           </template>
@@ -46,12 +46,12 @@ export default defineComponent({
   props: {
     id: {
       type: Number,
-      default: 0
-    }
+      default: 0,
+    },
   },
   setup(props) {
     const suggestedSeries = ref([]);
-    const foundSeries = computed(() => getSeries.value?.find(series => series.id === props.id));
+    const foundSeries = computed(() => getSeries.value?.find((series) => series.id === props.id));
     const foundSubgroups = computed(() => getSubgroups.value?.[props.id] ?? []);
 
     return { series: foundSeries, subgroups: foundSubgroups, suggestedSeries };
@@ -63,24 +63,22 @@ export default defineComponent({
     },
     async onSuggest() {
       const groups = await NyaaService.suggestSubgroups(this.series.name, this.series.otherNames);
-      const cleaned = groups
-        .reduce((acc, group) => {
-          const has = acc.find(found => found.name === group.name && found.preferedResultion === group.preferedResultion);
+      const cleaned = groups.reduce((acc, group) => {
+        const has = acc.find((found) => found.name === found.subgroup.name && found.preferedResultion === found.subgroup.preferedResultion);
 
-          return has ? acc : acc.concat(group);
-        }, [])
-        .sort((group1, group2) => group1.name.localeCompare(group2.name));
+        return has ? acc : acc.concat(group);
+      }, []);
 
       this.suggestedSeries = cleaned;
     },
     onCancel() {
       setType(SidebarType.NONE);
     },
-    async onItem(item) {
-      const group = await createSubgroup({ seriesId: this.id, name: item.name, preferedResultion: item.preferedResultion });
-      createRule({ subgroupId: group.id, rules: item.rules });
-    }
-  }
+    async onItem({ subgroup }) {
+      const group = await createSubgroup({ seriesId: this.id, name: subgroup.name, preferedResultion: subgroup.preferedResultion });
+      createRule({ subgroupId: group.id, rules: subgroup.rules });
+    },
+  },
 });
 </script>
 
@@ -127,5 +125,13 @@ export default defineComponent({
 .q-separator {
   margin-top: 20px;
   margin-bottom: 20px;
+}
+
+.q-item__label.trusted {
+  color: green;
+}
+
+.q-item__label.remake {
+  color: purple;
 }
 </style>

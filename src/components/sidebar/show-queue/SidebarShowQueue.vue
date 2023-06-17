@@ -9,12 +9,15 @@
               <q-item-label>{{ item.itemName }}</q-item-label>
               <q-item-label caption>{{ item.subGroupName }}</q-item-label>
             </q-item-section>
+            <q-item-section side v-if="handlingIgnored">
+              <q-toggle color="green" v-model="item.isIgnored" @update:model-value="onItem(item)" />
+            </q-item-section>
           </q-item>
         </template>
       </div>
     </div>
     <div class="no-wrap sidebar-actions row">
-      <q-btn class="col-4" flat @click="onShow">Toggle All</q-btn>
+      <q-btn class="col-4" flat @click="onShow">Toggle Ignored</q-btn>
       <q-btn class="col-4" flat @click="onSync">Sync</q-btn>
       <q-btn class="col-4" flat color="negative" @click="onCancel">Cancel</q-btn>
     </div>
@@ -27,7 +30,7 @@ import { NyaaItem } from '~/types/nyaa/nyaa-item.model';
 import { SidebarType } from '~/types/sidebar/sidebar.enum';
 import { service as NyaaService } from '~/services/nyaa.service';
 
-const { getSeries, getFilteredQueue } = useSeries();
+const { getSeries, toggleIgnored, getFilteredQueue } = useSeries();
 const { setType } = useSidebar();
 
 export default defineComponent({
@@ -35,32 +38,42 @@ export default defineComponent({
   props: {
     id: {
       type: Number,
-      default: 0
-    }
+      default: 0,
+    },
   },
 
   setup(props) {
-    const doFilter = ref(true);
-    const foundSeries = computed(() => getSeries.value?.find(series => series.id === props.id));
+    const handlingIgnored = ref(false);
+    const foundSeries = computed(() => getSeries.value?.find((series) => series.id === props.id));
 
-    return { doFilter, series: foundSeries, nyaaItems: computed(() => getFilteredQueue(props.id, doFilter.value).value) };
+    return { handlingIgnored, series: foundSeries, nyaaItems: computed(() => getFilteredQueue(props.id, handlingIgnored.value).value) };
   },
 
   methods: {
     onShow() {
-      this.doFilter = !this.doFilter;
+      this.handlingIgnored = !this.handlingIgnored;
     },
     onCancel() {
       setType(SidebarType.NONE);
     },
     onItem(item: NyaaItem) {
+      if (this.handlingIgnored) {
+        if (item.isIgnored) {
+          NyaaService.unignoreItem(item.downloadLink);
+        } else {
+          NyaaService.ignoreItem(item.downloadLink);
+        }
+        toggleIgnored(this.id, item.downloadLink);
+        return;
+      }
+
       console.log('1 2 and Item');
       NyaaService.download(this.id, item.downloadLink, item.itemName);
     },
     onSync() {
       NyaaService.syncShow(this.id);
-    }
-  }
+    },
+  },
 });
 </script>
 

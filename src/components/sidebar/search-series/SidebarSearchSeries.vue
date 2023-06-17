@@ -15,9 +15,7 @@
                   {{ show.name }}
                 </div>
                 <template v-slot:error>
-                  <div class="absolute-full flex flex-center bg-negative text-white">
-                    RIP Image
-                  </div>
+                  <div class="absolute-full flex flex-center bg-negative text-white">RIP Image</div>
                   <div class="series-card__title absolute-bottom text-subtitle2 text-center">
                     {{ show.name }}
                   </div>
@@ -44,6 +42,7 @@ import { useSeries, useSidebar, useSetting } from '~/composables';
 import { SidebarType } from '~/types/sidebar/sidebar.enum';
 import { service as SearchService } from '~/services/query.service';
 import { service as SeriesService } from '~/services/series.service';
+import { service as NyaaService } from '~/services/nyaa.service';
 import { Series } from '~/types/series/series.model';
 
 const { setUp } = useSeries();
@@ -74,10 +73,11 @@ export default defineComponent({
     },
     async onAddShow(item: Series) {
       await SeriesService.createByMal({ malId: item.malId, seasonYear: getCurrentYear.value, seasonName: getCurrentSeason.value });
-      await setUp();
+      const links = await NyaaService.fetchIgnoreLinks();
+      await setUp(links);
       setType(SidebarType.NONE);
-    }
-  }
+    },
+  },
 });
 </script>
 

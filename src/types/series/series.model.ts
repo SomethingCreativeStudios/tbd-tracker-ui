@@ -47,4 +47,6 @@ export class Series {
   showQueue: NyaaItem[];
 
   nextAiringDate?: Date;
+
+  episodeRegex?: string;
 }
