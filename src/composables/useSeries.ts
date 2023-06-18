@@ -63,6 +63,11 @@ function updateSyncStatus(id: number, isSyncing: boolean) {
   state.syncingSeries = { ...state.syncingSeries, [id]: isSyncing };
 }
 
+function updatePendingStatus(id: number, isPending: boolean) {
+  state.syncingSeries = { ...state.syncingSeries, [id]: false };
+  state.series = state.series.map((currentShow) => (currentShow.id === id ? { ...currentShow, hasSubgroupsPending: isPending } : currentShow));
+}
+
 async function toggleWatchStatus(id: number) {
   const newWatchStatus = await SeriesService.updateWatchStatus(id);
 
@@ -97,6 +102,14 @@ function toggleIgnored(id: number, link: string) {
   );
 }
 
+function getUntaggedSeries() {
+  return computed(() => state.series.filter((series) => series.tags.length === 0));
+}
+
+function getTaggedSeries() {
+  return computed(() => state.series.filter((series) => series.tags.length > 0));
+}
+
 async function setUp(ignoreLinks: string[]) {
   const foundSeries = await SeriesService.fetchAll({
     season: getCurrentSeason.value,
@@ -123,8 +136,11 @@ export function useSeries() {
     syncWithMal,
     createBySeason,
     updateSyncStatus,
+    updatePendingStatus,
     toggleWatchStatus,
     getFilteredQueue,
+    getUntaggedSeries,
+    getTaggedSeries,
     setUp,
     toggleIgnored,
     getSyncing: computed(() => readonly(state.syncingSeries)),

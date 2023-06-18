@@ -22,6 +22,7 @@
               :display-name="result.items[result.selectedItem || 0]?.displayName"
               :release-date="new Date(result.items[result.selectedItem || 0]?.releaseDate)"
               :alternative-count="result.items.length"
+              :size="result.items[result.selectedItem || 0]?.size"
               :name="result.name"
               :link="result.link"
               :parsed-resolution="result.parsedResolution"

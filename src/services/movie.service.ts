@@ -15,7 +15,6 @@ class MovieService extends BaseService {
     });
 
     this.socket.on('updated-meta', ({ link, items }: { link: string; items: MediaItem[] }) => {
-      console.log('Got new meta for', link);
       useMovies().setMeta(link, items);
     });
   }

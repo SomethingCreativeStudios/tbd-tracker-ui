@@ -9,6 +9,7 @@ const state = reactive({
   currentYear: 2020,
   currentSeason: SeasonName.FALL,
   defaultSubgroup: '',
+  approvedSubgroups: '',
   folderNames: [] as string[],
 });
 
@@ -23,6 +24,7 @@ function setSettings(settings: Settings[]) {
   const currentYear = settings.find(({ key }) => key === 'currentYear')?.value;
   const currentSeason = settings.find(({ key }) => key === 'currentSeason')?.value;
   const defaultSubgroup = settings.find(({ key }) => key === 'defaultSubgroup')?.value;
+  const approvedSubgroups = settings.find(({ key }) => key === 'approvedSubgroups')?.value;
 
   if (currentYear) {
     state.currentYear = Number(currentYear);
@@ -34,6 +36,10 @@ function setSettings(settings: Settings[]) {
 
   if (defaultSubgroup) {
     state.defaultSubgroup = defaultSubgroup;
+  }
+
+  if (approvedSubgroups) {
+    state.approvedSubgroups = approvedSubgroups;
   }
 }
 
@@ -67,6 +73,16 @@ async function setDefaultSubgroup(groupName: string) {
   state.defaultSubgroup = groupName;
 }
 
+async function setApprovedSubgroups(approvedSubgroups: string) {
+  await SettingService.setSettings({
+    key: 'approvedSubgroups',
+    value: approvedSubgroups,
+    type: SettingType.STRING,
+  });
+
+  state.approvedSubgroups = approvedSubgroups;
+}
+
 function buildIO(route: string) {
   const port = process.env.VUE_APP_WEBSOCKET_PORT;
   const path = window.location.hostname;
@@ -88,6 +104,8 @@ export function useSetting() {
     setCurrentYear,
     setCurrentSeason,
     setDefaultSubgroup,
+    setApprovedSubgroups,
+    getApprovedSubgroups: computed(() => state.approvedSubgroups),
     getCurrentYear: computed(() => state.currentYear),
     getFolderNames: computed(() => state.folderNames),
     getDefaultSubgroup: computed(() => state.defaultSubgroup),

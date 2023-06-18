@@ -11,11 +11,12 @@
       </q-toolbar>
 
       <q-tabs align="left">
-        <q-route-tab to="/shows" label="Shows" />
+        <q-route-tab to="/shows" :label="`Shows (${untagged.length} + ${tagged.length})`" />
         <q-route-tab to="/western-shows" label="Western Shows" />
         <q-route-tab to="/movies" label="Movies" />
         <q-route-tab to="/downloads" label="Downloads" />
         <q-route-tab to="/plex" label="Plex" />
+        <q-route-tab to="/settings" label="Settings" />
       </q-tabs>
     </q-header>
 
@@ -36,7 +37,7 @@
 
 <script>
 import { ref, watch } from 'vue';
-import { useSidebar } from '~/composables';
+import { useSidebar, useSeries } from '~/composables';
 import { useQuasar } from 'quasar';
 import { SidebarType } from '~/types/sidebar/sidebar.enum';
 import { SidebarSeries, SidebarSubgroup, SidebarShowQueue, SidebarSearchSeries, SidebarSearchSeason, FileDialogSidebar } from '~/components/sidebar';
@@ -46,6 +47,7 @@ export default {
   setup() {
     const { currentType, params, setType } = useSidebar();
     const { screen } = useQuasar();
+    const { getUntaggedSeries, getTaggedSeries } = useSeries();
     const rightDrawerOpen = ref(false);
 
     watch(currentType, () => (rightDrawerOpen.value = currentType.value !== SidebarType.NONE));
@@ -60,6 +62,8 @@ export default {
       sideBarWidth: screen.width < 650 ? 300 : 600,
       rightDrawerOpen,
       sideBarType: currentType,
+      untagged: getUntaggedSeries(),
+      tagged: getTaggedSeries(),
       toggleRightDrawer() {
         rightDrawerOpen.value = !rightDrawerOpen.value;
       },

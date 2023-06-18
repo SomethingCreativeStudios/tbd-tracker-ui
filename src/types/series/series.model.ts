@@ -49,4 +49,6 @@ export class Series {
   nextAiringDate?: Date;
 
   episodeRegex?: string;
+
+  hasSubgroupsPending?: boolean;
 }

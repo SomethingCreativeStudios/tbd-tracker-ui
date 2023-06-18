@@ -22,14 +22,11 @@ class TorrentService extends BaseService {
     });
 
     this.socket.on('torrent-queued', function ({ url, fileName }) {
-      console.log('Queued', url, fileName);
       Notify.create({ type: 'info', message: `Queued ${fileName as string}`, position: 'bottom-right', progress: true });
       addToQueue(fileName, url);
     });
 
-    this.socket.on('metadata', function ({ hash }) {
-      console.log('MetaData', hash);
-    });
+    this.socket.on('metadata', function () {});
 
     this.socket.on('downloading', function ({ hash, value }) {
       updateDownload({ hash, value });

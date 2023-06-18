@@ -1,6 +1,6 @@
 <template>
   <div class="western-shows q-pa-md">
-    <div class="row q-col-gutter-lg">I AM WESTERN SHOWS</div>
+    <div class="row q-col-gutter-lg">SADLY NOT READY... BLAME MONTREAL</div>
     <q-fab color="secondary" class="floating-button" icon="keyboard_arrow_up" direction="up">
       <q-fab-action color="secondary" @click="onAddShow" label="Add Show" icon="fas fa-search-plus" />
       <q-fab-action color="secondary" @click="onAddSeason" label="Add Season" icon="fas fa-folder-plus" />

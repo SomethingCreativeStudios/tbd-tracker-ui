@@ -40,4 +40,6 @@ export interface MediaItem {
   imagePath: string;
 
   releaseDate: Date;
+
+  size: string;
 }

@@ -23,8 +23,10 @@
         />
         <q-icon
           v-else
-          :class="`series-card__sync ${currentEp === '0' ? 'series-card__sync--error' : ''}`"
-          :name="currentEp === '0' ? 'fas fa-exclamation' : `fas fa-sync ${isSyncing ? 'fa-spin' : ''}`"
+          :class="`series-card__sync ${currentEp === '0' ? 'series-card__sync--error' : ''} series-card__sync--${
+            hasSubgroupsPending ? 'pending' : 'nothing'
+          }`"
+          :name="currentEp === '0' ? `fas fa-exclamation ${isSyncing ? 'fa-spin' : ''}` : `fas fa-sync ${isSyncing ? 'fa-spin' : ''}`"
           @click="onSync"
         />
         <div class="series-card__info text-h6">Have {{ currentEp }} out {{ total }}</div>
@@ -104,6 +106,10 @@ export default defineComponent({
       type: Date,
       default: new Date(),
     },
+    hasSubgroupsPending: {
+      type: Boolean,
+      default: false,
+    },
   },
   setup(props) {
     const queueItems = getFilteredQueue(props.id, false);
@@ -173,6 +179,10 @@ export default defineComponent({
 
 .series-card__sync--badge {
   color: white;
+}
+
+.series-card__sync--pending {
+  color: green;
 }
 
 .series-card__body {

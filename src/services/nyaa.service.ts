@@ -15,22 +15,29 @@ class NyaaService extends BaseService {
       auth: { token: localStorage.getItem('accessToken') },
     });
 
-    this.socket.on('series-syncing', ({ id, type }: { id: number; type: 'STARTING' | 'UPDATE_FOUND' | 'NO_UPDATE'; queue: NyaaItem[] }) => {
-      const { updateSyncStatus, refreshShow } = useSeries();
+    this.socket.on(
+      'series-syncing',
+      ({ id, type, queue }: { id: number; type: 'STARTING' | 'UPDATE_FOUND' | 'PENDING' | 'NO_UPDATE'; queue: NyaaItem[] }) => {
+        const { updateSyncStatus, updatePendingStatus, refreshShow } = useSeries();
 
-      if (type === 'STARTING') {
-        updateSyncStatus(id, true);
-      }
+        if (type === 'STARTING') {
+          updateSyncStatus(id, true);
+        }
 
-      if (type === 'UPDATE_FOUND') {
-        updateSyncStatus(id, false);
-        refreshShow(id);
-      }
+        if (type === 'UPDATE_FOUND') {
+          updateSyncStatus(id, false);
+          refreshShow(id);
+        }
 
-      if (type === 'NO_UPDATE') {
-        updateSyncStatus(id, false);
+        if (type === 'NO_UPDATE') {
+          updateSyncStatus(id, false);
+        }
+
+        if (type === 'PENDING') {
+          updatePendingStatus(id, queue.length > 0);
+        }
       }
-    });
+    );
   }
 
   async syncShow(id?: number, season?: string, year?: number): Promise<Series> {

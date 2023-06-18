@@ -44,6 +44,7 @@
               :description="show.description"
               :total="String(show.numberOfEpisodes)"
               :shows-to-download="show.showQueue.length"
+              :has-subgroups-pending="show.hasSubgroupsPending"
               :id="show.id"
               :title="show.name"
               :image-url="show.imageUrl"

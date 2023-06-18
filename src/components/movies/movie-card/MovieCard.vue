@@ -66,6 +66,10 @@ export default defineComponent({
       type: String,
       default: '',
     },
+    size: {
+      type: String,
+      default: ''
+    },
     alternativeCount: {
       type: Number,
       default: 0,
