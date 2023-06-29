@@ -72,6 +72,12 @@ class SeriesService extends BaseService {
     });
   }
 
+  async complete(id: number, score: number): Promise<Series> {
+    return new Promise((resolve) => {
+      this.socket.emit('complete', { id, score }, resolve);
+    });
+  }
+
   async updateWatchStatus(id: number): Promise<WatchingStatus> {
     return new Promise((resolve) => {
       this.socket.emit('toggle-watch-status', id, resolve);

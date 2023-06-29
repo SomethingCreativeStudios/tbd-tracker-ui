@@ -43,9 +43,27 @@ async function updateShow(updateModel: UpdateSeriesDTO) {
 }
 
 async function refreshShow(id: number) {
+  const filteredQueue = (items: NyaaItem[], groups: SubGroup[]) =>
+    items.filter((item) => {
+      return groups.every((group) => group.preferedResultion === item.resolution) && !item.isIgnored;
+    });
+
   const show = await SeriesService.fetchById(id);
 
-  state.series = state.series.map((currentShow) => (currentShow.id === show.id ? show : currentShow));
+  state.series = state.series
+    .map((currentShow) => (currentShow.id === show.id ? show : currentShow))
+    .sort((a, b) => {
+      const aQueue = filteredQueue(a.showQueue, a.subgroups);
+      const bQueue = filteredQueue(b.showQueue, b.subgroups);
+
+      if (aQueue.length > bQueue.length) return -1;
+      if (aQueue.length < bQueue.length) return 1;
+    })
+    .sort((a, b) => {
+      if (a.hasSubgroupsPending && !b.hasSubgroupsPending) return -1;
+      if (b.hasSubgroupsPending && !a.hasSubgroupsPending) return 1;
+      return 0;
+    });
 }
 
 async function syncWithMal(id: number) {
@@ -111,6 +129,11 @@ function getTaggedSeries() {
 }
 
 async function setUp(ignoreLinks: string[]) {
+  const filteredQueue = (items: NyaaItem[], groups: SubGroup[]) =>
+    items.filter((item) => {
+      return groups.every((group) => group.preferedResultion === item.resolution) && !item.isIgnored;
+    });
+
   const foundSeries = await SeriesService.fetchAll({
     season: getCurrentSeason.value,
     year: getCurrentYear.value,
@@ -124,7 +147,15 @@ async function setUp(ignoreLinks: string[]) {
   });
 
   setIgnoreLinks(ignoreLinks);
-  setSeries([...leftOvers, ...foundSeries]);
+  setSeries(
+    [...foundSeries, ...leftOvers].sort((a, b) => {
+      const aQueue = filteredQueue(a.showQueue, a.subgroups);
+      const bQueue = filteredQueue(b.showQueue, b.subgroups);
+
+      if (aQueue.length > bQueue.length) return -1;
+      if (aQueue.length < bQueue.length) return 1;
+    })
+  );
 }
 
 export function useSeries() {

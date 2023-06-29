@@ -13,8 +13,10 @@
         </template>
       </q-img>
       <q-card-section>
+        <q-icon v-if="watchStatus === 'watched' && isNaN(score) && score" :class="`series-card__score`" name="fas fa-plus" @click="onScore" />
+
         <q-badge
-          v-if="queueItems.length"
+          v-if="watchStatus !== 'watched' && queueItems.length"
           class="series-card__sync series-card__sync--badge"
           rounded
           color="primiary"
@@ -22,7 +24,7 @@
           :label="queueItems.length"
         />
         <q-icon
-          v-else
+          v-if="watchStatus !== 'watched' && !queueItems.length"
           :class="`series-card__sync ${currentEp === '0' ? 'series-card__sync--error' : ''} series-card__sync--${
             hasSubgroupsPending ? 'pending' : 'nothing'
           }`"
@@ -30,7 +32,8 @@
           @click="onSync"
         />
         <div class="series-card__info text-h6">Have {{ currentEp }} out {{ total }}</div>
-        <div class="series-card__info text-h8">Next: {{ tillDate }}</div>
+        <div class="series-card__info text-h8" v-if="watchStatus === 'watched' && !isNaN(score) && score">Score: {{ score }}</div>
+        <div class="series-card__info text-h8" v-else>Next: {{ tillDate }}</div>
         <div class="row series-card__tags" v-if="tags.length > 0">
           <template v-for="tag in tags" :key="tag">
             <q-badge rounded color="secondary" :label="tag" />
@@ -57,6 +60,7 @@ import { getAiringTime } from '~/utils/time-helpers';
 import { service as NyaaService } from '~/services/nyaa.service';
 import { useSeries, useSidebar, useDownload } from '~/composables';
 import { SidebarType } from '~/types/sidebar/sidebar.enum';
+import { WatchingStatus } from '~/types/series/watching-status.enum';
 
 const { isSyncing, getFilteredQueue, removeShow } = useSeries();
 const { setType } = useSidebar();
@@ -110,6 +114,18 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    malId: {
+      type: Number,
+      default: 0,
+    },
+    score: {
+      type: Number,
+      default: 0,
+    },
+    watchStatus: {
+      type: String as PropType<WatchingStatus>,
+      default: WatchingStatus.WATCHING,
+    },
   },
   setup(props) {
     const queueItems = getFilteredQueue(props.id, false);
@@ -131,6 +147,11 @@ export default defineComponent({
   },
   methods: {
     onSync() {
+      if (!this.malId) {
+        setType(SidebarType.SELECT_SHOW, { id: this.id });
+        return;
+      }
+
       console.log('1 2 and Sync');
       NyaaService.syncShow(this.id);
     },
@@ -150,6 +171,10 @@ export default defineComponent({
       console.log('1 2 and Queue');
       setType(SidebarType.EDIT_QUEUE, { id: this.id });
     },
+    onScore() {
+      console.log('1 2 and Score');
+      setType(SidebarType.EDIT_SHOW, { id: this.id });
+    },
   },
 });
 </script>
@@ -160,10 +185,12 @@ export default defineComponent({
   line-height: 1;
 }
 
+.series-card__score:hover,
 .series-card__sync:hover {
   cursor: pointer;
 }
 
+.series-card__score,
 .series-card__sync {
   color: #f7b40e;
   position: absolute;
@@ -171,6 +198,10 @@ export default defineComponent({
   top: 7px;
 
   text-shadow: 2px 2px rgb(0 0 0 / 75%);
+}
+
+.series-card__score {
+  color: green;
 }
 
 .series-card__sync--error {

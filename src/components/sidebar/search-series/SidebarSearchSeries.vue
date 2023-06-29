@@ -1,8 +1,8 @@
 <template>
   <div class="sidebar-search-series">
     <div class="text-h6 title">
-      Add Series
-      <q-input outlined color="secondary" label="Search" @change="onSearch" />
+      {{ title }}
+      <q-input outlined color="secondary" label="Search" :model-value="showName" @change="onSearch" v-on:keyup.enter="() => onSearch(showName)" />
       <q-linear-progress v-if="loading" indeterminate color="secondary" class="q-mt-sm" />
     </div>
     <div class="row row_body">
@@ -37,7 +37,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, computed } from 'vue';
 import { useSeries, useSidebar, useSetting } from '~/composables';
 import { SidebarType } from '~/types/sidebar/sidebar.enum';
 import { service as SearchService } from '~/services/query.service';
@@ -45,18 +45,33 @@ import { service as SeriesService } from '~/services/series.service';
 import { service as NyaaService } from '~/services/nyaa.service';
 import { Series } from '~/types/series/series.model';
 
-const { setUp } = useSeries();
+const { setUp, getSeries, updateShow } = useSeries();
 const { getCurrentYear, getCurrentSeason } = useSetting();
 const { setType } = useSidebar();
 
 export default defineComponent({
   name: 'sidebar-search-series',
 
-  setup() {
+  props: {
+    id: {
+      type: Number,
+      default: 0,
+    },
+    mode: {
+      type: String,
+      default: 'search',
+    },
+  },
+
+  setup(props) {
     const loading = ref(false);
     const results = ref([] as Series[]);
 
-    return { loading, results };
+    const foundSeries = getSeries.value.find((s) => s.id === props.id);
+    const showName = ref(foundSeries?.name || '');
+    const title = computed(() => (props.mode === 'search' ? 'Add Series' : 'Select Series'));
+
+    return { title, showName, loading, results };
   },
 
   methods: {
@@ -72,10 +87,15 @@ export default defineComponent({
       this.loading = false;
     },
     async onAddShow(item: Series) {
-      await SeriesService.createByMal({ malId: item.malId, seasonYear: getCurrentYear.value, seasonName: getCurrentSeason.value });
-      const links = await NyaaService.fetchIgnoreLinks();
-      await setUp(links);
-      setType(SidebarType.NONE);
+      if (this.mode === 'search') {
+        await SeriesService.createByMal({ malId: item.malId, seasonYear: getCurrentYear.value, seasonName: getCurrentSeason.value });
+        const links = await NyaaService.fetchIgnoreLinks();
+        await setUp(links);
+        setType(SidebarType.NONE);
+      } else {
+        await updateShow({ id: this.id, malId: item.malId });
+        setType(SidebarType.NONE);
+      }
     },
   },
 });

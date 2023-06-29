@@ -48,6 +48,9 @@
               :id="show.id"
               :title="show.name"
               :image-url="show.imageUrl"
+              :mal-id="+show.malId"
+              :watch-status="show.watchStatus"
+              :score="show.score"
               :tags="[].concat(show.tags)"
             ></series-card>
           </div>

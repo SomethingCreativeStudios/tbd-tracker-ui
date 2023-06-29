@@ -8,6 +8,10 @@ export class UpdateSeriesDTO {
   id: number;
 
   @IsOptional()
+  @IsNumber()
+  malId?: number;
+
+  @IsOptional()
   @IsString()
   name?: string;
 

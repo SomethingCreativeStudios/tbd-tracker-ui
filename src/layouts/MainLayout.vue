@@ -24,7 +24,11 @@
       <sidebar-series v-if="sideBarType === 1" v-bind="params"></sidebar-series>
       <sidebar-subgroup v-if="sideBarType === 2" v-bind="params"></sidebar-subgroup>
       <sidebar-show-queue v-if="sideBarType === 3" v-bind="params"></sidebar-show-queue>
-      <sidebar-search-series v-if="sideBarType === 4" v-bind="params"></sidebar-search-series>
+      <sidebar-search-series
+        v-if="sideBarType === 4 || sideBarType === 7"
+        v-bind="params"
+        :mode="sideBarType === 7 ? 'select' : 'search'"
+      ></sidebar-search-series>
       <sidebar-search-season v-if="sideBarType === 5" v-bind="params"></sidebar-search-season>
       <file-dialog-sidebar v-if="sideBarType === 6" v-bind="params"></file-dialog-sidebar>
     </q-drawer>
