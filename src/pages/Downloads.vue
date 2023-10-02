@@ -49,6 +49,7 @@ import { useDownload, useSidebar } from '~/composables';
 import { useQuasar } from 'quasar';
 import { service as TorrentService } from '~/services/torrent.service';
 import { SidebarType } from '~/types/sidebar/sidebar.enum';
+import { MediaType } from '~/types/movie/movie.models';
 
 const { getDownloads, getQueued } = useDownload();
 const { setType } = useSidebar();
@@ -60,7 +61,7 @@ export default defineComponent({
 
     return {
       magUrl: ref(''),
-      downloadLocation: ref(''),
+      downloadLocation: ref('/'),
       downloads: getDownloads,
       queued: getQueued,
       height: `${screen.height - 123}px`,
@@ -71,12 +72,13 @@ export default defineComponent({
       TorrentService.testDownload();
     },
     onLocation() {
-      setType(SidebarType.FILE_DIALOG, {}, (value) => {
+      setType(SidebarType.FILE_DIALOG, { basePath: this.downloadLocation }, (value) => {
+        console.log(value);
         this.downloadLocation = value;
       });
     },
     onAddDownload() {
-      TorrentService.addDownload(this.magUrl, this.realDownloadPath);
+      TorrentService.addDownload(this.magUrl, MediaType.TV_SHOW, this.downloadLocation);
     },
     getDownloadSpeed(speed: number) {
       const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];

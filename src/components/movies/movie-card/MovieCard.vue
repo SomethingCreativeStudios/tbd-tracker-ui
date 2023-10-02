@@ -68,7 +68,7 @@ export default defineComponent({
     },
     size: {
       type: String,
-      default: ''
+      default: '',
     },
     alternativeCount: {
       type: Number,
@@ -116,7 +116,7 @@ export default defineComponent({
       setMeta(this.link, items);
     },
     onDownload() {
-      TorrentService.addDownload(this.link, MediaType.MOVIE);
+      TorrentService.addDownload(this.link, MediaType.MOVIE, '');
     },
   },
 });

@@ -29,12 +29,19 @@ const { setType, params } = useSidebar();
 export default defineComponent({
   name: 'sidebar-file-dialog',
 
-  setup() {
+  props: {
+    basePath: {
+      type: String,
+      default: '/',
+    },
+  },
+
+  setup(props) {
     const { screen } = useQuasar();
     const items = ref([] as { name: string; fullPath: string }[]);
-    const currentDir = ref('/');
+    const currentDir = ref(props.basePath || '/');
 
-    FileService.directoryGoTo('/').then((found: any) => {
+    FileService.directoryGoTo(currentDir.value).then((found: any) => {
       items.value = found;
     });
 

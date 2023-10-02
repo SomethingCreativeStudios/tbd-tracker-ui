@@ -44,9 +44,9 @@ class TorrentService extends BaseService {
     });
   }
 
-  async addDownload(magUrl: string, type: MediaType) {
+  async addDownload(magUrl: string, type: MediaType, downloadPath: string) {
     return new Promise((resolve) => {
-      this.socket.emit('direct-download', { fileName: '', url: magUrl, type }, resolve);
+      this.socket.emit('direct-download', { fileName: '', url: magUrl, type, downloadPath }, resolve);
     });
   }
 }
