@@ -58,6 +58,12 @@ class NyaaService extends BaseService {
     });
   }
 
+  async suggestFromRecentSubgroups(): Promise<SubGroup[]> {
+    return new Promise((resolve) => {
+      this.socket.emit('suggest-from-recent-subgroups', {}, resolve);
+    });
+  }
+
   async ignoreItem(link: string) {
     return new Promise((resolve) => {
       this.socket.emit('ignore', { link }, resolve);

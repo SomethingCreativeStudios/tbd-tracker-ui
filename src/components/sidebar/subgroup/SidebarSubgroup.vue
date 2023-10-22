@@ -4,10 +4,21 @@
     <div class="row row_body">
       <div class="row_body--body">
         <q-expansion-item v-if="suggestedSeries.length" icon="far fa-question-circle" label="Suggested Groups">
-          <template v-for="suggestion in suggestedSeries" :key="suggestion.subgroup.name + suggestion.subgroup.preferedResultion">
+          <template v-for="suggestion in suggestedSeries" :key="'reg' + suggestion.subgroup.name + suggestion.subgroup.preferedResultion">
             <q-item clickable v-ripple @click="onItem(suggestion)">
               <q-item-section>
                 <q-item-label :class="{ trusted: suggestion.isTrusted, remake: suggestion.isRemake }">{{ suggestion.subgroup.name }}</q-item-label>
+                <q-item-label caption>{{ suggestion.subgroup.preferedResultion }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </template>
+        </q-expansion-item>
+
+        <q-expansion-item v-if="recentSuggestSeries.length" icon="far fa-question-circle" label="Brute Suggested Groups">
+          <template v-for="suggestion in recentSuggestSeries" :key="'brute' + suggestion.subgroup.name + suggestion.subgroup.preferedResultion">
+            <q-item clickable v-ripple @click="onItem(suggestion)">
+              <q-item-section>
+                <q-item-label :class="{ trusted: suggestion.isTrusted, remake: suggestion.isRemake }">{{ suggestion.subgroup.name }} - {{ suggestion.subgroup.rules[0].text }}</q-item-label>
                 <q-item-label caption>{{ suggestion.subgroup.preferedResultion }}</q-item-label>
               </q-item-section>
             </q-item>
@@ -20,9 +31,10 @@
       </div>
     </div>
     <div class="no-wrap sidebar-actions row">
-      <q-btn class="col-4" flat color="secondary" @click="onAddGroup">Add</q-btn>
-      <q-btn class="col-4" flat @click="onSuggest">Suggest</q-btn>
-      <q-btn class="col-4" flat color="negative" @click="onCancel">Close</q-btn>
+      <q-btn class="col-3" flat color="secondary" @click="onAddGroup">Add</q-btn>
+      <q-btn class="col-3" flat @click="onSuggest">Suggest</q-btn>
+      <q-btn class="col-3" flat color="yellow" @click="onForceSuggest">Force Suggest</q-btn>
+      <q-btn class="col-3" flat color="negative" @click="onCancel">Close</q-btn>
     </div>
   </div>
 </template>
@@ -51,10 +63,11 @@ export default defineComponent({
   },
   setup(props) {
     const suggestedSeries = ref([]);
+    const recentSuggestSeries = ref([]);
     const foundSeries = computed(() => getSeries.value?.find((series) => series.id === props.id));
     const foundSubgroups = computed(() => getSubgroups.value?.[props.id] ?? []);
 
-    return { series: foundSeries, subgroups: foundSubgroups, suggestedSeries };
+    return { series: foundSeries, subgroups: foundSubgroups, suggestedSeries, recentSuggestSeries };
   },
   methods: {
     onAddGroup() {
@@ -70,6 +83,17 @@ export default defineComponent({
       }, []);
 
       this.suggestedSeries = cleaned;
+    },
+    async onForceSuggest() {
+      const groups = await NyaaService.suggestFromRecentSubgroups();
+      const cleaned = groups.reduce((acc, group) => {
+        const has = acc.find((found) => found.name === found.subgroup.name && found.preferedResultion === found.subgroup.preferedResultion);
+
+        return has ? acc : acc.concat(group);
+      }, []);
+
+      this.recentSuggestSeries = cleaned;
+      console.log(this.recentSuggestSeries);
     },
     onCancel() {
       setType(SidebarType.NONE);

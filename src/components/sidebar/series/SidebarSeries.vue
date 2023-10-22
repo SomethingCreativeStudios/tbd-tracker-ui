@@ -25,28 +25,36 @@
             @new-value="onNewValue('otherNames', $event)"
           />
           <q-input class="col-12" color="secondary" label="Description" v-model="series.description" autogrow dense />
+          <q-input class="col-12" color="secondary" label="Studio" v-model="series.studio" dense />
         </div>
 
         <q-separator color="secondary" inset />
 
-        <div class="row q-col-gutter-lg">
-          <q-input class="col-12 col-md-6" color="secondary" label="Studio" v-model="series.studio" dense />
-          <q-input class="col-12 col-md-6" color="secondary" v-model="series.airingData" mask="date" :rules="['date']" dense>
-            <template v-slot:append>
-              <q-icon name="event" class="cursor-pointer">
-                <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
-                  <q-date v-model="series.airingData">
-                    <div class="row items-center justify-end">
-                      <q-btn v-close-popup label="Close" color="primary" flat />
-                    </div>
-                  </q-date>
-                </q-popup-proxy>
-              </q-icon>
-            </template>
-          </q-input>
-        </div>
+        <q-input class="col-12" color="secondary" v-model="series.airingData">
+          <template v-slot:prepend>
+            <q-icon name="event" class="cursor-pointer">
+              <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                <q-date v-model="series.airingData" mask="YYYY-MM-DDTHH:mm:ss.sssZ">
+                  <div class="row items-center justify-end">
+                    <q-btn v-close-popup label="Close" color="primary" flat />
+                  </div>
+                </q-date>
+              </q-popup-proxy>
+            </q-icon>
+          </template>
 
-        <q-separator color="secondary" inset />
+          <template v-slot:append>
+            <q-icon name="access_time" class="cursor-pointer">
+              <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                <q-time v-model="series.airingData" mask="YYYY-MM-DDTHH:mm:ss.sssZ" format24h>
+                  <div class="row items-center justify-end">
+                    <q-btn v-close-popup label="Close" color="primary" flat />
+                  </div>
+                </q-time>
+              </q-popup-proxy>
+            </q-icon>
+          </template>
+        </q-input>
 
         <q-select label="Genres" color="secondary" v-model="series.genres" use-input use-chips multiple @new-value="onNewValue('genres', $event)" />
         <q-select label="Tags" color="secondary" v-model="series.tags" use-input use-chips multiple @new-value="onNewValue('tags', $event)" />
@@ -62,9 +70,6 @@
           use-input
           @new-value="onNewValue('tags', $event)"
         >
-          <template v-slot:append>
-            <q-btn round dense flat icon="add" @click="onFolderAdd" />
-          </template>
         </q-select>
         <div class="row q-col-gutter-lg">
           <q-input class="col-12 col-md-12" label="Override File Name" color="secondary" v-model="series.showName" dense />

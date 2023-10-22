@@ -8,6 +8,7 @@ import { useSetting } from './useSettings';
 import { useSubgroup } from './useSubgroup';
 import { SubGroup } from '~/types/sub-group/sub-group.model';
 import { NyaaItem } from '~/types/nyaa/nyaa-item.model';
+import { isAfter } from 'date-fns';
 
 const { getCurrentSeason, getCurrentYear } = useSetting();
 const state = reactive({
@@ -20,7 +21,43 @@ const state = reactive({
 window.state.series = state;
 
 function setSeries(series: Series[]) {
-  state.series = series.map((series) => ({
+  const filteredQueue = (items: NyaaItem[], groups: SubGroup[]) =>
+    items.filter((item) => {
+      return groups.every((group) => group.preferedResultion === item.resolution) && !item.isIgnored;
+    });
+
+  const isFullyDownloaded = (series: Series) => series.downloaded != 0 && series.downloaded === series.numberOfEpisodes;
+
+  const queuedSeries = series.filter((series) => series.subgroups.length > 0 && filteredQueue(series.showQueue, series.subgroups).length > 0);
+
+  const activeSeries = series.filter(
+    (series) => !isFullyDownloaded(series) && series.subgroups.length > 0 && filteredQueue(series.showQueue, series.subgroups).length === 0
+  );
+  const pendingSeries = series.filter((series) => series.subgroups.length === 0);
+  const finsihedSeries = series.filter((series) => isFullyDownloaded(series) && series.subgroups.length > 0);
+
+  const compareQueue = (a: Series, b: Series) => {
+    if (a.downloaded === 0 && b.downloaded === 0) return 0;
+
+    const aQueue = filteredQueue(a.showQueue, a.subgroups);
+    const bQueue = filteredQueue(b.showQueue, b.subgroups);
+
+    if (aQueue.length > bQueue.length) return -1;
+    if (aQueue.length < bQueue.length) return 1;
+
+    return 0;
+  };
+
+  const compareDate = (a: Series, b: Series) => {
+    if (isAfter(a.nextAiringDate, b.nextAiringDate)) return -1;
+    if (!isAfter(a.nextAiringDate, b.nextAiringDate)) return 1;
+
+    return 0;
+  };
+
+  const sortedSeries = [...queuedSeries.sort(compareQueue), ...activeSeries.sort(compareDate), ...pendingSeries.sort(compareDate), ...finsihedSeries];
+
+  state.series = sortedSeries.map((series) => ({
     ...series,
     showQueue: series.showQueue.map((queue) => ({ ...queue, isIgnored: state.ignoreLinks.includes(queue.downloadLink) })),
   }));
@@ -33,13 +70,13 @@ function setIgnoreLinks(links: string[]) {
 async function removeShow(id: number) {
   await SeriesService.remove(id);
 
-  state.series = state.series.filter(({ id: seriesId }) => id !== seriesId);
+  setSeries(state.series.filter(({ id: seriesId }) => id !== seriesId));
 }
 
 async function updateShow(updateModel: UpdateSeriesDTO) {
   const show = await SeriesService.update(updateModel);
 
-  state.series = state.series.map((currentShow) => (currentShow.id === show.id ? show : currentShow));
+  setSeries(state.series.map((currentShow) => (currentShow.id === show.id ? show : currentShow)));
 }
 
 async function refreshShow(id: number) {
@@ -50,8 +87,12 @@ async function refreshShow(id: number) {
 
   const show = await SeriesService.fetchById(id);
 
-  state.series = state.series
-    .map((currentShow) => (currentShow.id === show.id ? show : currentShow))
+  const newSeries = state.series
+    .map((currentShow) =>
+      currentShow.id === show.id
+        ? { ...show, showQueue: show.showQueue.map((queue) => ({ ...queue, isIgnored: state.ignoreLinks.includes(queue.downloadLink) })) }
+        : currentShow
+    )
     .sort((a, b) => {
       const aQueue = filteredQueue(a.showQueue, a.subgroups);
       const bQueue = filteredQueue(b.showQueue, b.subgroups);
@@ -64,13 +105,15 @@ async function refreshShow(id: number) {
       if (b.hasSubgroupsPending && !a.hasSubgroupsPending) return 1;
       return 0;
     });
+
+  setSeries(newSeries);
 }
 
 async function syncWithMal(id: number) {
   const show = await SeriesService.syncWithMal(id);
   const imageUrl = await SeriesService.syncImageUrl(id);
 
-  state.series = state.series.map((currentShow) => (currentShow.id === show.id ? { ...show, imageUrl } : currentShow));
+  setSeries(state.series.map((currentShow) => (currentShow.id === show.id ? { ...show, imageUrl } : currentShow)));
 }
 
 async function createBySeason(createModel: CreateBySeasonDTO) {
@@ -83,13 +126,13 @@ function updateSyncStatus(id: number, isSyncing: boolean) {
 
 function updatePendingStatus(id: number, isPending: boolean) {
   state.syncingSeries = { ...state.syncingSeries, [id]: false };
-  state.series = state.series.map((currentShow) => (currentShow.id === id ? { ...currentShow, hasSubgroupsPending: isPending } : currentShow));
+  setSeries(state.series.map((currentShow) => (currentShow.id === id ? { ...currentShow, hasSubgroupsPending: isPending } : currentShow)));
 }
 
 async function toggleWatchStatus(id: number) {
   const newWatchStatus = await SeriesService.updateWatchStatus(id);
 
-  state.series = state.series.map((currentShow) => (currentShow.id === id ? { ...currentShow, watchStatus: newWatchStatus } : currentShow));
+  setSeries(state.series.map((currentShow) => (currentShow.id === id ? { ...currentShow, watchStatus: newWatchStatus } : currentShow)));
 }
 
 function getFilteredQueue(id: number, showIgnored = false) {
@@ -129,11 +172,6 @@ function getTaggedSeries() {
 }
 
 async function setUp(ignoreLinks: string[]) {
-  const filteredQueue = (items: NyaaItem[], groups: SubGroup[]) =>
-    items.filter((item) => {
-      return groups.every((group) => group.preferedResultion === item.resolution) && !item.isIgnored;
-    });
-
   const foundSeries = await SeriesService.fetchAll({
     season: getCurrentSeason.value,
     year: getCurrentYear.value,
@@ -147,15 +185,7 @@ async function setUp(ignoreLinks: string[]) {
   });
 
   setIgnoreLinks(ignoreLinks);
-  setSeries(
-    [...foundSeries, ...leftOvers].sort((a, b) => {
-      const aQueue = filteredQueue(a.showQueue, a.subgroups);
-      const bQueue = filteredQueue(b.showQueue, b.subgroups);
-
-      if (aQueue.length > bQueue.length) return -1;
-      if (aQueue.length < bQueue.length) return 1;
-    })
-  );
+  setSeries([...foundSeries, ...leftOvers]);
 }
 
 export function useSeries() {

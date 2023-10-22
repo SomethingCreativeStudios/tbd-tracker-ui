@@ -102,6 +102,12 @@ class SeriesService extends BaseService {
     });
   }
 
+  async syncAllWithMal(): Promise<Series> {
+    return new Promise((resolve) => {
+      this.socket.emit('sync-all-mal', {}, resolve);
+    });
+  }
+
   async syncImageUrl(id: number): Promise<string> {
     return new Promise((resolve) => {
       this.socket.emit('sync-mal-image', id, resolve);

@@ -16,7 +16,7 @@
         </div>
         <div class="col-12 col-md-6">
           <div class="row">
-            <div class="col-8 col-lg-10">
+            <div class="col-6 col-lg-9">
               <q-select
                 label="Year"
                 color="secondary"
@@ -26,10 +26,19 @@
               />
             </div>
             <div class="col-2 col-lg-1">
-              <q-icon class="series-card__sync series-card--icon" :name="`fas fa-sync`" @click="onSync" />
+              <q-icon class="series-card__sync series-card__sync--nyaa series-card--icon" :name="`fas fa-sync`" @click="onSync">
+                <q-tooltip> Sync All Nyaa </q-tooltip>
+              </q-icon>
             </div>
             <div class="col-2 col-lg-1">
-              <q-icon class="series-card__signin series-card--icon" :name="`fas fa-sign-in-alt`" @click="onSignIn" />
+              <q-icon class="series-card__sync series-card__sync--mal series-card--icon" :name="`fas fa-sync`" @click="onSyncMal">
+                <q-tooltip> Sync All MAL </q-tooltip>
+              </q-icon>
+            </div>
+            <div class="col-2 col-lg-1">
+              <q-icon class="series-card__signin series-card--icon" :name="`fas fa-sign-in-alt`" @click="onSignIn">
+                <q-tooltip> MAL Login </q-tooltip>
+              </q-icon>
             </div>
           </div>
         </div>
@@ -69,6 +78,7 @@ import { defineComponent, ref } from 'vue';
 import { useQuasar } from 'quasar';
 import { service as NyaaService } from '~/services/nyaa.service';
 import { service as MalService } from '~/services/mal.service';
+import { service as SeriesService } from '~/services/series.service';
 import { useSeries, useSidebar, useSetting, useGlobal } from '~/composables';
 import { SeriesCard } from '~/components/series';
 import { SidebarType } from '~/types/sidebar/sidebar.enum';
@@ -118,6 +128,9 @@ export default defineComponent({
     onSync() {
       NyaaService.syncShow();
     },
+    onSyncMal() {
+      SeriesService.syncAllWithMal();
+    },
     async onSignIn() {
       const { url } = await MalService.getAuthURL();
 
@@ -160,6 +173,7 @@ export default defineComponent({
   }
 }
 
+
 .series-card__signin,
 .series-card__sync {
   color: #f7b40e;
@@ -167,5 +181,9 @@ export default defineComponent({
   top: 24px;
   left: 35px;
   font-size: 30px;
+}
+
+.series-card__sync--mal {
+  color: #2e51a2;
 }
 </style>
