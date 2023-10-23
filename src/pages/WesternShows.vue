@@ -15,7 +15,7 @@ import { SidebarType } from '~/types/sidebar/sidebar.enum';
 const { setType } = useSidebar();
 
 export default defineComponent({
-  name: 'western-shows',
+  name: 'page-western-shows',
   components: {},
   setup() {
     return {};

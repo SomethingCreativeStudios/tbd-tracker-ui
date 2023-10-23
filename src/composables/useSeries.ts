@@ -17,6 +17,7 @@ const state = reactive({
   ignoreLinks: [] as string[],
 });
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-ignore
 window.state.series = state;
 

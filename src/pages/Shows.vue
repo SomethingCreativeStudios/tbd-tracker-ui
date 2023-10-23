@@ -89,7 +89,7 @@ const { getCurrentSeason, getCurrentYear, setCurrentSeason, setCurrentYear } = u
 const { reload, isLoading } = useGlobal();
 
 export default defineComponent({
-  name: 'show',
+  name: 'page-show',
   components: { SeriesCard },
   setup() {
     const searchModel = ref({ season: getCurrentSeason.value, year: getCurrentYear.value });

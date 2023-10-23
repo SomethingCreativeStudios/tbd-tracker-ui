@@ -13,7 +13,7 @@ import { defineComponent, ref } from 'vue';
 import { useSetting } from '~/composables';
 
 export default defineComponent({
-  name: 'settings',
+  name: 'page-settings',
   components: {},
   setup() {
     const { getApprovedSubgroups } = useSetting();

@@ -55,7 +55,7 @@ const { getDownloads, getQueued } = useDownload();
 const { setType } = useSidebar();
 
 export default defineComponent({
-  name: 'download',
+  name: 'page-download',
   setup() {
     const { screen } = useQuasar();
 

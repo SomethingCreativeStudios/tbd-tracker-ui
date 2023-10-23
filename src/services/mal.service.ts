@@ -34,7 +34,7 @@ class MalService extends BaseService {
     });
   }
 
-  async searchSeason(year: string, season: string): Promise<{}> {
+  async searchSeason(year: string, season: string): Promise<object> {
     return new Promise((resolve, error) => {
       try {
         this.socket.emit('search-season', { year, season }, resolve);

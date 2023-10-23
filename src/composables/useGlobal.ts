@@ -15,6 +15,7 @@ import { useSeries, useSetting, useSubgroup, useSubgroupRule } from '~/composabl
 
 const state = reactive({ isLoading: true });
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-ignore
 window.state.global = state;
 
@@ -22,6 +23,7 @@ async function refreshAuthToken() {
   const isValid = await AuthService.validateToken(localStorage.getItem('accessToken'));
 
   if (!isValid) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const router = window.router as Router;
     localStorage.removeItem('accessToken');

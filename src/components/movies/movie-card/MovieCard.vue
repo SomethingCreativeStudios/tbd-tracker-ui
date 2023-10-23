@@ -111,12 +111,12 @@ export default defineComponent({
   },
   methods: {
     async onMeta() {
-      const items = await MovieService.findMeta(this.parsedName);
+      const items = await MovieService.findMeta(this.parsedName as string);
 
-      setMeta(this.link, items);
+      setMeta(this.link as string, items);
     },
     onDownload() {
-      TorrentService.addDownload(this.link, MediaType.MOVIE, '');
+      TorrentService.addDownload(this.link as string, MediaType.MOVIE, '');
     },
   },
 });

@@ -20,7 +20,7 @@ import { useGlobal } from '~/composables';
 import { service as AuthService } from '~/services/auth.service';
 
 export default defineComponent({
-  name: 'login',
+  name: 'page-login',
   setup() {
     const username = ref('');
     const password = ref('');

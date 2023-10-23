@@ -67,6 +67,8 @@ export default defineComponent({
     },
 
     onFolderSelect() {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       params.value.returnValue(this.currentDir);
       setType(SidebarType.NONE);
     },

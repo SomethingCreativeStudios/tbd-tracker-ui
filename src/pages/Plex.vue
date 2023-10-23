@@ -13,7 +13,7 @@ import { LibraryType } from '~/types/plex/plex.model';
 import { service as PlexService } from '~/services/plex.service';
 
 export default defineComponent({
-  name: 'plex',
+  name: 'page-plex',
   components: {},
   setup() {
     return {};

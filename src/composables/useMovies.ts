@@ -5,6 +5,7 @@ const state = reactive({
   results: [] as MediaCollection[],
 });
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-ignore
 window.state.movies = state;
 

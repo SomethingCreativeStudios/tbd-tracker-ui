@@ -47,7 +47,7 @@ const { setType } = useSidebar();
 const { setResults, getResults } = useMovies();
 
 export default defineComponent({
-  name: 'movies',
+  name: 'page-movies',
   components: { MovieCard },
   setup() {
     const query = ref('');

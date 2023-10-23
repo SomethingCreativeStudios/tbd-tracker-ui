@@ -9,7 +9,7 @@ export default boot(async () => {
 
   await useGlobal().reload();
 
-  if (urlParams.get('code') as any) {
+  if (urlParams.get('code')) {
     try {
       await MalService.login(urlParams.get('code'));
       location.replace(window.location.href.split('?')[0]);

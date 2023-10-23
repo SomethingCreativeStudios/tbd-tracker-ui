@@ -8,6 +8,7 @@ import { useSubgroup } from './useSubgroup';
 const { getSubgroups } = useSubgroup();
 const state = reactive({ rules: {} as { [groupId: number]: SubGroupRule[] } });
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-ignore
 window.state.subgroupRules = state;
 

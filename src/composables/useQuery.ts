@@ -5,6 +5,7 @@ const state = reactive({
   selectMode: 'single' as 'single' | 'many',
 });
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-ignore
 window.state.query = state;
 

@@ -7,6 +7,7 @@ const state = reactive({
   queue: [] as { fileName: string; url: string }[],
 });
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-ignore
 window.state.downloads = state;
 

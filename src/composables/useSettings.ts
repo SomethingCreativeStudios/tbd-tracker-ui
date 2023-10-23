@@ -13,6 +13,7 @@ const state = reactive({
   folderNames: [] as string[],
 });
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-ignore
 window.state.settings = state;
 
@@ -46,7 +47,7 @@ function setSettings(settings: Settings[]) {
 async function setCurrentYear(year: number) {
   await SettingService.setSettings({
     key: 'currentYear',
-    value: year as any,
+    value: String(year),
     type: SettingType.NUMBER,
   });
 
@@ -56,7 +57,7 @@ async function setCurrentYear(year: number) {
 async function setCurrentSeason(name: SeasonName) {
   await SettingService.setSettings({
     key: 'currentSeason',
-    value: name as any,
+    value: String(name),
     type: SettingType.STRING,
   });
 
