@@ -1,7 +1,7 @@
 <template>
   <div class="fullscreen bg-black text-white text-center q-pa-md flex flex-center">
     <div class="login-panel">
-      <q-input outlined v-model="username" label="Username" />
+      <q-input outlined v-model="username" label="Username (2)" />
 
       <q-input v-model="password" filled :type="hidePassword ? 'password' : 'text'" label="Password" @keydown="onEnter">
         <template v-slot:append>
@@ -16,7 +16,6 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { useGlobal } from '~/composables';
 import { service as AuthService } from '~/services/auth.service';
 
 export default defineComponent({
@@ -31,13 +30,7 @@ export default defineComponent({
       if (accessToken?.accessToken) {
         localStorage.setItem('accessToken', accessToken.accessToken);
 
-        // @ts-ignore
-        const router = window.router;
-
-        // @ts-ignore
-        useGlobal().reload();
-
-        router.push({ path: '/' });
+        window.location.reload();
       }
     };
 

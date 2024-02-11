@@ -31,6 +31,7 @@
       ></sidebar-search-series>
       <sidebar-search-season v-if="sideBarType === 5" v-bind="params"></sidebar-search-season>
       <file-dialog-sidebar v-if="sideBarType === 6" v-bind="params"></file-dialog-sidebar>
+      <sidebar-sync-results v-if="sideBarType === 8" v-bind="params"></sidebar-sync-results>
     </q-drawer>
 
     <q-page-container>
@@ -44,10 +45,18 @@ import { ref, watch } from 'vue';
 import { useSidebar, useSeries } from '~/composables';
 import { useQuasar } from 'quasar';
 import { SidebarType } from '~/types/sidebar/sidebar.enum';
-import { SidebarSeries, SidebarSubgroup, SidebarShowQueue, SidebarSearchSeries, SidebarSearchSeason, FileDialogSidebar } from '~/components/sidebar';
+import {
+  SidebarSeries,
+  SidebarSubgroup,
+  SidebarShowQueue,
+  SidebarSearchSeries,
+  SidebarSearchSeason,
+  FileDialogSidebar,
+  SidebarSyncResults,
+} from '~/components/sidebar';
 
 export default {
-  components: { SidebarSeries, SidebarSubgroup, SidebarShowQueue, SidebarSearchSeries, SidebarSearchSeason, FileDialogSidebar },
+  components: { SidebarSeries, SidebarSubgroup, SidebarShowQueue, SidebarSearchSeries, SidebarSearchSeason, FileDialogSidebar, SidebarSyncResults },
   setup() {
     const { currentType, params, setType } = useSidebar();
     const { screen } = useQuasar();
@@ -60,6 +69,7 @@ export default {
         setType(SidebarType.NONE);
       }
     });
+
 
     return {
       params,

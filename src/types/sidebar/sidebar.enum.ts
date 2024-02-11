@@ -7,4 +7,5 @@ export enum SidebarType {
   ADD_SEASON,
   FILE_DIALOG,
   SELECT_SHOW,
+  SYNC_LOCAL,
 }

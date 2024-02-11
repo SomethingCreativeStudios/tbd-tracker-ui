@@ -9,6 +9,7 @@ import { useSubgroup } from './useSubgroup';
 import { SubGroup } from '~/types/sub-group/sub-group.model';
 import { NyaaItem } from '~/types/nyaa/nyaa-item.model';
 import { isAfter } from 'date-fns';
+import { uniq } from 'ramda';
 
 const { getCurrentSeason, getCurrentYear } = useSetting();
 const state = reactive({
@@ -22,20 +23,20 @@ const state = reactive({
 window.state.series = state;
 
 function setSeries(series: Series[]) {
-  const filteredQueue = (items: NyaaItem[], groups: SubGroup[]) =>
+  const filteredQueue = (items: NyaaItem[] = [], groups: SubGroup[] = []) =>
     items.filter((item) => {
       return groups.every((group) => group.preferedResultion === item.resolution) && !item.isIgnored;
     });
 
   const isFullyDownloaded = (series: Series) => series.downloaded != 0 && series.downloaded === series.numberOfEpisodes;
 
-  const queuedSeries = series.filter((series) => series.subgroups.length > 0 && filteredQueue(series.showQueue, series.subgroups).length > 0);
+  const queuedSeries = series.filter((series) => series.subgroups?.length > 0 && filteredQueue(series.showQueue, series.subgroups).length > 0);
 
   const activeSeries = series.filter(
-    (series) => !isFullyDownloaded(series) && series.subgroups.length > 0 && filteredQueue(series.showQueue, series.subgroups).length === 0
+    (series) => !isFullyDownloaded(series) && series.subgroups?.length > 0 && filteredQueue(series.showQueue, series.subgroups).length === 0
   );
-  const pendingSeries = series.filter((series) => series.subgroups.length === 0);
-  const finsihedSeries = series.filter((series) => isFullyDownloaded(series) && series.subgroups.length > 0);
+  const pendingSeries = series.filter((series) => series.subgroups?.length === 0);
+  const finsihedSeries = series.filter((series) => isFullyDownloaded(series) && series.subgroups?.length > 0);
 
   const compareQueue = (a: Series, b: Series) => {
     if (a.downloaded === 0 && b.downloaded === 0) return 0;
@@ -50,8 +51,11 @@ function setSeries(series: Series[]) {
   };
 
   const compareDate = (a: Series, b: Series) => {
-    if (isAfter(a.nextAiringDate, b.nextAiringDate)) return -1;
-    if (!isAfter(a.nextAiringDate, b.nextAiringDate)) return 1;
+    const nextAiringDateA = a.nextAiringDate;
+    const nextAiringDateB = b.nextAiringDate;
+
+    if (isAfter(nextAiringDateA, nextAiringDateB)) return -1;
+    if (!isAfter(nextAiringDateA, nextAiringDateB)) return 1;
 
     return 0;
   };
@@ -77,44 +81,28 @@ async function removeShow(id: number) {
 async function updateShow(updateModel: UpdateSeriesDTO) {
   const show = await SeriesService.update(updateModel);
 
-  setSeries(state.series.map((currentShow) => (currentShow.id === show.id ? show : currentShow)));
+  setSeries(state.series.map((currentShow) => (currentShow.id === show.id ? { ...currentShow, ...show } : currentShow)));
 }
 
 async function refreshShow(id: number) {
-  const filteredQueue = (items: NyaaItem[], groups: SubGroup[]) =>
-    items.filter((item) => {
-      return groups.every((group) => group.preferedResultion === item.resolution) && !item.isIgnored;
-    });
-
   const show = await SeriesService.fetchById(id);
+  const { setUp } = useSubgroup();
 
-  const newSeries = state.series
-    .map((currentShow) =>
-      currentShow.id === show.id
-        ? { ...show, showQueue: show.showQueue.map((queue) => ({ ...queue, isIgnored: state.ignoreLinks.includes(queue.downloadLink) })) }
-        : currentShow
-    )
-    .sort((a, b) => {
-      const aQueue = filteredQueue(a.showQueue, a.subgroups);
-      const bQueue = filteredQueue(b.showQueue, b.subgroups);
-
-      if (aQueue.length > bQueue.length) return -1;
-      if (aQueue.length < bQueue.length) return 1;
-    })
-    .sort((a, b) => {
-      if (a.hasSubgroupsPending && !b.hasSubgroupsPending) return -1;
-      if (b.hasSubgroupsPending && !a.hasSubgroupsPending) return 1;
-      return 0;
-    });
+  const newSeries = state.series.map((currentShow) =>
+    currentShow.id === show.id
+      ? { ...show, showQueue: show.showQueue.map((queue) => ({ ...queue, isIgnored: state.ignoreLinks.includes(queue.downloadLink) })) }
+      : currentShow
+  );
 
   setSeries(newSeries);
+  setUp();
 }
 
 async function syncWithMal(id: number) {
   const show = await SeriesService.syncWithMal(id);
   const imageUrl = await SeriesService.syncImageUrl(id);
 
-  setSeries(state.series.map((currentShow) => (currentShow.id === show.id ? { ...show, imageUrl } : currentShow)));
+  setSeries(state.series.map((currentShow) => (currentShow.id === show.id ? { ...currentShow, ...show, imageUrl } : currentShow)));
 }
 
 async function createBySeason(createModel: CreateBySeasonDTO) {
@@ -172,6 +160,10 @@ function getTaggedSeries() {
   return computed(() => state.series.filter((series) => series.tags.length > 0));
 }
 
+function getExistingTags() {
+  return computed(() => uniq(state.series.flatMap((series) => series.tags)));
+}
+
 async function setUp(ignoreLinks: string[]) {
   const foundSeries = await SeriesService.fetchAll({
     season: getCurrentSeason.value,
@@ -205,6 +197,7 @@ export function useSeries() {
     getTaggedSeries,
     setUp,
     toggleIgnored,
+    getExistingTags,
     getSyncing: computed(() => readonly(state.syncingSeries)),
     getSeries: computed(() => readonly(state.series)),
     getIgnoreLinks: computed(() => readonly(state.ignoreLinks)),

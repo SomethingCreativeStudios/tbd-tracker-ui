@@ -8,6 +8,8 @@ import { Series } from '~/types/series/series.model';
 import { WatchingStatus } from '~/types/series/watching-status.enum';
 import { useSetting } from '~/composables/useSettings';
 import { BaseService } from './base.service';
+import { SyncResultsDTO } from '~/types/series/dto/SyncResultsDTO';
+import { ExportResultDTO } from '~/types/series/dto/ExportResultDTO';
 
 const { buildIO } = useSetting();
 class SeriesService extends BaseService {
@@ -66,6 +68,12 @@ class SeriesService extends BaseService {
     });
   }
 
+  async syncLocal(): Promise<SyncResultsDTO[]> {
+    return new Promise((resolve) => {
+      this.socket.emit('sync-local', {}, resolve);
+    });
+  }
+
   async update(updateModel: UpdateSeriesDTO): Promise<Series> {
     return new Promise((resolve) => {
       this.socket.emit('update', updateModel, resolve);
@@ -111,6 +119,12 @@ class SeriesService extends BaseService {
   async syncImageUrl(id: number): Promise<string> {
     return new Promise((resolve) => {
       this.socket.emit('sync-mal-image', id, resolve);
+    });
+  }
+
+  async exportShows(): Promise<ExportResultDTO[]> {
+    return new Promise((resolve) => {
+      this.socket.emit('export-shows', {}, resolve);
     });
   }
 

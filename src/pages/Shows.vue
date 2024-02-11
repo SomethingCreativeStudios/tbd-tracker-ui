@@ -44,7 +44,7 @@
         </div>
       </div>
       <div class="shows__items row q-col-gutter-lg">
-        <template v-for="show in series" :key="show.id">
+        <template v-for="show in series" :key="show.id + show.showQueue?.length">
           <div class="col-12 col-md-3">
             <series-card
               :airing-data="show.airingData"
@@ -69,6 +69,8 @@
       <q-fab color="secondary" class="floating-button" icon="keyboard_arrow_up" direction="up">
         <q-fab-action color="secondary" @click="onAddShow" label="Add Show" icon="fas fa-search-plus" />
         <q-fab-action color="secondary" @click="onAddSeason" label="Add Season" icon="fas fa-folder-plus" />
+        <q-fab-action color="secondary" @click="onExportShows" label="Export Shows" icon="fas fa-download" />
+        <q-fab-action color="secondary" @click="onSyncLocal" label="Sync With Local" icon="fas fa-sync" />
       </q-fab>
     </template>
   </div>
@@ -83,6 +85,7 @@ import { useSeries, useSidebar, useSetting, useGlobal } from '~/composables';
 import { SeriesCard } from '~/components/series';
 import { SidebarType } from '~/types/sidebar/sidebar.enum';
 import { SeasonName } from '~/types/season/season-name.enum';
+import { json2csv } from 'json-2-csv';
 
 const { setType } = useSidebar();
 const { getCurrentSeason, getCurrentYear, setCurrentSeason, setCurrentYear } = useSetting();
@@ -95,12 +98,16 @@ export default defineComponent({
     const searchModel = ref({ season: getCurrentSeason.value, year: getCurrentYear.value });
     const { getSeries } = useSeries();
     const $q = useQuasar();
+    const showsHeight = ref(`${$q.screen.height - 123 - 138 - ($q.platform.is.mobile ? 70 : 0)}px`);
 
-    console.log($q.platform.is);
+    window.onresize = () => {
+      showsHeight.value = `${$q.screen.height - 123 - 138 - ($q.platform.is.mobile ? 70 : 0)}px`;
+    };
 
     return {
       series: getSeries,
       searchModel,
+      showsHeight,
       currentSeason: getCurrentSeason,
       currentYear: getCurrentYear,
       isLoading: isLoading(),
@@ -114,6 +121,9 @@ export default defineComponent({
     },
     onAddSeason() {
       setType(SidebarType.ADD_SEASON);
+    },
+    onSyncLocal() {
+      setType(SidebarType.SYNC_LOCAL);
     },
     async onSeason(newValue: string, field: string) {
       if (field === 'season') {
@@ -136,6 +146,21 @@ export default defineComponent({
 
       window.location.href = decodeURIComponent(url);
     },
+    async onExportShows() {
+      const results = await SeriesService.exportShows();
+      const csv = json2csv(results);
+      const blob = new Blob([csv], {
+        type: 'text/csv', // or whatever your Content-Type is
+      });
+
+      const aElement = document.createElement('a');
+      aElement.setAttribute('download', 'export.csv');
+      const href = URL.createObjectURL(blob);
+      aElement.href = href;
+      aElement.setAttribute('target', '_blank');
+      aElement.click();
+      URL.revokeObjectURL(href);
+    },
   },
 });
 </script>
@@ -150,7 +175,7 @@ export default defineComponent({
 .floating-button {
   position: fixed;
   bottom: 30px;
-  right: 40px;
+  right: 55px;
 }
 
 .settings {
@@ -164,15 +189,8 @@ export default defineComponent({
 .shows__items {
   overflow: auto;
   padding-right: 20px;
-  height: 77vh;
+  height: v-bind(showsHeight);
 }
-
-.is-mobile {
-  .shows__items {
-    height: 63vh;
-  }
-}
-
 
 .series-card__signin,
 .series-card__sync {

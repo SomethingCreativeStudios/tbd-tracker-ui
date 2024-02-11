@@ -61,6 +61,7 @@ import { service as NyaaService } from '~/services/nyaa.service';
 import { useSeries, useSidebar, useDownload } from '~/composables';
 import { SidebarType } from '~/types/sidebar/sidebar.enum';
 import { WatchingStatus } from '~/types/series/watching-status.enum';
+import { NyaaItem } from '~/types/nyaa/nyaa-item.model';
 
 const { isSyncing, getFilteredQueue, removeShow } = useSeries();
 const { setType } = useSidebar();
@@ -126,9 +127,17 @@ export default defineComponent({
       type: String as PropType<WatchingStatus>,
       default: WatchingStatus.WATCHING,
     },
+
+    showQueue: {
+      type: Array as PropType<NyaaItem[]>,
+      default: () => [],
+    },
   },
   setup(props) {
-    const queueItems = getFilteredQueue(props.id, false);
+    const queueItems = computed(() => {
+      console.log(props.title, getFilteredQueue(props.id, false).value);
+      return getFilteredQueue(props.id, false).value;
+    });
 
     const mainClass = computed(() => ({
       'has-tags': props.tags.length > 0,

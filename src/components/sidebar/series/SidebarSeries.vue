@@ -57,7 +57,16 @@
         </q-input>
 
         <q-select label="Genres" color="secondary" v-model="series.genres" use-input use-chips multiple @new-value="onNewValue('genres', $event)" />
-        <q-select label="Tags" color="secondary" v-model="series.tags" use-input use-chips multiple @new-value="onNewValue('tags', $event)" />
+        <q-select
+          label="Tags"
+          color="secondary"
+          v-model="series.tags"
+          :options="existingTags"
+          use-input
+          use-chips
+          multiple
+          @new-value="onNewValue('tags', $event)"
+        />
 
         <q-separator color="secondary" inset />
 
@@ -127,7 +136,7 @@ import { Series } from '~/types/series/series.model';
 import { SidebarType } from '~/types/sidebar/sidebar.enum';
 import { SeasonName } from '~/types/season/season-name.enum';
 
-const { getSeries, updateShow, syncWithMal } = useSeries();
+const { getSeries, updateShow, syncWithMal, getExistingTags } = useSeries();
 const { getFolderNames } = useSetting();
 const { setType } = useSidebar();
 
@@ -162,6 +171,7 @@ export default defineComponent({
       seasons: [SeasonName.FALL, SeasonName.WINTER, SeasonName.SUMMER, SeasonName.SPRING],
       startingSeries: foundSeries,
       folderNames: getFolderNames,
+      existingTags: getExistingTags(),
     };
   },
 
@@ -175,8 +185,9 @@ export default defineComponent({
     openInMal() {
       window.open(`https://myanimelist.net/anime/${this.series?.malId as string}`);
     },
-    onSync() {
-      syncWithMal(this.series.id);
+    async onSync() {
+      await syncWithMal(this.series.id);
+      setType(SidebarType.NONE);
     },
     onFolderAdd() {
       console.log('1 2 and Folder Add');
